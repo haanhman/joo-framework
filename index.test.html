@@ -1,0 +1,99 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link href="static/css/default/ui.css" rel="stylesheet" type="text/css" />
+		<link href="static/css/default/portlet.css" rel="stylesheet" type="text/css" />
+		<link href="static/css/default/sample.css" rel="stylesheet" type="text/css" />
+		<link href="static/js/thirdparty/colorpicker/css/colorpicker.css" rel="stylesheet" type="text/css" />
+	</head>
+	
+    <body>
+        <!-- required libraries -->
+        <script type="text/javascript" src="static/js/lib/jquery-1.7.1.min.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.ui.core.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.ui.widget.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.ui.mouse.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.ui.draggable.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.ui.droppable.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.effects.core.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.effects.bounce.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.json-2.2.js"></script>
+		<script type="text/javascript" src="static/js/lib/jquery.cookie.js"></script>
+		<script type="text/javascript" src="static/js/lib/inherit.js"></script>
+		<script type="text/javascript" src="static/js/lib/micro-templating.js"></script>
+		<script type="text/javascript" src="static/js/lib/kinetic-v3.7.3.js"></script>
+		
+		<!-- 3rd party library -->
+		<script type="text/javascript" src="static/js/thirdparty/colorpicker/colorpicker.js"></script>
+		
+        <!-- framework -->
+        <script type="text/javascript" src="static/js/framework/base.js"></script>
+		<script type="text/javascript" src="static/js/framework/ui.base.js"></script>
+		<script type="text/javascript" src="static/js/framework/ui.interfaces.js"></script>
+		<script type="text/javascript" src="static/js/framework/ui.controls.js"></script>
+		<script type="text/javascript" src="static/js/framework/ui.extras.js"></script>
+		<script type="text/javascript" src="static/js/framework/ui.experimental.js"></script>
+        <script type="text/javascript" src="static/js/framework/event.js"></script>
+        <script type="text/javascript" src="static/js/framework/observer.js"></script>
+        <script type="text/javascript" src="static/js/framework/plugins.js"></script>
+        <script type="text/javascript" src="static/js/framework/page.js"></script>
+        <script type="text/javascript" src="static/js/framework/portlet.js"></script>
+        <script type="text/javascript" src="static/js/framework/request.js"></script>
+        <script type="text/javascript" src="static/js/framework/bootstrap.js"></script>
+        <script type="text/javascript" src="static/js/framework/utils.js"></script>
+		<script type="text/javascript" src="static/js/framework/memcached.js"></script>
+		
+		<!-- application bootstrap -->
+		
+		<!-- application plugins -->
+		
+		<!-- application portlets -->
+		<script type="text/javascript" src="static/js/app/portlets/samples/SamplePortlet.js"></script>
+
+		<!-- addons -->
+
+		<!-- entry-point -->
+		
+		<script type="text/javascript" src="static/js/app/appinfo.js"></script>
+
+        <div id="Application-Main"></div>
+		<!-- indicate the application main area, as specified in index.default.js -->
+		
+		Number of spawn objects: <input type="text" id="no" /><br />
+		Size: <input type="text" id="size" value='5' /><br />
+		<button onclick="regressTest($('#no').val(),$('#size').val())">Start test</button>
+		
+		<script type="text/javascript">
+			//stage
+			var stage = new Stage({id: 'Application-Main'});
+			var master;
+			
+			function regressTest(val,size) {
+				if (master != undefined) {
+					stage.removeChild(master);
+				}
+				master = new Sketch({width: 400, height: 300});
+				master.setLayout('flow');
+				stage.addChild(master);
+				for(var i=0; i<val; i++) {
+					var red = Math.round(Math.random()*256);
+					var green = Math.round(Math.random()*256);
+					var blue = Math.round(Math.random()*256);
+					var bg = 'rgb('+((red+i)%255)+', '+((green+i)%255)+', '+((blue+i)%255)+')';
+					var div = new Sketch({width: size, height: size, backgroundColor: bg});
+					div.addEventListener('mouseover', function() {
+						this.setStyle('background-color', 'white');
+					});
+					div.addEventListener('mouseout', function() {
+						var bg = 'rgb('+Math.round(Math.random()*256)+', '+Math.round(Math.random()*256)+', '+Math.round(Math.random()*256)+')';
+						this.setStyle('background-color', bg);
+					});
+					master.addChild(div);
+				}
+				setTimeout(function() {
+					regressTest(val,size);
+				}, 1000);
+			}
+		</script>
+</body>
+</html>

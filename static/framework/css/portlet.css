@@ -1,0 +1,3 @@
+.portlet-data, .page_template, .doNotDisplay, .plugin-data	{
+	display: none !important;
+}

@@ -1,0 +1,41 @@
+<!-- indicate the effective area, required by Joo Framework -->
+<div id="effective-area">
+	<div id="container">
+		<div id="header"></div>
+		<div id="wrapper">
+			<div id="left"></div>
+			<div id="main"></div>
+			<div id="right"></div>
+		</div><!-- wrapper -->
+		<div id="footer"></div>
+	</div><!-- container -->
+</div><!-- effective-area -->
+<div id="Portlets-Layout">
+	<script type="text/html" id="portlets-Layout">
+		{
+			portlets:
+			[
+			],
+			plugins:
+			[
+			]
+		}
+	</script>
+	
+	<script type="text/html" id="portlets-Home">
+		{
+			portlets:
+			[
+			{ portlet: 'SamplePortlet', position: 'main' }
+			],
+			plugins:
+			[
+			],
+			parent: 'Layout'
+		}
+	</script>
+</div>
+<!-- plugin template -->
+<div class="plugin-data">
+	<!-- all plugin templates go here -->
+</div>
