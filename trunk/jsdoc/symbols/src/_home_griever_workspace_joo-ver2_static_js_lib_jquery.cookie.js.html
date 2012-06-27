@@ -1,0 +1,99 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/*jslint browser: true */</span><span class="WHIT"> </span><span class="COMM">/*global jQuery: true */</span><span class="WHIT">
+<span class='line'>  2</span> 
+<span class='line'>  3</span> </span><span class="COMM">/**
+<span class='line'>  4</span>  * jQuery Cookie plugin
+<span class='line'>  5</span>  *
+<span class='line'>  6</span>  * Copyright (c) 2010 Klaus Hartl (stilbuero.de)
+<span class='line'>  7</span>  * Dual licensed under the MIT and GPL licenses:
+<span class='line'>  8</span>  * http://www.opensource.org/licenses/mit-license.php
+<span class='line'>  9</span>  * http://www.gnu.org/licenses/gpl.html
+<span class='line'> 10</span>  *
+<span class='line'> 11</span>  */</span><span class="WHIT">
+<span class='line'> 12</span> 
+<span class='line'> 13</span> </span><span class="COMM">// TODO JsDoc</span><span class="WHIT">
+<span class='line'> 14</span> 
+<span class='line'> 15</span> </span><span class="COMM">/**
+<span class='line'> 16</span>  * Create a cookie with the given key and value and other optional parameters.
+<span class='line'> 17</span>  *
+<span class='line'> 18</span>  * @example $.cookie('the_cookie', 'the_value');
+<span class='line'> 19</span>  * @desc Set the value of a cookie.
+<span class='line'> 20</span>  * @example $.cookie('the_cookie', 'the_value', { expires: 7, path: '/', domain: 'jquery.com', secure: true });
+<span class='line'> 21</span>  * @desc Create a cookie with all available options.
+<span class='line'> 22</span>  * @example $.cookie('the_cookie', 'the_value');
+<span class='line'> 23</span>  * @desc Create a session cookie.
+<span class='line'> 24</span>  * @example $.cookie('the_cookie', null);
+<span class='line'> 25</span>  * @desc Delete a cookie by passing null as value. Keep in mind that you have to use the same path and domain
+<span class='line'> 26</span>  *       used when the cookie was set.
+<span class='line'> 27</span>  *
+<span class='line'> 28</span>  * @param String key The key of the cookie.
+<span class='line'> 29</span>  * @param String value The value of the cookie.
+<span class='line'> 30</span>  * @param Object options An object literal containing key/value pairs to provide optional cookie attributes.
+<span class='line'> 31</span>  * @option Number|Date expires Either an integer specifying the expiration date from now on in days or a Date object.
+<span class='line'> 32</span>  *                             If a negative value is specified (e.g. a date in the past), the cookie will be deleted.
+<span class='line'> 33</span>  *                             If set to null or omitted, the cookie will be a session cookie and will not be retained
+<span class='line'> 34</span>  *                             when the the browser exits.
+<span class='line'> 35</span>  * @option String path The value of the path atribute of the cookie (default: path of page that created the cookie).
+<span class='line'> 36</span>  * @option String domain The value of the domain attribute of the cookie (default: domain of page that created the cookie).
+<span class='line'> 37</span>  * @option Boolean secure If true, the secure attribute of the cookie will be set and the cookie transmission will
+<span class='line'> 38</span>  *                        require a secure protocol (like HTTPS).
+<span class='line'> 39</span>  * @type undefined
+<span class='line'> 40</span>  *
+<span class='line'> 41</span>  * @name $.cookie
+<span class='line'> 42</span>  * @cat Plugins/Cookie
+<span class='line'> 43</span>  * @author Klaus Hartl/klaus.hartl@stilbuero.de
+<span class='line'> 44</span>  */</span><span class="WHIT">
+<span class='line'> 45</span> 
+<span class='line'> 46</span> </span><span class="COMM">/**
+<span class='line'> 47</span>  * Get the value of a cookie with the given key.
+<span class='line'> 48</span>  *
+<span class='line'> 49</span>  * @example $.cookie('the_cookie');
+<span class='line'> 50</span>  * @desc Get the value of a cookie.
+<span class='line'> 51</span>  *
+<span class='line'> 52</span>  * @param String key The key of the cookie.
+<span class='line'> 53</span>  * @return The value of the cookie.
+<span class='line'> 54</span>  * @type String
+<span class='line'> 55</span>  *
+<span class='line'> 56</span>  * @name $.cookie
+<span class='line'> 57</span>  * @cat Plugins/Cookie
+<span class='line'> 58</span>  * @author Klaus Hartl/klaus.hartl@stilbuero.de
+<span class='line'> 59</span>  */</span><span class="WHIT">
+<span class='line'> 60</span> </span><span class="NAME">jQuery.cookie</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">key</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">value</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 61</span> </span><span class="WHIT">    
+<span class='line'> 62</span>     </span><span class="COMM">// key and at least value given, set cookie...</span><span class="WHIT">
+<span class='line'> 63</span> </span><span class="WHIT">    </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">arguments.length</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NUMB">1</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">String</span><span class="PUNC">(</span><span class="NAME">value</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="STRN">"[object Object]"</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 64</span> </span><span class="WHIT">        </span><span class="NAME">options</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">jQuery.extend</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 65</span> 
+<span class='line'> 66</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">value</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">value</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 67</span> </span><span class="WHIT">            </span><span class="NAME">options.expires</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="NUMB">1</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 68</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 69</span> 
+<span class='line'> 70</span> </span><span class="WHIT">        </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">typeof</span><span class="WHIT"> </span><span class="NAME">options.expires</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">'number'</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 71</span> </span><span class="WHIT">            </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">days</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">options.expires</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">t</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">options.expires</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Date</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 72</span> </span><span class="WHIT">            </span><span class="NAME">t.setDate</span><span class="PUNC">(</span><span class="NAME">t.getDate</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">days</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 73</span> </span><span class="WHIT">        </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 74</span> </span><span class="WHIT">        
+<span class='line'> 75</span>         </span><span class="NAME">value</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">String</span><span class="PUNC">(</span><span class="NAME">value</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 76</span> </span><span class="WHIT">        
+<span class='line'> 77</span>         </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">document.cookie</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="WHIT">
+<span class='line'> 78</span> </span><span class="WHIT">            </span><span class="NAME">encodeURIComponent</span><span class="PUNC">(</span><span class="NAME">key</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">'='</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 79</span> </span><span class="WHIT">            </span><span class="NAME">options.raw</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="NAME">value</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">encodeURIComponent</span><span class="PUNC">(</span><span class="NAME">value</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 80</span> </span><span class="WHIT">            </span><span class="NAME">options.expires</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="STRN">'; expires='</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">options.expires.toUTCString</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">''</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="COMM">// use expires attribute, max-age is not supported by IE</span><span class="WHIT">
+<span class='line'> 81</span> </span><span class="WHIT">            </span><span class="NAME">options.path</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="STRN">'; path='</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">options.path</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">''</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 82</span> </span><span class="WHIT">            </span><span class="NAME">options.domain</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="STRN">'; domain='</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">options.domain</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">''</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 83</span> </span><span class="WHIT">            </span><span class="NAME">options.secure</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="STRN">'; secure'</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">''</span><span class="WHIT">
+<span class='line'> 84</span> </span><span class="WHIT">        </span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">join</span><span class="PUNC">(</span><span class="STRN">''</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 85</span> </span><span class="WHIT">    </span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 86</span> 
+<span class='line'> 87</span> </span><span class="WHIT">    </span><span class="COMM">// key and possibly options given, get cookie...</span><span class="WHIT">
+<span class='line'> 88</span> </span><span class="WHIT">    </span><span class="NAME">options</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">value</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 89</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">result</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">decode</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">options.raw</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">s</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">s</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">decodeURIComponent</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 90</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">result</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">RegExp</span><span class="PUNC">(</span><span class="STRN">'(?:^|; )'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">encodeURIComponent</span><span class="PUNC">(</span><span class="NAME">key</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'=([^;]*)'</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">exec</span><span class="PUNC">(</span><span class="NAME">document.cookie</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="NAME">decode</span><span class="PUNC">(</span><span class="NAME">result</span><span class="PUNC">[</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 91</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 92</span> </span></pre></body></html>

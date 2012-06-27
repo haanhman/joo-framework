@@ -1,0 +1,568 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
+<span class='line'>  2</span>  * @class A component used as a view of 1 portlet.
+<span class='line'>  3</span>  * Further version will allow user to interact with
+<span class='line'>  4</span>  * the portlet.
+<span class='line'>  5</span>  * @augments Graphic
+<span class='line'>  6</span>  */</span><span class="WHIT">
+<span class='line'>  7</span> </span><span class="NAME">PortletCanvas</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Graphic.extend</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>  8</span> 
+<span class='line'>  9</span> </span><span class="WHIT">	</span><span class="NAME">setupBase</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">config</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 10</span> </span><span class="WHIT">		</span><span class="NAME">this._appendBaseClass</span><span class="PUNC">(</span><span class="STRN">'PortletCanvas'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 11</span> </span><span class="WHIT">		</span><span class="NAME">this._super</span><span class="PUNC">(</span><span class="NAME">config</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 12</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 13</span> </span><span class="WHIT">	
+<span class='line'> 14</span> 	</span><span class="NAME">setupDomObject</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">config</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 15</span> </span><span class="WHIT">		</span><span class="NAME">this._super</span><span class="PUNC">(</span><span class="NAME">config</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 16</span> </span><span class="WHIT">		</span><span class="NAME">this.access</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">addClass</span><span class="PUNC">(</span><span class="STRN">'portlet'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 17</span> </span><span class="WHIT">		</span><span class="NAME">this.access</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">addClass</span><span class="PUNC">(</span><span class="STRN">'portlet-canvas'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 18</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 19</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 20</span> 
+<span class='line'> 21</span> </span><span class="COMM">/**
+<span class='line'> 22</span>  * @class An interface for all portlets.
+<span class='line'> 23</span>  * A portlet is a pluggable UI components that is managed
+<span class='line'> 24</span>  * and rendered by JOO framework. A portlet is independent
+<span class='line'> 25</span>  * from the rest of the application.
+<span class='line'> 26</span>  * @interface
+<span class='line'> 27</span>  */</span><span class="WHIT">
+<span class='line'> 28</span> </span><span class="NAME">PortletInterface</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">InterfaceImplementor.extend</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 29</span> </span><span class="WHIT">	</span><span class="NAME">implement</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">obj</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 30</span> </span><span class="WHIT">		
+<span class='line'> 31</span> 		</span><span class="NAME">obj.prototype.toString</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">obj.prototype.toString</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 32</span> </span><span class="WHIT">			</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getName</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 33</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 34</span> </span><span class="WHIT">		
+<span class='line'> 35</span> 		</span><span class="COMM">/**
+<span class='line'> 36</span> 		 * Get the name of the portlet. By default, it equals to the className of the
+<span class='line'> 37</span> 		 * portlet.
+<span class='line'> 38</span> 		 * @methodOf PortletInterface#
+<span class='line'> 39</span> 		 * @name getName
+<span class='line'> 40</span> 		 * @returns {String} The name of the portlet.
+<span class='line'> 41</span> 		 */</span><span class="WHIT">
+<span class='line'> 42</span> </span><span class="WHIT">		</span><span class="NAME">obj.prototype.getName</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">obj.prototype.getName</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 43</span> </span><span class="WHIT">			</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.className</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 44</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 45</span> </span><span class="WHIT">		
+<span class='line'> 46</span> 		</span><span class="COMM">/**
+<span class='line'> 47</span> 		 * Called automatically by JOO framework when the portlet is initialized.
+<span class='line'> 48</span> 		 * @methodOf PortletInterface#
+<span class='line'> 49</span> 		 * @name onBegin
+<span class='line'> 50</span> 		 */</span><span class="WHIT">
+<span class='line'> 51</span> </span><span class="WHIT">		</span><span class="NAME">obj.prototype.onBegin</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">obj.prototype.onBegin</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 52</span> </span><span class="WHIT">		
+<span class='line'> 53</span> 		</span><span class="COMM">/**
+<span class='line'> 54</span> 		 * Called automatically by JOO framework when the portlet is loaded into DOM.
+<span class='line'> 55</span> 		 * @methodOf PortletInterface#
+<span class='line'> 56</span> 		 * @name run
+<span class='line'> 57</span> 		 */</span><span class="WHIT">
+<span class='line'> 58</span> </span><span class="WHIT">		</span><span class="NAME">obj.prototype.run</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">obj.prototype.run</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 59</span> </span><span class="WHIT">		
+<span class='line'> 60</span> 		</span><span class="COMM">/**
+<span class='line'> 61</span> 		 * Called automatically by JOO framework when the portlet is reloaded.
+<span class='line'> 62</span> 		 * @methodOf PortletInterface#
+<span class='line'> 63</span> 		 * @name onReloadPage
+<span class='line'> 64</span> 		 */</span><span class="WHIT">
+<span class='line'> 65</span> </span><span class="WHIT">		</span><span class="NAME">obj.prototype.onReloadPage</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">obj.prototype.onReloadPage</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 66</span> </span><span class="WHIT">		
+<span class='line'> 67</span> 		</span><span class="COMM">/**
+<span class='line'> 68</span> 		 * Called automatically by JOO framework when the portlet is no longer needed.
+<span class='line'> 69</span> 		 * @methodOf PortletInterface#
+<span class='line'> 70</span> 		 * @name onEnd
+<span class='line'> 71</span> 		 */</span><span class="WHIT">
+<span class='line'> 72</span> </span><span class="WHIT">		</span><span class="NAME">obj.prototype.onEnd</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">obj.prototype.onEnd</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 73</span> </span><span class="WHIT">		
+<span class='line'> 74</span> 		</span><span class="COMM">/**
+<span class='line'> 75</span> 		 * Get the placeholder (container) of the portlet.
+<span class='line'> 76</span> 		 * @methodOf PortletInterface#
+<span class='line'> 77</span> 		 * @name getPortletPlaceholder
+<span class='line'> 78</span> 		 * @returns {PortletPlaceholder} the placeholder of the portlet
+<span class='line'> 79</span> 		 */</span><span class="WHIT">
+<span class='line'> 80</span> </span><span class="WHIT">		</span><span class="NAME">obj.prototype.getPortletPlaceholder</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">obj.prototype.getPortletPlaceholder</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 81</span> </span><span class="WHIT">			</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.placeholder</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 82</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 83</span> </span><span class="WHIT">		
+<span class='line'> 84</span> 		</span><span class="COMM">/**
+<span class='line'> 85</span> 		 * Change the placeholder (container) of the portlet.
+<span class='line'> 86</span> 		 * This method is not intended to be used by developers.
+<span class='line'> 87</span> 		 * @methodOf PortletInterface#
+<span class='line'> 88</span> 		 * @name setPortletPlaceholder
+<span class='line'> 89</span> 		 * @param {PortletPlaceholder} plhd the new placeholder of the portlet
+<span class='line'> 90</span> 		 */</span><span class="WHIT">
+<span class='line'> 91</span> </span><span class="WHIT">		</span><span class="NAME">obj.prototype.setPortletPlaceholder</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">obj.prototype.setPortletPlaceholder</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">plhd</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 92</span> </span><span class="WHIT">			</span><span class="NAME">this.placeholder</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">plhd</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 93</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 94</span> </span><span class="WHIT">		
+<span class='line'> 95</span> 		</span><span class="COMM">/**
+<span class='line'> 96</span> 		 * Get the page instance
+<span class='line'> 97</span> 		 * @methodOf PortletInterface#
+<span class='line'> 98</span> 		 * @name getPage
+<span class='line'> 99</span> 		 * @returns {Page} the page instance
+<span class='line'>100</span> 		 */</span><span class="WHIT">
+<span class='line'>101</span> </span><span class="WHIT">		</span><span class="NAME">obj.prototype.getPage</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">obj.prototype.getPage</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>102</span> </span><span class="WHIT">			</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">SingletonFactory.getInstance</span><span class="PUNC">(</span><span class="NAME">Page</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>103</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>104</span> </span><span class="WHIT">		
+<span class='line'>105</span> 		</span><span class="COMM">/**
+<span class='line'>106</span> 		 * Get the init parameters of the portlet. These parameters are
+<span class='line'>107</span> 		 * usually configured in a &lt;code>layout.txt&lt;/code>
+<span class='line'>108</span> 		 * @methodOf PortletInterface#
+<span class='line'>109</span> 		 * @name getInitParameters
+<span class='line'>110</span> 		 * @param {Page} the page instance
+<span class='line'>111</span> 		 */</span><span class="WHIT">
+<span class='line'>112</span> </span><span class="WHIT">		</span><span class="NAME">obj.prototype.getInitParameters</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">obj.prototype.getInitParameters</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>113</span> </span><span class="WHIT">			</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.initParams</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>114</span> </span><span class="WHIT">				</span><span class="NAME">this.initParams</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Array</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>115</span> </span><span class="WHIT">			</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.initParams</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>116</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>117</span> </span><span class="WHIT">		
+<span class='line'>118</span> 		</span><span class="COMM">/**
+<span class='line'>119</span> 		 * Change the init parameters. This method is not intended to be used
+<span class='line'>120</span> 		 * by developers.
+<span class='line'>121</span> 		 * @methodOf PortletInterface#
+<span class='line'>122</span> 		 * @name setInitParameters 
+<span class='line'>123</span> 		 * @param {Object} params the init parameters
+<span class='line'>124</span> 		 */</span><span class="WHIT">
+<span class='line'>125</span> </span><span class="WHIT">		</span><span class="NAME">obj.prototype.setInitParameters</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">obj.prototype.setInitParameters</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>126</span> </span><span class="WHIT">			</span><span class="NAME">this.initParams</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">params</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>127</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>128</span> </span><span class="WHIT">		
+<span class='line'>129</span> 		</span><span class="COMM">/**
+<span class='line'>130</span> 		 * Get the current request
+<span class='line'>131</span> 		 * @methodOf PortletInterface#
+<span class='line'>132</span> 		 * @name getRequest
+<span class='line'>133</span> 		 * @param {Request} the current request
+<span class='line'>134</span> 		 */</span><span class="WHIT">
+<span class='line'>135</span> </span><span class="WHIT">		</span><span class="NAME">obj.prototype.getRequest</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">obj.prototype.getRequest</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>136</span> </span><span class="WHIT">			</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getPage</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">getRequest</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>137</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>138</span> </span><span class="WHIT">		
+<span class='line'>139</span> 		</span><span class="NAME">obj.prototype.requestForMatchingEffectiveResource</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">obj.prototype.requestForMatchingEffectiveResource</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">resourceName</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">condition</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>140</span> </span><span class="WHIT">			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">app</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SingletonFactory.getInstance</span><span class="PUNC">(</span><span class="NAME">Application</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>141</span> </span><span class="WHIT">			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">rm</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">app.getResourceManager</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>142</span> </span><span class="WHIT">			</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">rm.requestForCustomResource</span><span class="PUNC">(</span><span class="STRN">"#effective-area #"</span><span class="PUNC">+</span><span class="NAME">this.getName</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">+</span><span class="STRN">"-"</span><span class="PUNC">+</span><span class="NAME">resourceName</span><span class="PUNC">+</span><span class="STRN">" "</span><span class="PUNC">+</span><span class="NAME">condition</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>143</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>144</span> </span><span class="WHIT">		
+<span class='line'>145</span> 		</span><span class="COMM">/**
+<span class='line'>146</span> 		 * Get the portlet resource. This resource resides in the portlet template
+<span class='line'>147</span> 		 * and is not visible to users.
+<span class='line'>148</span> 		 * @methodOf PortletInterface#
+<span class='line'>149</span> 		 * @name getPortletResource
+<span class='line'>150</span> 		 * @param resourceName the name (or ID) of the resource
+<span class='line'>151</span> 		 * @returns {Resource} the portlet (means template) resource with matching name
+<span class='line'>152</span> 		 */</span><span class="WHIT">
+<span class='line'>153</span> </span><span class="WHIT">		</span><span class="NAME">obj.prototype.getPortletResource</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">obj.prototype.getPortletResource</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">resourceName</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>154</span> </span><span class="WHIT">			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">app</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SingletonFactory.getInstance</span><span class="PUNC">(</span><span class="NAME">Application</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>155</span> </span><span class="WHIT">			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">rm</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">app.getResourceManager</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>156</span> </span><span class="WHIT">			</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">rm.requestForCustomResource</span><span class="PUNC">(</span><span class="STRN">"#"</span><span class="PUNC">+</span><span class="NAME">this.getName</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">+</span><span class="STRN">"-RootData #"</span><span class="PUNC">+</span><span class="NAME">this.getName</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">+</span><span class="STRN">"-"</span><span class="PUNC">+</span><span class="NAME">resourceName</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>157</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>158</span> </span><span class="WHIT">		
+<span class='line'>159</span> 		</span><span class="COMM">/**
+<span class='line'>160</span> 		 * Get the portlet DOM resource. This resource resides in the portlet rendered
+<span class='line'>161</span> 		 * content and is visible to users.
+<span class='line'>162</span> 		 * @methodOf PortletInterface#
+<span class='line'>163</span> 		 * @name getDomResource
+<span class='line'>164</span> 		 * @param resourceName the name of the resource
+<span class='line'>165</span> 		 * @returns {Resource} the DOM (means rendered) resource with matching name
+<span class='line'>166</span> 		 */</span><span class="WHIT">
+<span class='line'>167</span> </span><span class="WHIT">		</span><span class="NAME">obj.prototype.getDomResource</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">obj.prototype.getDomResource</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">resourceName</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>168</span> </span><span class="WHIT">			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">app</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SingletonFactory.getInstance</span><span class="PUNC">(</span><span class="NAME">Application</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>169</span> </span><span class="WHIT">			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">rm</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">app.getResourceManager</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>170</span> </span><span class="WHIT">			</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">rm.requestForCustomResource</span><span class="PUNC">(</span><span class="STRN">"#effective-area #"</span><span class="PUNC">+</span><span class="NAME">this.getName</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">+</span><span class="STRN">"-"</span><span class="PUNC">+</span><span class="NAME">resourceName</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>171</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>172</span> </span><span class="WHIT">		
+<span class='line'>173</span> 		</span><span class="COMM">/**
+<span class='line'>174</span> 		 * Get the &lt;code>HTML ID&lt;/code> of a resource by its name.
+<span class='line'>175</span> 		 * @methodOf PortletInterface#
+<span class='line'>176</span> 		 * @name getResourceID
+<span class='line'>177</span> 		 * @param resourceName the name of the resource
+<span class='line'>178</span> 		 * @returns {String} the ID of the resource with matching name
+<span class='line'>179</span> 		 */</span><span class="WHIT">
+<span class='line'>180</span> </span><span class="WHIT">		</span><span class="NAME">obj.prototype.getResourceID</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">obj.prototype.getResourceID</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">resourceName</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>181</span> </span><span class="WHIT">			</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.getName</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">+</span><span class="STRN">"-"</span><span class="PUNC">+</span><span class="NAME">resourceName</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>182</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>183</span> </span><span class="WHIT">		
+<span class='line'>184</span> 		</span><span class="COMM">/**
+<span class='line'>185</span> 		 * Get a localized text.
+<span class='line'>186</span> 		 * @methodOf PortletInterface#
+<span class='line'>187</span> 		 * @name getLocalizedText
+<span class='line'>188</span> 		 * @param resourceName the name of the text
+<span class='line'>189</span> 		 * @returns {String} the localized text
+<span class='line'>190</span> 		 */</span><span class="WHIT">
+<span class='line'>191</span> </span><span class="WHIT">		</span><span class="NAME">obj.prototype.getLocalizedText</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">obj.prototype.getLocalizedText</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">resourceName</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>192</span> </span><span class="WHIT">			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">app</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SingletonFactory.getInstance</span><span class="PUNC">(</span><span class="NAME">Application</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>193</span> </span><span class="WHIT">			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">rm</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">app.getResourceManager</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>194</span> </span><span class="WHIT">			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">res</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">rm.requestForResource</span><span class="PUNC">(</span><span class="NAME">this.getName</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">"Text"</span><span class="PUNC">+</span><span class="NAME">resourceName</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>195</span> </span><span class="WHIT">			</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">res</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>196</span> </span><span class="WHIT">				</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>197</span> </span><span class="WHIT">			</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">res.html</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>198</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>199</span> </span><span class="WHIT">		
+<span class='line'>200</span> 		</span><span class="COMM">/**
+<span class='line'>201</span> 		 * Get a localized message. A message can be parameterized.
+<span class='line'>202</span> 		 * @methodOf PortletInterface#
+<span class='line'>203</span> 		 * @name getLocalizedMessage
+<span class='line'>204</span> 		 * @param resourceName the name of the message
+<span class='line'>205</span> 		 * @returns {String} the localized message
+<span class='line'>206</span> 		 */</span><span class="WHIT">
+<span class='line'>207</span> </span><span class="WHIT">		</span><span class="NAME">obj.prototype.getLocalizedMessage</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">obj.prototype.getLocalizedMessage</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">resourceName</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>208</span> </span><span class="WHIT">			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">app</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SingletonFactory.getInstance</span><span class="PUNC">(</span><span class="NAME">Application</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>209</span> </span><span class="WHIT">			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">rm</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">app.getResourceManager</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>210</span> </span><span class="WHIT">			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">res</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">rm.requestForResource</span><span class="PUNC">(</span><span class="NAME">this.getName</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="STRN">"Message"</span><span class="PUNC">+</span><span class="NAME">resourceName</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>211</span> </span><span class="WHIT">			</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">res</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>212</span> </span><span class="WHIT">				</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>213</span> </span><span class="WHIT">			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">unresolved</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">res.html</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>214</span> </span><span class="WHIT">			
+<span class='line'>215</span> 			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">resolved</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">unresolved</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>216</span> </span><span class="WHIT">			</span><span class="COMM">//resolved string pattern</span><span class="WHIT">
+<span class='line'>217</span> </span><span class="WHIT">			</span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">1</span><span class="PUNC">;</span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">arguments.length</span><span class="PUNC">;</span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>218</span> </span><span class="WHIT">				</span><span class="NAME">resolved</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">resolved.replace</span><span class="PUNC">(</span><span class="STRN">"%"</span><span class="PUNC">+</span><span class="NAME">i</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>219</span> </span><span class="WHIT">			</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>220</span> </span><span class="WHIT">			</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">resolved</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>221</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>222</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>223</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>224</span> 
+<span class='line'>225</span> </span><span class="COMM">/**
+<span class='line'>226</span>  * @class An interface for all components which need rendering.
+<span class='line'>227</span>  * The &lt;code>RenderInterface&lt;/code> is commonly used in 
+<span class='line'>228</span>  * user-defined &lt;code>Portlet&lt;/code>. Note that a component can
+<span class='line'>229</span>  * have multiple extra views besides the main view. In this case,
+<span class='line'>230</span>  * developers should use &lt;code>renderView&lt;/code> method.
+<span class='line'>231</span>  * @interface
+<span class='line'>232</span>  */</span><span class="WHIT">
+<span class='line'>233</span> </span><span class="NAME">RenderInterface</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">InterfaceImplementor.extend</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>234</span> </span><span class="WHIT">	
+<span class='line'>235</span> 	</span><span class="NAME">onModelChange</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>236</span> </span><span class="WHIT">		
+<span class='line'>237</span> 	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>238</span> </span><span class="WHIT">	
+<span class='line'>239</span> 	</span><span class="NAME">implement</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">obj</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>240</span> </span><span class="WHIT">		</span><span class="COMM">/**
+<span class='line'>241</span> 		 * Render the component using microtemplating mechanism.
+<span class='line'>242</span> 		 * The component must supply the following:
+<span class='line'>243</span> 		 * &lt;p>
+<span class='line'>244</span> 		 * 	&lt;ul>
+<span class='line'>245</span> 		 *  	&lt;li>A &lt;code>viewId&lt;/code> or implement &lt;code>getName&lt;/code> method&lt;/li>
+<span class='line'>246</span> 		 *  	&lt;li>An optional &lt;code>model&lt;/code> which is a Javascript object&lt;/li>
+<span class='line'>247</span> 		 *  	&lt;li>A template, which must exists in DOM before this method is called.
+<span class='line'>248</span> 		 *  		The template should be a &lt;code>script&lt;/code> element, with 
+<span class='line'>249</span> 		 *  		&lt;i>&lt;code>text/html&lt;/code>&lt;/i> &lt;code>type&lt;/code> attributes.
+<span class='line'>250</span> 		 *  		The &lt;code>id&lt;/code> of the template is the &lt;code>viewId&lt;/code>
+<span class='line'>251</span> 		 *  		followed by "View".
+<span class='line'>252</span> 		 *  		&lt;br />For example, suppose the &lt;code>viewId&lt;/code> of the component
+<span class='line'>253</span> 		 *  		is MyComponent, then the &lt;code>id&lt;/code> should be MyComponentView.
+<span class='line'>254</span> 		 *  	&lt;/li>
+<span class='line'>255</span> 		 *  &lt;/ul>
+<span class='line'>256</span> 		 * &lt;/p>
+<span class='line'>257</span> 		 * @name render
+<span class='line'>258</span> 		 * @methodOf RenderInterface#
+<span class='line'>259</span> 		 * @returns {String} the rendered content of the component
+<span class='line'>260</span> 		 */</span><span class="WHIT">
+<span class='line'>261</span> </span><span class="WHIT">		</span><span class="NAME">obj.prototype.render</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">obj.prototype.render</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>262</span> </span><span class="WHIT">			</span><span class="NAME">this.viewId</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.viewId</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">this.getName</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">+</span><span class="STRN">"View"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>263</span> </span><span class="WHIT">			</span><span class="NAME">this.model</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.model</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">JOOModel.from</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>264</span> </span><span class="COMM">//			if(this.viewId == undefined || this.model == undefined){</span><span class="WHIT">
+<span class='line'>265</span> </span><span class="COMM">//				throw "No viewId or model for rendering";</span><span class="WHIT">
+<span class='line'>266</span> </span><span class="COMM">//			}</span><span class="WHIT">
+<span class='line'>267</span> </span><span class="WHIT">			</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">tmpl</span><span class="PUNC">(</span><span class="NAME">this.viewId</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.model</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>268</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>269</span> 
+<span class='line'>270</span> </span><span class="WHIT">		</span><span class="COMM">/**
+<span class='line'>271</span> 		 * Render a specific view the component using microtemplating mechanism.
+<span class='line'>272</span> 		 * The component must supply the following:
+<span class='line'>273</span> 		 * &lt;p>
+<span class='line'>274</span> 		 * 	&lt;ul>
+<span class='line'>275</span> 		 *  	&lt;li>A &lt;code>viewId&lt;/code> or implement &lt;code>getName&lt;/code> method&lt;/li>
+<span class='line'>276</span> 		 *  	&lt;li>A view template, which must exists in DOM before this method is called.
+<span class='line'>277</span> 		 *  		The template should be a &lt;code>script&lt;/code> element, with 
+<span class='line'>278</span> 		 *  		&lt;i>&lt;code>text/html&lt;/code>&lt;/i> &lt;code>type&lt;/code> attributes.
+<span class='line'>279</span> 		 *  		The &lt;code>id&lt;/code> of the template is the &lt;code>viewId&lt;/code>
+<span class='line'>280</span> 		 *  		followed by "-" and the &lt;code>view&lt;/code> parameters.
+<span class='line'>281</span> 		 *  		&lt;br />For example, suppose the &lt;code>viewId&lt;/code> of the component
+<span class='line'>282</span> 		 *  		is MyComponent, then calling &lt;code>this.renderView("FirstView", {})&lt;/code>
+<span class='line'>283</span> 		 *  		inside the component will render the template with &lt;code>id&lt;/code> 
+<span class='line'>284</span> 		 *  		MyComponent-FirstView.
+<span class='line'>285</span> 		 *  	&lt;/li>
+<span class='line'>286</span> 		 *  &lt;/ul>
+<span class='line'>287</span> 		 * &lt;/p>
+<span class='line'>288</span> 		 * @methodOf RenderInterface#
+<span class='line'>289</span> 		 * @name renderView
+<span class='line'>290</span> 		 * @returns {String} the rendered view of the component
+<span class='line'>291</span> 		 */</span><span class="WHIT">
+<span class='line'>292</span> </span><span class="WHIT">		</span><span class="NAME">obj.prototype.renderView</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">obj.prototype.renderView</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">view</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">model</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>293</span> </span><span class="WHIT">			</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">tmpl</span><span class="PUNC">(</span><span class="PUNC">(</span><span class="NAME">this.viewId</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">this.getName</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">+</span><span class="STRN">"-"</span><span class="PUNC">+</span><span class="NAME">view</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">model</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>294</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>295</span> </span><span class="WHIT">		
+<span class='line'>296</span> 		</span><span class="COMM">/**
+<span class='line'>297</span> 		 * Display and bind the model to the view.
+<span class='line'>298</span> 		 * @methodOf RenderInterface#
+<span class='line'>299</span> 		 * @name displayAndBind
+<span class='line'>300</span> 		 */</span><span class="WHIT">
+<span class='line'>301</span> </span><span class="WHIT">		</span><span class="NAME">obj.prototype.displayAndBind</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">obj.prototype.displayAndBind</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>302</span> </span><span class="WHIT">			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">_self</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">this</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>303</span> </span><span class="WHIT">			</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.model</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>304</span> </span><span class="WHIT">				</span><span class="NAME">this.model.addEventListener</span><span class="PUNC">(</span><span class="STRN">'change'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>305</span> </span><span class="WHIT">					</span><span class="NAME">_self.getPortletPlaceholder</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">paintCanvas</span><span class="PUNC">(</span><span class="NAME">_self.render</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>306</span> </span><span class="WHIT">				</span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>307</span> </span><span class="WHIT">			</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>308</span> </span><span class="WHIT">			</span><span class="NAME">this.getPortletPlaceholder</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">paintCanvas</span><span class="PUNC">(</span><span class="NAME">this.render</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>309</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>310</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>311</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>312</span> 
+<span class='line'>313</span> </span><span class="NAME">PortletPlaceholder</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Class.extend</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>314</span> </span><span class="COMM">/** @lends PortletPlaceholder# */</span><span class="WHIT">		
+<span class='line'>315</span> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>316</span> 
+<span class='line'>317</span> </span><span class="WHIT">	</span><span class="COMM">/**
+<span class='line'>318</span> 	 * @class A placeholder to store a single portlet.
+<span class='line'>319</span> 	 * It acts as a bridge between Portlet and {@link PortletCanvas}
+<span class='line'>320</span> 	 * @augments Class
+<span class='line'>321</span> 	 * @param canvas the portlet canvas
+<span class='line'>322</span> 	 * @constructs
+<span class='line'>323</span> 	 */</span><span class="WHIT">
+<span class='line'>324</span> </span><span class="WHIT">	</span><span class="NAME">init</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">canvas</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>325</span> </span><span class="WHIT">		</span><span class="NAME">this.canvas</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">canvas</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>326</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>327</span> </span><span class="WHIT">	
+<span class='line'>328</span> 	</span><span class="COMM">/**
+<span class='line'>329</span> 	 * Add an object to the canvas
+<span class='line'>330</span> 	 * @param {Object} object the object to be added
+<span class='line'>331</span> 	 */</span><span class="WHIT">
+<span class='line'>332</span> </span><span class="WHIT">	</span><span class="NAME">addToCanvas</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>333</span> </span><span class="WHIT">		</span><span class="NAME">this.canvas.addChild</span><span class="PUNC">(</span><span class="NAME">object</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>334</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>335</span> </span><span class="WHIT">	
+<span class='line'>336</span> 	</span><span class="COMM">/**
+<span class='line'>337</span> 	 * Clear everything and repaint the canvas
+<span class='line'>338</span> 	 * @param {String} html the HTML data to be painted
+<span class='line'>339</span> 	 */</span><span class="WHIT">
+<span class='line'>340</span> </span><span class="WHIT">	</span><span class="NAME">paintCanvas</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">html</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>341</span> </span><span class="WHIT">		</span><span class="NAME">this.canvas.repaint</span><span class="PUNC">(</span><span class="NAME">html</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>342</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">subject</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SingletonFactory.getInstance</span><span class="PUNC">(</span><span class="NAME">Subject</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>343</span> </span><span class="WHIT">		</span><span class="NAME">subject.notifyEvent</span><span class="PUNC">(</span><span class="STRN">'HtmlUpdated'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>344</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>345</span> </span><span class="WHIT">	
+<span class='line'>346</span> 	</span><span class="COMM">/**
+<span class='line'>347</span> 	 * Append to the canvas
+<span class='line'>348</span> 	 * @param {String} html the HTML data to be appended
+<span class='line'>349</span> 	 */</span><span class="WHIT">
+<span class='line'>350</span> </span><span class="WHIT">	</span><span class="NAME">drawToCanvas</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">html</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>351</span> </span><span class="WHIT">		</span><span class="NAME">this.canvas.paint</span><span class="PUNC">(</span><span class="NAME">html</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>352</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">subject</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">SingletonFactory.getInstance</span><span class="PUNC">(</span><span class="NAME">Subject</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>353</span> </span><span class="WHIT">		</span><span class="NAME">subject.notifyEvent</span><span class="PUNC">(</span><span class="STRN">'HtmlUpdated'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>354</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>355</span> </span><span class="WHIT">	
+<span class='line'>356</span> 	</span><span class="COMM">/**
+<span class='line'>357</span> 	 * Access the underlying canvas
+<span class='line'>358</span> 	 * @returns {PortletCanvas} the portlet canvas
+<span class='line'>359</span> 	 */</span><span class="WHIT">
+<span class='line'>360</span> </span><span class="WHIT">	</span><span class="NAME">getCanvas</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>361</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.canvas</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>362</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>363</span> </span><span class="WHIT">	
+<span class='line'>364</span> 	</span><span class="NAME">toString</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>365</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="STRN">"PortletPlaceholder"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>366</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>367</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>368</span> 
+<span class='line'>369</span> </span><span class="NAME">PortletContainer</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Class.extend</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>370</span> </span><span class="COMM">/** @lends PortletContainer# */</span><span class="WHIT">
+<span class='line'>371</span> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>372</span> </span><span class="WHIT">	</span><span class="COMM">/**
+<span class='line'>373</span> 	 * @class A container which maintains and controls multiple portlets
+<span class='line'>374</span> 	 * @singleton
+<span class='line'>375</span> 	 * @augments Class
+<span class='line'>376</span> 	 * @constructs
+<span class='line'>377</span> 	 */</span><span class="WHIT">
+<span class='line'>378</span> </span><span class="WHIT">	</span><span class="NAME">init</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>379</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">PortletContainer.singleton</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>380</span> </span><span class="WHIT">			</span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="STRN">"Singleton class"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>381</span> </span><span class="WHIT">			</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>382</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>383</span> </span><span class="WHIT">		</span><span class="NAME">this.portlets</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Array</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>384</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>385</span> </span><span class="WHIT">	
+<span class='line'>386</span> 	</span><span class="COMM">/**
+<span class='line'>387</span> 	 * Add a portlet to this container and initialize it
+<span class='line'>388</span> 	 * @param {PortletInterface} portlet the portlet to be added
+<span class='line'>389</span> 	 * @param {Object} item portlet metadata
+<span class='line'>390</span> 	 */</span><span class="WHIT">
+<span class='line'>391</span> </span><span class="WHIT">	</span><span class="NAME">addPortlet</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">portlet</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">item</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>392</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">portletMeta</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>393</span> </span><span class="WHIT">		</span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">item</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>394</span> </span><span class="WHIT">			</span><span class="NAME">portletMeta</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">item</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>395</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>396</span> </span><span class="WHIT">		</span><span class="NAME">portletMeta.portlet</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">portlet</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>397</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">portletMeta.order</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>398</span> </span><span class="WHIT">			</span><span class="NAME">portletMeta.order</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">''</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>399</span> </span><span class="WHIT">		</span><span class="NAME">portletMeta.loaded</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>400</span> </span><span class="WHIT">		</span><span class="NAME">this.portlets.push</span><span class="PUNC">(</span><span class="NAME">portletMeta</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>401</span> </span><span class="WHIT">		</span><span class="KEYW">try</span><span class="WHIT"> 
+<span class='line'>402</span> 		</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>403</span> </span><span class="WHIT">			</span><span class="NAME">portlet.onBegin</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>404</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT"> 
+<span class='line'>405</span> 		</span><span class="KEYW">catch</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">err</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>406</span> </span><span class="WHIT">			</span><span class="NAME">log</span><span class="PUNC">(</span><span class="NAME">err</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>407</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>408</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>409</span> </span><span class="WHIT">	
+<span class='line'>410</span> 	</span><span class="COMM">/**
+<span class='line'>411</span> 	 * Move the portlet to another position
+<span class='line'>412</span> 	 * @param {Object} portletMeta the metadata associated with the portlet to be moved
+<span class='line'>413</span> 	 * @param {String} newPosition the new position, which is the &lt;code>id&lt;/code>
+<span class='line'>414</span> 	 * of a DOM element
+<span class='line'>415</span> 	 */</span><span class="WHIT">
+<span class='line'>416</span> </span><span class="WHIT">	</span><span class="NAME">movePortlet</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">portletMeta</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">newPosition</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>417</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">portletPosition</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Stage</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="NAME">id</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">newPosition</span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>418</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">portletCanvas</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Stage</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="NAME">id</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">portletMeta.portlet.getPortletPlaceholder</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">getCanvas</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">id</span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>419</span> </span><span class="WHIT">		</span><span class="NAME">this.attachPortletHtml</span><span class="PUNC">(</span><span class="NAME">portletPosition</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">portletCanvas</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">portletMeta</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>420</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>421</span> </span><span class="WHIT">	
+<span class='line'>422</span> 	</span><span class="COMM">/**
+<span class='line'>423</span> 	 * Load all active portlets, execute them synchronously.
+<span class='line'>424</span> 	 */</span><span class="WHIT">
+<span class='line'>425</span> </span><span class="WHIT">	</span><span class="NAME">loadPortlets</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>426</span> </span><span class="WHIT">		</span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">this.portlets.length</span><span class="PUNC">;</span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>427</span> </span><span class="WHIT">			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">portletMeta</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.portlets</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>428</span> </span><span class="WHIT">			</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">portletMeta.active</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">portletMeta.loaded</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>429</span> </span><span class="WHIT">				</span><span class="NAME">this.activatePortlet</span><span class="PUNC">(</span><span class="NAME">portletMeta</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>430</span> </span><span class="WHIT">				</span><span class="NAME">portletMeta.loaded</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>431</span> </span><span class="WHIT">			</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>432</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>433</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>434</span> </span><span class="WHIT">	
+<span class='line'>435</span> 	</span><span class="COMM">/**
+<span class='line'>436</span> 	 * Get all portlets
+<span class='line'>437</span> 	 * @returns {Array} All loaded portlets
+<span class='line'>438</span> 	 */</span><span class="WHIT">
+<span class='line'>439</span> </span><span class="WHIT">	</span><span class="NAME">getPortlets</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>440</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.portlets</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>441</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>442</span> </span><span class="WHIT">	
+<span class='line'>443</span> 	</span><span class="COMM">/**
+<span class='line'>444</span> 	 * Get portlet metadata using the portlet's name
+<span class='line'>445</span> 	 * @param {String} name the portlet's name
+<span class='line'>446</span> 	 */</span><span class="WHIT">
+<span class='line'>447</span> </span><span class="WHIT">	</span><span class="NAME">getPortletMetaByName</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">name</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>448</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.portlets.map</span><span class="PUNC">(</span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">portlet</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>449</span> </span><span class="WHIT">			</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">portlet.portlet.getName</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">name</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>450</span> </span><span class="WHIT">				</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">portlet</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>451</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>452</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>453</span> </span><span class="WHIT">	
+<span class='line'>454</span> 	</span><span class="COMM">/**
+<span class='line'>455</span> 	 * Get portlet metadata using the portlet's name
+<span class='line'>456</span> 	 * @param {String} name the portlet's name
+<span class='line'>457</span> 	 */</span><span class="WHIT">
+<span class='line'>458</span> </span><span class="WHIT">	</span><span class="NAME">getPortletMetaById</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">id</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>459</span> </span><span class="WHIT">		</span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">portlets.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>460</span> </span><span class="WHIT">			</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">portlet.id</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">id</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>461</span> </span><span class="WHIT">				</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">portlet</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>462</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>463</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>464</span> </span><span class="WHIT">	
+<span class='line'>465</span> 	</span><span class="COMM">/**
+<span class='line'>466</span> 	 * Remove portlet at the specified position
+<span class='line'>467</span> 	 * @param {String} position the position of the portlet to be removed
+<span class='line'>468</span> 	 */</span><span class="WHIT">
+<span class='line'>469</span> </span><span class="WHIT">	</span><span class="NAME">removePortlet</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">position</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>470</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">portletMeta</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.portlets</span><span class="PUNC">[</span><span class="NAME">position</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>471</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">portletMeta</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>472</span> </span><span class="WHIT">			</span><span class="NAME">this.portlets.splice</span><span class="PUNC">(</span><span class="NAME">position</span><span class="PUNC">,</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>473</span> </span><span class="WHIT">			</span><span class="NAME">portletMeta.portlet.onEnd</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>474</span> </span><span class="WHIT">			</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">portletMeta.portlet.getPortletPlaceholder</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>475</span> </span><span class="WHIT">				</span><span class="COMM">//console.log("dispose canvas of portlet: "+portletMeta.portlet.getName());</span><span class="WHIT">
+<span class='line'>476</span> </span><span class="WHIT">				</span><span class="NAME">portletMeta.portlet.getPortletPlaceholder</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">getCanvas</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">dispose</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>477</span> </span><span class="WHIT">			</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>478</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>479</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>480</span> </span><span class="WHIT">	
+<span class='line'>481</span> 	</span><span class="NAME">attachPortletHtml</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">portletPosition</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">portletCanvas</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">portletMeta</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>482</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">jPortletCanvas</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">portletPosition.access</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>483</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">canvases</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">jPortletCanvas.find</span><span class="PUNC">(</span><span class="STRN">'.portlet.portlet-canvas'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>484</span> 
+<span class='line'>485</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">found</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>486</span> </span><span class="WHIT">		</span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">canvases.length</span><span class="PUNC">;</span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>487</span> </span><span class="WHIT">			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">canvasI</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">canvases</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>488</span> </span><span class="WHIT">			</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">$</span><span class="PUNC">(</span><span class="NAME">canvasI</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">attr</span><span class="PUNC">(</span><span class="STRN">'order'</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NAME">portletMeta.order</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>489</span> </span><span class="WHIT">				</span><span class="NAME">portletPosition.addChildBeforePosition</span><span class="PUNC">(</span><span class="NAME">portletCanvas</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">canvasI</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>490</span> </span><span class="WHIT">				</span><span class="NAME">found</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>491</span> </span><span class="WHIT">				</span><span class="KEYW">break</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>492</span> </span><span class="WHIT">			</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>493</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>494</span> </span><span class="WHIT">		
+<span class='line'>495</span> 		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">found</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>496</span> </span><span class="WHIT">			</span><span class="NAME">portletPosition.addChild</span><span class="PUNC">(</span><span class="NAME">portletCanvas</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>497</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>498</span> </span><span class="WHIT">		</span><span class="NAME">portletCanvas.setAttribute</span><span class="PUNC">(</span><span class="STRN">'order'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">portletMeta.order</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>499</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>500</span> </span><span class="WHIT">	
+<span class='line'>501</span> 	</span><span class="COMM">/**
+<span class='line'>502</span> 	 * Activate a portlet.
+<span class='line'>503</span> 	 * @param {Object} portletMeta the metadata of the portlet to be activated
+<span class='line'>504</span> 	 */</span><span class="WHIT">
+<span class='line'>505</span> </span><span class="WHIT">	</span><span class="NAME">activatePortlet</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">portletMeta</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>506</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">portlet</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">portletMeta.portlet</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>507</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">portletMeta.loaded</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>508</span> </span><span class="WHIT">			</span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>509</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>510</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">portletPosition</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Stage</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="NAME">id</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">portletMeta.position</span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>511</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">portletCanvas</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">PortletCanvas</span><span class="PUNC">(</span><span class="NAME">portlet.getName</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>512</span> </span><span class="WHIT">		</span><span class="NAME">this.attachPortletHtml</span><span class="PUNC">(</span><span class="NAME">portletPosition</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">portletCanvas</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">portletMeta</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>513</span> </span><span class="WHIT">		</span><span class="NAME">portletCanvas.setAttribute</span><span class="PUNC">(</span><span class="STRN">'portlet'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">portlet.getName</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>514</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">portletPlaceholder</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">PortletPlaceholder</span><span class="PUNC">(</span><span class="NAME">portletCanvas</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>515</span> </span><span class="WHIT">		</span><span class="NAME">portlet.setPortletPlaceholder</span><span class="PUNC">(</span><span class="NAME">portletPlaceholder</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>516</span> </span><span class="WHIT">		</span><span class="NAME">portletMeta.loaded</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">true</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>517</span> </span><span class="WHIT">		</span><span class="KEYW">try</span><span class="WHIT"> 
+<span class='line'>518</span> 		</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>519</span> </span><span class="WHIT">			</span><span class="NAME">portlet.run</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>520</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT"> 
+<span class='line'>521</span> 		</span><span class="KEYW">catch</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">err</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>522</span> </span><span class="WHIT">			</span><span class="NAME">log</span><span class="PUNC">(</span><span class="NAME">err</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>523</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>524</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>525</span> </span><span class="WHIT">	
+<span class='line'>526</span> 	</span><span class="COMM">/**
+<span class='line'>527</span> 	 * Deactivate a portlet.
+<span class='line'>528</span> 	 * @param {Object} portletMeta the metadata of the portlet to be deactivated
+<span class='line'>529</span> 	 */</span><span class="WHIT">
+<span class='line'>530</span> </span><span class="WHIT">	</span><span class="NAME">deactivatePortlet</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">portletMeta</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>531</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">portlet</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">portletMeta.portlet</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>532</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">portletMeta.loaded</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>533</span> </span><span class="WHIT">			</span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>534</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>535</span> </span><span class="WHIT">		</span><span class="NAME">portletMeta.loaded</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>536</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">portlet.getPortletPlaceholder</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT">	</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>537</span> </span><span class="WHIT">			</span><span class="NAME">portlet.getPortletPlaceholder</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">paintCanvas</span><span class="PUNC">(</span><span class="STRN">''</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>538</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>539</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>540</span> </span><span class="WHIT">	
+<span class='line'>541</span> 	</span><span class="NAME">toString</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>542</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="STRN">"PortletContainer"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>543</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>544</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>545</span> 
+<span class='line'>546</span> </span><span class="COMM">/**
+<span class='line'>547</span>  * @class A simple portlet used for rendering
+<span class='line'>548</span>  * @augments Class
+<span class='line'>549</span>  * @implements PortletInterface
+<span class='line'>550</span>  * @implements RenderInterface
+<span class='line'>551</span>  */</span><span class="WHIT">
+<span class='line'>552</span> </span><span class="NAME">RenderPortlet</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Class.extend</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>553</span> </span><span class="COMM">/** @lends RenderPortlet# */</span><span class="WHIT">	
+<span class='line'>554</span> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>555</span> </span><span class="WHIT">	</span><span class="COMM">/**
+<span class='line'>556</span> 	 * Render and display the portlet.
+<span class='line'>557</span> 	 */</span><span class="WHIT">
+<span class='line'>558</span> </span><span class="WHIT">	</span><span class="NAME">run</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>559</span> </span><span class="WHIT">		</span><span class="NAME">this.getPortletPlaceholder</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">paintCanvas</span><span class="PUNC">(</span><span class="NAME">this.render</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>560</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>561</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">implement</span><span class="PUNC">(</span><span class="NAME">PortletInterface</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">RenderInterface</span><span class="PUNC">)</span><span class="PUNC">;</span></pre></body></html>

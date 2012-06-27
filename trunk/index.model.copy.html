@@ -1,0 +1,153 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link href="static/framework/css/ui.css" rel="stylesheet" type="text/css" />
+		<link href="static/framework/css/portlet.css" rel="stylesheet" type="text/css" />
+		<link href="static/framework/css/tooltips.css" rel="stylesheet" type="text/css" />
+		<link href="static/app/css/default/sample.css" rel="stylesheet" type="text/css" />
+		<link href="static/thirdparty/colorpicker/css/colorpicker.css" rel="stylesheet" type="text/css" />
+		<title>JOO Version 2</title>
+	</head>
+	
+    <body>
+    	<div id="Application-Main"></div>
+    	
+        <!-- required libraries -->
+        <script type="text/javascript" src="static/lib/jquery-1.7.1.min.js"></script>
+        <script type="text/javascript" src="static/lib/jquery.ui.core.js"></script>
+        <script type="text/javascript" src="static/lib/jquery.ui.widget.js"></script>
+        <script type="text/javascript" src="static/lib/jquery.ui.mouse.js"></script>
+        <script type="text/javascript" src="static/lib/jquery.ui.draggable.js"></script>
+        <script type="text/javascript" src="static/lib/jquery.ui.droppable.js"></script>
+        <script type="text/javascript" src="static/lib/jquery.effects.core.js"></script>
+        <script type="text/javascript" src="static/lib/jquery.effects.bounce.js"></script>
+        <script type="text/javascript" src="static/lib/jquery.effects.explode.js"></script>
+        <script type="text/javascript" src="static/lib/jquery.effects.transfer.js"></script>
+        <script type="text/javascript" src="static/lib/jquery.json-2.2.js"></script>
+		<script type="text/javascript" src="static/lib/jquery.cookie.js"></script>
+		<script type="text/javascript" src="static/lib/computedStyle.js"></script>
+		<script type="text/javascript" src="static/lib/styleChangedListener.js"></script>
+		<script type="text/javascript" src="static/lib/inherit.js"></script>
+		<script type="text/javascript" src="static/lib/micro-templating.js"></script>
+		<script type="text/javascript" src="static/lib/kinetic-v3.7.3.js"></script>
+		
+		<!-- 3rd party library -->
+		<script type="text/javascript" src="static/thirdparty/colorpicker/colorpicker.js"></script>
+		<script type="text/javascript" src="static/thirdparty/tooltips.js"></script>
+		
+        <!-- framework -->
+        <script type="text/javascript" src="static/framework/js/base.js"></script>
+        <script type="text/javascript" src="static/framework/js/ajax.js"></script>
+        <script type="text/javascript" src="static/framework/js/ui.composition.js"></script>
+		<script type="text/javascript" src="static/framework/js/ui.base.js"></script>
+		<script type="text/javascript" src="static/framework/js/ui.interfaces.js"></script>
+		<script type="text/javascript" src="static/framework/js/ui.controls.js"></script>
+		<script type="text/javascript" src="static/framework/js/ui.controls.desktop.js"></script>
+		<script type="text/javascript" src="static/framework/js/ui.properties.js"></script>
+		<script type="text/javascript" src="static/framework/js/ui.extras.js"></script>
+		<script type="text/javascript" src="static/framework/js/ui.experimental.js"></script>
+        <script type="text/javascript" src="static/framework/js/observer.js"></script>
+        <script type="text/javascript" src="static/framework/js/model.js"></script>
+        <script type="text/javascript" src="static/framework/js/plugins.js"></script>
+        <script type="text/javascript" src="static/framework/js/page.js"></script>
+        <script type="text/javascript" src="static/framework/js/portlet.js"></script>
+        <script type="text/javascript" src="static/framework/js/request.js"></script>
+        <script type="text/javascript" src="static/framework/js/bootstrap.js"></script>
+        <script type="text/javascript" src="static/framework/js/utils.js"></script>
+		<script type="text/javascript" src="static/framework/js/memcached.js"></script>
+		
+		<!-- application bootstrap -->
+		
+		<!-- application ui -->
+		
+		<!-- addons -->
+
+		<!-- entry-point -->
+		<script type="text/javascript" src="static/app/js/main.js"></script>
+		<script type="text/javascript" src="static/app/js/portlets/samples/SamplePortlet.js"></script>
+		
+		<script type="text/javascript" src="static/framework/js/classNameInjection.js"></script>
+		
+		<script type="text/javascript">
+			var model = JOOModel.from({
+				foo: [
+				    {foo1: 'foo1', foo2: 'foo2', foo3: 'foo3'},
+				    {foo4: 'foo4', foo5: 'foo5', foo6: 'foo6'}
+				],
+				bar: 'bar1'
+			});
+			model.addEventListener('change', function(e) {
+				console.log(e);
+				if (e.type == 'function')
+					console.log('model with path "'+e.path+'" has updated its value via function "'+e.functionName+'"');
+				else
+					console.log('model with path "'+e.path+'" has updated its value to "'+e.value+'"');
+			});
+			
+			function test() {
+				//change a single properties
+				model.bar = 'bar2';
+				
+				//change an array
+				model.foo.push({foo7: 'foo7', foo8: 'foo8', foo9: 'foo9'});
+				
+				//change previous element of an array
+				model.foo[1].foo4 = 'you are fool';
+				
+				//change new element of an array
+				model.foo[2].foo7 = 'you are fool again';
+			}
+			
+			//now we are binding to an UI element
+			function binding(ui, model, path) {
+				ui.setValue(ExpressionUtils.express(model, path));
+				
+				//constraint model to view
+				model.addEventListener('change', function(e) {
+					if (e.path == path) {
+						if (e.type == 'setter') {
+							ui.setValue(ExpressionUtils.express(model, path));
+						} else {
+							//we'll omit this in this tutorial
+						}
+					}
+				});
+				
+				//constraint view to model
+				ui.addEventListener('change', function(e) {
+					var disabled = model.disabled;
+					model.disable(true);
+					ExpressionUtils.expressSetter(model, path, ui.getValue());
+					model.disable(disabled);
+				});
+			};
+			
+			var stage = new Stage({id: 'Application-Main', layout: 'vertical'});
+			
+			//test model
+			var btn = new JOOButton({lbl: 'Click to test what happend when model change. See the result in console'});
+			btn.addEventListener('click', function() {
+				test();
+			});
+			stage.addChild(btn);
+			
+			//test bindings
+			//this test will bind model.foo[1].foo4 to the text input
+			var ui = new JOOTextInput();
+			binding(ui, model, "foo['1']['foo4']");
+			stage.addChild(ui);
+			
+			//test model change
+			btn = new JOOButton({lbl: 'Click to change text'});
+			btn.addEventListener('click', function() {
+				model.foo[1].foo4 = 'no i am not fool';
+			});
+			stage.addChild(btn);
+			
+			//test view change
+			ui.addEventListener('change', function(e) {
+				console.log("model with path \"foo['1']['foo4']\" has been updated via Bindings to \""+model.foo[1].foo4+"\"");
+			});
+		</script>
+</body>
+</html>
