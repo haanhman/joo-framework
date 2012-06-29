@@ -196,8 +196,8 @@ DisplayObject = EventDispatcher.extend(
 		this.setupDisplay(config);
 		this.setupDomObject(config);
 		
-		var objMgr = SingletonFactory.getInstance(Application).getObjectManager();
-		objMgr.register(this);
+//		var objMgr = SingletonFactory.getInstance(Application).getObjectManager();
+//		objMgr.register(this);
 	},
 	
 	/**
@@ -251,7 +251,7 @@ DisplayObject = EventDispatcher.extend(
 	},
 	
 	_appendBaseClass: function(className) {
-		this.classes.push(className);
+		this.classes.push('joo-'+className.toLowerCase());
 	},
 
 	/**
@@ -292,20 +292,26 @@ DisplayObject = EventDispatcher.extend(
 	setupDomObject: function(config) {
 		this.domObject = JOOUtils.accessCustom(this.toHtml());
 		this.setAttribute('id', this.id);
-		var c = this.inheritedCSSClasses? this.classes.length : 1;
-		for(var i=0; i<c; i++) {
-			this.access().addClass('joo-'+this.classes[i].toLowerCase());
-		}
+//		var c = this.inheritedCSSClasses? this.classes.length : 1;
+//		for(var i=0; i<c; i++) {
+//			this.access().addClass('joo-'+this.classes[i].toLowerCase());
+//		}
+		this.classes.push('joo-ui');
+		this.setAttribute('class', this.classes.join(' '));
 		this.classes = undefined;
-		this.access().addClass('joo-ui');	//for base styles, e.g: all DisplayObject has 'position: absolute'
+//		this.access().addClass('joo-ui');	//for base styles, e.g: all DisplayObject has 'position: absolute'
 		
 		if (config.tooltip)
 			this.setAttribute('title', config.tooltip);
-		if (!config.absolute) {
-			var x = config.x || 0;
-			var y = config.y || 0;
-			this.setLocation(x, y);
-		}
+//		if (!config.absolute) {
+			if (config.x != undefined)
+				this.setX(config.x);
+			if (config.y != undefined)
+				this.setY(config.y);
+//			var x = config.x || 0;
+//			var y = config.y || 0;
+//			this.setLocation(x, y);
+//		}
 		if (config['background-color'] != undefined)
 			this.setStyle('background-color', config['background-color']);
 		
@@ -625,22 +631,28 @@ DisplayObject = EventDispatcher.extend(
 	 * Developers should use the <code>selfRemove</code> method instead.</p>
 	 * @private
 	 */
-	dispose: function() {
+	dispose: function(skipRemove) {
 		this.dispatchEvent('dispose');
 		
-		this.access().remove();
-		var objMgr = SingletonFactory.getInstance(Application).getObjectManager();
-		objMgr.remove(this);
+		if (!skipRemove) {
+			this.access().remove();
+		}
+//		var objMgr = SingletonFactory.getInstance(Application).getObjectManager();
+//		objMgr.remove(this);
 		this.listeners = undefined;
 		this.config = undefined;
 		this.dead = true;
 		
-		if (this.domEventBound != undefined) {
-			for(var i in this.domEventBound) {
-				this.access().unbind(i, this.bindEvent);
-			}
+		//if (this.domEventBound != undefined) {
+			//for(var i in this.domEventBound) {
+				//this.access().unbind(i, this.bindEvent);
+			//}
+			//this.access().unbind();
 			this.domEventBound = undefined;
-		}
+		//}
+		this._parent = undefined;
+		this.domObject = undefined;
+		this.stage = undefined;
 	},
 	
 	/**
@@ -917,11 +929,12 @@ DisplayObjectContainer = DisplayObject.extend(
 		this.layout = layout;
 	},
 	
-	dispose: function() {
+	dispose: function(skipRemove) {
 		for(var i=0;i<this.children.length;i++) {
-			this.children[i].dispose();
+			this.children[i].dispose(true);
 		}
-		this._super();
+		this.children = undefined;
+		this._super(skipRemove);
 	}
 });
 
