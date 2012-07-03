@@ -1667,6 +1667,7 @@ JOOMenu = JOOMenuItem.extend(
 	},
 	
 	onclick: function() {
+		e.stopPropagation();
 		this.toggleMenuItems();
 	},
 
@@ -1718,10 +1719,17 @@ JOOMenuBar = UIComponent.extend(
 	
 	setupDomObject: function(config) {
 		this._super(config);
-		var _self = this;
-		$(window).bind('click', function() {
-			_self.hideAllMenus();
-		});
+		$(window).bind('click', {_self: this}, this._hideAllMenus);
+	},
+	
+	dispose: function(skipRemove) {
+		$(window).unbind('click', this._hideAllMenus);
+		this._super(skipRemove);
+	},
+	
+	_hideAllMenus: function(e) {
+		var _self = e.data ? e.data._self || this : this;
+		_self.hideAllMenus();
 	},
 
 	/**

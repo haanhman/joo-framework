@@ -145,9 +145,9 @@ JOOVideo = UIComponent.extend(
 		return "<video></video>";
 	},
 	
-	dispose: function(){
+	dispose: function(skipRemove){
 		this.stop();
-		this._super();
+		this._super(skipRemove);
 	}
 });
 
@@ -841,9 +841,9 @@ JOOSprite = UIComponent.extend(
 		return "<div></div>";
 	},
 	
-	dispose: function() {
+	dispose: function(skipRemove) {
 		this.stop();
-		this._super();
+		this._super(skipRemove);
 	}
 });
 
@@ -1751,10 +1751,10 @@ SliderIcon = Sketch.extend({
 		$(window).bind("mouseup", {_self: this}, this.mouseUpHandler);
 	},
 	
-	dispose: function() {
+	dispose: function(skipRemove) {
 		$(window).unbind("mouseup", this.mouseUpHandler);
 		$(window).unbind("mousedown", this.mouseDownHandler);
-		this._super();
+		this._super(skipRemove);
 	},
 	
 	mouseUpHandler: function(e) {
