@@ -191,8 +191,8 @@ JOOPropertiesDialog = JOODialog.extend({
 		this._super(config);
 		this.setTitle('Properties');
 		this.getContentPane().setLayout('vertical');
-		this.supportedProperties = this.supportedProperties || [];
-		this.propertyMappings = this.propertyMappings || {
+		this.supportedProperties = config.supportedProperties || this.supportedProperties || [];
+		this.propertyMappings = config.propertyMappings || this.propertyMappings || {
 			'colorpicker': JOOColorProperty,
 			'media': JOOMediaProperty,
 			'slider': JOOSliderProperty,

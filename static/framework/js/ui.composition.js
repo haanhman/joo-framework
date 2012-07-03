@@ -13,10 +13,40 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 		 * @methodOf CompositionRenderInterface#
 		 * @name renderUIComposition
 		 */
-		obj.prototype.renderUIComposition = obj.prototype.renderUIComposition || function(model) {
-			model =  model || this.config.model || {};
-			var composition = $(tmpl(this.className+"View", model))[0];
-			_self.processElement(this, this, composition, model);
+		obj.prototype.renderUIComposition = obj.prototype.renderUIComposition || function() {
+			model = this.config.model || {};
+			var composition = $(tmpl(this.className+"View", model));
+			_self.processElement(this, this, composition[0], model);
+		};
+		
+		obj.prototype.bindModelView = obj.prototype.bindModelView || function(ui, model, path) {
+			ui.setValue(ExpressionUtils.express(model, path));
+			
+			//constraint model to view
+			model.addEventListener('change', function(e) {
+				if (this._currentTarget == ui)
+					return;
+				if (e.path == path) {
+					if (e.type == 'setter') {
+						var _currentTarget = ui._currentTarget;
+						ui._currentTarget = this;
+						ui.setValue(ExpressionUtils.express(model, path));
+						ui._currentTarget = _currentTarget;
+					} else {
+						//we'll omit this in this tutorial
+					}
+				}
+			});
+			
+			//constraint view to model
+			ui.addEventListener('change', function(e) {
+				if (this._currentTarget == model)
+					return;
+				var _currentTarget = model._currentTarget;
+				model._currentTarget = this;
+				ExpressionUtils.expressSetter(model, path, ui.getValue());
+				model._currentTarget = _currentTarget;
+			});
 		};
 	},
 	
@@ -28,7 +58,11 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 		var config = JOOUtils.getAttributes(composition);
 		
 		var handlers = {};
-		var bindings = undefined; 
+		var bindings = undefined;
+		
+		var isAddTab = false;
+		var isAddItem = false;
+		var tabTitle = undefined;
 		
 		for(var i in config) {
 			if (i.indexOf('handler:') != -1) {
@@ -40,6 +74,10 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 				var expression = config[i].substr(2, config[i].length-3);
 				config[i] = ExpressionUtils.express(model, expression);
 				bindings = expression;
+			} else if (config[i].indexOf('${') == 0) {
+				var expression = config[i].substr(2, config[i].length-3);
+				config[i] = ExpressionUtils.express(root, expression);
+//				bindings = expression;
 			}
 		}
 		
@@ -54,27 +92,45 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 			var varName = $composition.attr('name');
 			currentObject = obj[varName];
 			break;
+		case "joo:addtab":
+			isAddTab = true;
+			tabTitle = config.title;
+			break;
+		case "joo:additem":
+			isAddItem = true;
+			break;
 		default:
 			if (config.custom) {
 				config.custom = eval('('+config.custom+')');
 			}
 			var className = ClassMapping[tagName.split(':')[1]];
-			currentObject = new window[className](config);
+			if (className) {
+				currentObject = new window[className](config);
+			} else {
+				throw "Undefined UI Tag: "+tagName;
+			}
 		}
 		
 		for(var i in handlers) {
 			(function(i) {
 				currentObject.addEventListener(i, function() {
-					handlers[i].apply(root, arguments);
-				})
+					try {
+						handlers[i].apply(root, arguments);
+					} catch (err) {
+						log(err);
+					}
+				});
 			})(i);
 		}
 		
 		if (bindings) {
+			/*
 			currentObject.dataBindings = bindings;
 			currentObject.addEventListener('change', function() {
 				root.dispatchEvent('bindingchanged', currentObject);
 			});
+			*/
+			root.bindModelView(currentObject, model, bindings);
 		}
 		
 		var varName = $composition.attr('varName');
@@ -84,7 +140,15 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 		
 		for(var i=0; i<children.length; i++) {
 			var child = this.processElement(root, currentObject, children[i], model);
-			currentObject.addChild(child);
+			if (isAddTab) {
+				currentObject.addTab(tabTitle, child);
+			} else if (isAddItem) {
+				currentObject.addItem(child);
+			}
+			else {
+				if (currentObject != child)
+					currentObject.addChild(child);
+			}
 		}
 		return currentObject;
 	}
