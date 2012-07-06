@@ -14,7 +14,7 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 		 * @name renderUIComposition
 		 */
 		obj.prototype.renderUIComposition = obj.prototype.renderUIComposition || function() {
-			model = this.config.model || {};
+			var model = this.config.model || {};
 			var composition = $(tmpl(this.className+"View", model));
 			_self.processElement(this, this, composition[0], model);
 		};
@@ -26,7 +26,7 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 			model.addEventListener('change', function(e) {
 				if (this._currentTarget == ui)
 					return;
-				if (e.path == path) {
+				if (path.indexOf(e.path) != -1 || e.path.indexOf(path) != -1) {
 					if (e.type == 'setter') {
 						var _currentTarget = ui._currentTarget;
 						ui._currentTarget = this;
@@ -123,7 +123,7 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 			})(i);
 		}
 		
-		if (bindings) {
+		if (bindings != undefined) {
 			/*
 			currentObject.dataBindings = bindings;
 			currentObject.addEventListener('change', function() {
