@@ -174,6 +174,7 @@ JOOMovieClip = JOOSprite.extend({
 	
 	setupBase: function(config) {
 		this.skippedAnimation = ['position'];
+		this.scripts = {};
 		this.intervals = Array();
 		this._super(config);
 	},
@@ -194,6 +195,13 @@ JOOMovieClip = JOOSprite.extend({
 		}
 		this.buildStage();
 		this.buildAnimations();
+		this.buildScript();
+	},
+	
+	buildScript: function(){
+		if(this.data.scripts){
+			this.scripts = this.data.scripts;
+		}
 	},
 	
 	buildStage: function() {
@@ -216,7 +224,7 @@ JOOMovieClip = JOOSprite.extend({
 		for(var i in objDef.attributes){
 			obj.setAttribute(i,objDef.attributes[i]);
 		}
-//		obj.setStyle("display","none");
+		obj.setStyle("display","none");
 		if(!obj.getStyle("position")){ obj.setStyle("position","absolute"); }
 		if (objDef.type == "composition") {
 			//obj.setLayout('absolute');
@@ -308,7 +316,11 @@ JOOMovieClip = JOOSprite.extend({
 	},
 	
 	callScript: function(animation) {
-		var fn = window[animation.script_ref];
+		//var fn = window[animation.script_ref];
+		var fn = this.scripts[animation.script_ref];
+		if(!fn){
+			fn = window[animation.script_ref];
+		}
 		if (fn) {
 			var args = animation.script_args;
 			if (args == undefined || args == "")
