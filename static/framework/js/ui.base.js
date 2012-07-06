@@ -134,6 +134,9 @@ EventDispatcher = Class.extend(
 				if (result === false)
 					return;
 			}
+			if (this._parent) {
+				this._parent.dispatchEvent.apply(this._parent, arguments);
+			}
 		}
 	},
 	
@@ -296,8 +299,12 @@ DisplayObject = EventDispatcher.extend(
 //		for(var i=0; i<c; i++) {
 //			this.access().addClass('joo-'+this.classes[i].toLowerCase());
 //		}
-		this.classes.push('joo-ui');
-		this.setAttribute('class', this.classes.join(' '));
+		if (!this.inheritedCSSClasses) {
+			this.access().addClass(this.classes[0]);
+		} else {
+			this.classes.push('joo-ui');
+			this.setAttribute('class', this.classes.join(' '));
+		}
 		this.classes = undefined;
 //		this.access().addClass('joo-ui');	//for base styles, e.g: all DisplayObject has 'position: absolute'
 		
@@ -1594,10 +1601,10 @@ JOOMenuItem = Sketch.extend(
 	
 	setupDomObject: function(config) {
 		this._super(config);
-		if (config.label == undefined) {
-			config.label = this.id;
+		if (config.lbl == undefined) {
+			config.lbl = this.id;
 		}
-		this._outputText(config.label);
+		this._outputText(config.lbl);
 		if (config.command != undefined)
 			this.onclick = config.command;
 		this.addEventListener('click', this.onclick);
@@ -1824,6 +1831,8 @@ JOOContextMenu = Sketch.extend({
 	 * Hide the context menu
 	 */
 	hide: function() {
+		var subject = SingletonFactory.getInstance(Subject);
+		subject.notifyEvent('ContextMenuHidden', this);
 		this.access().hide();
 	}
 });

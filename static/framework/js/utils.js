@@ -185,7 +185,7 @@ function getPositionFromRotatedCoordinate(pos, angle, coef) { // angle in radian
 ExpressionUtils = {
 		
 	express: function(obj, expression) {
-		var s = "obj."+expression;
+		var s = expression ? "obj."+expression : "obj";
 		try {
 			return eval(s);
 		} catch (err) {
