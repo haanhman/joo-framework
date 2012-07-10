@@ -27,14 +27,16 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 				if (this._currentTarget == ui)
 					return;
 				if (path.indexOf(e.path) != -1 || e.path.indexOf(path) != -1) {
+					var _currentTarget = ui._currentTarget;
+					ui._currentTarget = this;
 					if (e.type == 'setter') {
-						var _currentTarget = ui._currentTarget;
-						ui._currentTarget = this;
-						ui.setValue(ExpressionUtils.express(model, path));
-						ui._currentTarget = _currentTarget;
+						ui.setValue(ExpressionUtils.express(model, path), {path: e.path, bindingPath: path});
 					} else {
-						//we'll omit this in this tutorial
+						if (typeof ui['partialModelChange'] == 'function') {
+							ui.partialModelChange(model, e);
+						}
 					}
+					ui._currentTarget = _currentTarget;
 				}
 			});
 			

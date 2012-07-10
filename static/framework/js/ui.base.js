@@ -123,16 +123,18 @@ EventDispatcher = Class.extend(
 	 * @param {String} event the event to be dispatched.
 	 */
 	dispatchEvent: function(event) {
-		if (!this.disabled && this.listeners && this.listeners[event] != undefined) {
-			var handlers = this.listeners[event];
-			var args = Array();
-			for(var i=1; i<arguments.length; i++) {
-				args.push(arguments[i]);
-			}
-			for(var i=0;i<handlers.length;i++) {
-				var result = handlers[i].apply(this, args);
-				if (result === false)
-					return;
+		if (!this.disabled)  { 
+			if (this.listeners && this.listeners[event] != undefined) {
+				var handlers = this.listeners[event];
+				var args = Array();
+				for(var i=1; i<arguments.length; i++) {
+					args.push(arguments[i]);
+				}
+				for(var i=0;i<handlers.length;i++) {
+					var result = handlers[i].apply(this, args);
+					if (result === false)
+						return;
+				}
 			}
 			if (this._parent) {
 				this._parent.dispatchEvent.apply(this._parent, arguments);
