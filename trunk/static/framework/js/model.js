@@ -50,6 +50,15 @@ JOOModel = EventDispatcher.extend({
 		}
 	},
 	
+	notifyChange: function(path, params) {
+		this.dispatchEvent('change', {type: 'manual', path: path, params: params});
+	},
+	
+	setPropertyAndBind: function(obj, i, value) {
+		obj[i] = value;
+		this._bindings(obj, i, obj.__path__);
+	},
+	
 	_bindings: function(obj, i, path) {
 		if (i == 'className' || i == 'ancestors' || i == 'listeners' || i =='_bindingName_') 
 			return;
@@ -103,9 +112,11 @@ JOOModel = EventDispatcher.extend({
 		obj[i] = undefined;
 		delete obj[i];
 		
+		obj.__path__ = path;
+		
 		if (!obj.__lookupGetter__(i)) {
 			obj.__defineGetter__(i, function() {
-		        return obj[prop];prop
+		        return obj[prop];
 		    });
 		}
 		if (!obj.__lookupSetter__(i)) {

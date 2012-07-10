@@ -1099,7 +1099,8 @@ JOOAccordion = UIComponent.extend(
 		this.header.access().html(config.lbl);
 		var _self = this;
 		this.header.addEventListener('click', function() {
-			_self.contentPane.access().slideToggle(500);
+			_self.contentPane.access().slideToggle(config.toggleSpeed || 500);
+			_self.header.access().toggleClass('collapsed');
 		});
 		this.contentPane = new Sketch();
 		this.contentPane.access().addClass('joo-accordion-content');
