@@ -1,0 +1,75 @@
+<!-- indicate the effective area, required by Joo Framework -->
+<div id="effective-area">
+	<div id="container">
+		<div id="header"></div>
+		<div id="wrapper">
+			<div id="left"></div>
+			<div id="main"></div>
+			<div id="right"></div>
+		</div><!-- wrapper -->
+		<div id="footer"></div>
+	</div><!-- container -->
+</div><!-- effective-area -->
+<div id="Portlets-Layout">
+	<script type="text/html" id="portlets-Layout">
+		{
+			portlets:
+			[
+			],
+			plugins:
+			[
+			]
+		}
+	</script>
+	
+	<script type="text/html" id="portlets-Home">
+		{
+			portlets:
+			[
+			{ portlet: 'SamplePortlet', position: 'main' }
+			],
+			plugins:
+			[
+			],
+			parent: 'Layout'
+		}
+	</script>
+</div>
+<!-- plugin template -->
+<div class="plugin-data">
+	<!-- all plugin templates go here -->
+</div>
+<div class="portlet-data">
+	<script type="text/html" id="SamplePortletView">
+		<div class="title">
+			<img width="40px" height="30px" src="static/images/logo.jpg" alt="logo" />
+			Welcome to JooFramework!
+		</div>
+		<p>
+			JOO is a javascript framework, by which programmer can make a website like a traditional application. JOO is a platform for rich client application.
+		</p>
+		<p>
+			Please take a look at <a href="static/js/app/portlets/samples/SamplePortlet.js">static/js/app/portlets/SamplePortlet.js</a>
+			and <a href="static/microtemplating/default/samples/SamplePortlet.htm">static/microtemplating/default/samples/SamplePortlet.htm</a>
+			for getting yourself familiar with Joo Framework & its portlet architecture.
+		</p>
+		<p>
+			If this is the your first time with Joo Framework,
+			consider consulting the following resources:
+			<ul>
+				<li>
+					<a href="http://jooframework.org/getting-started">Getting started</a>
+				</li>
+				<li>
+					<a href="http://jooframework.org/developer-guide">Developer Guide</a>
+				</li>
+				<li>
+					<a href="http://jooframework.org/forums">Forums</a>
+				</li>
+				<li>
+					<a href="mailto:dungba@bkprofile.com">Email</a>
+				</li>
+			</ul>
+		</p>  
+	</script>
+</div>
