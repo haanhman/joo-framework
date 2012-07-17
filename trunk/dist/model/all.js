@@ -14977,14 +14977,27 @@ AjaxInterface = InterfaceImplementor.extend({
 				}
 			}
 			
+			var args = arguments;
+			var _self = this;
+			
 			var subject = SingletonFactory.getInstance(Subject);
+			subject.notifyEvent('AjaxBegan', {
+				key: memcacheKey,
+				args: args,
+				target: _self
+			});
 			$.ajax({
 				dataType: 'json',
 				url: url,
 				type: type,
 				data: params,
 				success: function(ret)	{
-					subject.notifyEvent('AjaxFinished');
+					subject.notifyEvent('AjaxFinished', {
+						key: memcacheKey,
+						args: args,
+						target: _self,
+						error: false
+					});
 					if (ret != null)	{
 						if (type == 'GET' && cache == true)	{
 							//cache the result
@@ -14996,8 +15009,20 @@ AjaxInterface = InterfaceImplementor.extend({
 						AjaxHandler.handleResponse(ret, success, fail, url);
 					}
 				},
-				error: function(ret, textStatus)	{
-					subject.notifyEvent('AjaxFinished');
+				error: function(ret, statusText, errorCode)	{
+					subject.notifyEvent('AjaxError', {ret: ret, 
+						statusText: statusText, 
+						errorCode: errorCode,
+						key: memcacheKey,
+						target: _self,
+						args: args
+					});
+					subject.notifyEvent('AjaxFinished', {
+						key: memcacheKey,
+						args: args,
+						target: _self,
+						error: true
+					});
 				},
 				statusCode: {
 					403: function()	{
@@ -15301,6 +15326,18 @@ EventDispatcher = Class.extend(
 		this.listeners = {};
 	},
 	
+	addEventListenerWithNamespace: function(eventType, eventNamespace, handler) {
+		eventNamespace = eventNamespace || "__global__";
+		if (this.listeners[eventType] == undefined) {
+			this.listeners[eventType] = {};
+		}
+		var listener = this.listeners[eventType];
+		if (!listener[eventNamespace]) {
+			listener[eventNamespace] = Array();
+		}
+		listener[eventNamespace].push(handler);
+	},
+	
 	/**
 	 * Add a new listener for a specific event.
 	 * @param {String} event the event to be handled. 
@@ -15308,34 +15345,54 @@ EventDispatcher = Class.extend(
 	 * at a later time, it must not be an anonymous function
 	 */
 	addEventListener: function(event, handler) {
-		if (this.listeners[event] == undefined) {
-			this.listeners[event] = Array();
+		var strSplited = event.split(' ');
+		for (var i = 0, l = strSplited.length; i < l; i++) {
+			var evt = strSplited[i].trim();
+			if (evt && evt != '') {
+				var ssed = evt.split('.');
+				this.addEventListenerWithNamespace(ssed[0], ssed[1], handler);
+			}
 		}
-		this.listeners[event].push(handler);
+	},
+	
+	dispatchEventWithNamespace: function(event, namespace, args) {
+		var handlers = this.listeners[event][namespace];
+		if (!handlers) 
+			return;
+		for(var i=0, l=handlers.length; i<l;i++) {
+			handlers[i].apply(this, args);
+		}
 	},
 	
 	/**
 	 * Dispatch a event.
 	 * @param {String} event the event to be dispatched.
 	 */
-	dispatchEvent: function(event) {
-		if (!this.disabled)  { 
-			if (this.listeners && this.listeners[event] != undefined) {
-				var handlers = this.listeners[event];
+	dispatchEvent: function(event, eventData) {
+		if (!this.disabled)  {
+			var strSplited = event.split('.');
+			var eventType = strSplited[0];
+			var eventNamespace = strSplited[1];
+			
+			if (this.listeners && this.listeners[eventType] != undefined) {
 				var args = Array();
-				for(var i=1; i<arguments.length; i++) {
+				for(var i=1, l=arguments.length; i<l; i++) {
 					args.push(arguments[i]);
 				}
-				for(var i=0;i<handlers.length;i++) {
-					var result = handlers[i].apply(this, args);
-					if (result === false)
-						return;
+				
+				if (eventNamespace) {
+					this.dispatchEventWithNamespace(eventType, '__global__', args);
+					this.dispatchEventWithNamespace(eventType, eventNamespace, args);
+				} else {
+					var handlerNamespace = this.listeners[eventType];
+					for(var i in handlerNamespace) {
+						this.dispatchEventWithNamespace(eventType, i, args);
+					}
 				}
 			}
-			if (this._parent) {
-				this._parent.dispatchEvent.apply(this._parent, arguments);
-			}
+			return true;
 		}
+		return false;
 	},
 	
 	/**
@@ -15344,10 +15401,40 @@ EventDispatcher = Class.extend(
 	 * @param {Function} handler the handler to be removed
 	 */
 	removeEventListener: function(event, handler) {
-		if (this.listeners && this.listeners[event] != undefined) {
-			var index = this.listeners[event].indexOf(handler);
+		if (!event) {
+			this.listeners = {};
+			return;
+		}
+		var strSplited = event.split('.');
+		var eventType = strSplited[0];
+		var eventNamespace = strSplited[1];
+
+		if (this.listeners[eventType] == undefined) {
+			return;
+		}
+		
+		if (handler == undefined) {
+			if (eventNamespace) {
+				this.listeners[eventType][eventNamespace] = undefined;
+			} else {
+				this.listeners[eventType] = undefined;
+			}
+			return;
+		}
+		
+		var index = -1;
+		if (eventNamespace) {
+			index = this.listeners[eventType][eventNamespace].indexOf(handler);
 			if (index != -1)
-				this.listeners[event].splice(index, 1);
+				this.listeners[eventType][eventNamespace].splice(index, 1);
+		} else {
+			for(var i in this.listeners[eventType]) {
+				index = this.listeners[eventType][i].indexOf(handler);
+				if (index != -1) {
+					this.listeners[eventType][i].splice(index, 1);
+					break;
+				}
+			}
 		}
 	},
 	
@@ -15426,17 +15513,31 @@ DisplayObject = EventDispatcher.extend(
 		this.setStyle('height', parent.getHeight());
 	},
 
-	addEventListener: function(event, handler) {
+	addEventListenerWithNamespace: function(event, namespace, handler) {
 		if (this.domEventBound[event] != true) {
 			this.access().bind(event, {_self: this, event: event}, this.bindEvent );
 			this.domEventBound[event] = true;
 		}
-		this._super(event, handler);
+		this._super(event, namespace, handler);
 	},
 	
-	dispatchEvent: function(event) {
-		if (!this.disabled) {
-			this._super.apply(this, arguments);
+	dispatchEvent: function(event, eventData) {
+		if (!eventData) eventData = {};
+		if (typeof eventData['stopPropagation'] == 'undefined') {
+			eventData.stopPropagation = function() {
+				this.isBubbleStop = true;
+			};
+		}
+		var args = [event, eventData];
+		var eventType = event.split('.')[0];
+		
+		var skipped = ['stageUpdated'];	//stageUpdated is internal event and should not be propagated
+		var result = this._super.apply(this, args);
+		if (result) {
+			if (this._parent && !eventData.isBubbleStop 
+					&& skipped.indexOf(eventType) == -1) {
+				this._parent.dispatchEvent.apply(this._parent, args);
+			}
 		}
 	},
 	
