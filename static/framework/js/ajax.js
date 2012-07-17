@@ -39,15 +39,27 @@ AjaxInterface = InterfaceImplementor.extend({
 				}
 			}
 			
+			var args = arguments;
+			var _self = this;
+			
 			var subject = SingletonFactory.getInstance(Subject);
-			subject.notifyEvent('AjaxBegan');
+			subject.notifyEvent('AjaxBegan', {
+				key: memcacheKey,
+				args: args,
+				target: _self
+			});
 			$.ajax({
 				dataType: 'json',
 				url: url,
 				type: type,
 				data: params,
 				success: function(ret)	{
-					subject.notifyEvent('AjaxFinished');
+					subject.notifyEvent('AjaxFinished', {
+						key: memcacheKey,
+						args: args,
+						target: _self,
+						error: false
+					});
 					if (ret != null)	{
 						if (type == 'GET' && cache == true)	{
 							//cache the result
@@ -59,9 +71,20 @@ AjaxInterface = InterfaceImplementor.extend({
 						AjaxHandler.handleResponse(ret, success, fail, url);
 					}
 				},
-				error: function(ret, textStatus)	{
-					subject.notifyEvent('AjaxError', {ret: ret, statusText: statusText, errorCode: errorCode});
-					subject.notifyEvent('AjaxFinished');
+				error: function(ret, statusText, errorCode)	{
+					subject.notifyEvent('AjaxError', {ret: ret, 
+						statusText: statusText, 
+						errorCode: errorCode,
+						key: memcacheKey,
+						target: _self,
+						args: args
+					});
+					subject.notifyEvent('AjaxFinished', {
+						key: memcacheKey,
+						args: args,
+						target: _self,
+						error: true
+					});
 				},
 				statusCode: {
 					403: function()	{
