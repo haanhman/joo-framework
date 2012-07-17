@@ -1,0 +1,198 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link href="static/css/default/ui.css" rel="stylesheet" type="text/css" />
+		<link href="static/css/default/portlet.css" rel="stylesheet" type="text/css" />
+		<link href="static/css/default/sample.css" rel="stylesheet" type="text/css" />
+		<link href="static/js/thirdparty/colorpicker/css/colorpicker.css" rel="stylesheet" type="text/css" />
+	</head>
+	
+    <body>
+        <!-- required libraries -->
+        <script type="text/javascript" src="static/js/lib/jquery-1.7.1.min.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.ui.core.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.ui.widget.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.ui.mouse.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.ui.draggable.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.ui.droppable.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.effects.core.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.effects.bounce.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.json-2.2.js"></script>
+		<script type="text/javascript" src="static/js/lib/jquery.cookie.js"></script>
+		<script type="text/javascript" src="static/js/lib/inherit.js"></script>
+		<script type="text/javascript" src="static/js/lib/micro-templating.js"></script>
+		<script type="text/javascript" src="static/js/lib/kinetic-v3.7.3.js"></script>
+		
+		<!-- 3rd party library -->
+		<script type="text/javascript" src="static/js/thirdparty/colorpicker/colorpicker.js"></script>
+		
+        <!-- framework -->
+        <script type="text/javascript" src="static/js/framework/base.js"></script>
+		<script type="text/javascript" src="static/js/framework/ui.base.js"></script>
+		<script type="text/javascript" src="static/js/framework/ui.interfaces.js"></script>
+		<script type="text/javascript" src="static/js/framework/ui.controls.js"></script>
+		<script type="text/javascript" src="static/js/framework/ui.extras.js"></script>
+		<script type="text/javascript" src="static/js/framework/ui.experimental.js"></script>
+        <script type="text/javascript" src="static/js/framework/event.js"></script>
+        <script type="text/javascript" src="static/js/framework/observer.js"></script>
+        <script type="text/javascript" src="static/js/framework/plugins.js"></script>
+        <script type="text/javascript" src="static/js/framework/page.js"></script>
+        <script type="text/javascript" src="static/js/framework/portlet.js"></script>
+        <script type="text/javascript" src="static/js/framework/request.js"></script>
+        <script type="text/javascript" src="static/js/framework/bootstrap.js"></script>
+        <script type="text/javascript" src="static/js/framework/utils.js"></script>
+		<script type="text/javascript" src="static/js/framework/memcached.js"></script>
+		
+		<!-- application bootstrap -->
+		
+		<!-- application plugins -->
+		
+		<!-- application portlets -->
+		<script type="text/javascript" src="static/js/app/portlets/samples/SamplePortlet.js"></script>
+
+		<!-- addons -->
+
+		<!-- entry-point -->
+		
+		<script type="text/javascript" src="static/js/app/appinfo.js"></script>
+
+        <div id="Application-Main"></div>
+		<!-- indicate the application main area, as specified in index.default.js -->
+		
+		<script type="text/javascript">
+			//stage
+			var stage = new Stage({id: 'Application-Main'});
+			stage.setLayout('vertical');
+			stage.setStyle('background-color', 'silver');
+			stage.setHeight('100%');
+			
+			var drawingArea = new Sketch({width: 800, height: '85%'});
+			drawingArea.access().addClass('drawing-area');
+			drawingArea.setLayout('absolute');
+			stage.addChild(drawingArea);
+			
+			var sketch = new Sketch({width: '100%', height: '100', backgroundColor: 'white'});
+			sketch.setLayout('flow');
+			stage.addChild(sketch);
+			
+			var ruler = new JOORuler({width: 1000, height: 100, initMax: 500, initMin: 50, interval: 10, groupMode: "quarter"});
+			
+			var frameLabel = new JOOLabel({lbl: 'Current frame: '+ruler.getValue()});
+			sketch.addChild(frameLabel);
+			
+			sketch.addChild(ruler);
+			
+			var frameRegBtn = new JOOButton({lbl: 'Register Frame'});
+			sketch.addChild(frameRegBtn);
+			
+			var changed = true;
+			var prevFrame = ruler.getValue();
+			ruler.addEventListener('change', function() {
+				/**
+				changed = true;
+				frameLabel.setText('Current frame: '+this.getValue());
+				
+				if (!changed) {
+					alert('Must change frame');
+					return;
+				}
+				changed = false;*/
+				var curFrame = prevFrame;
+				prevFrame = ruler.getValue();
+				var children = drawingArea.children;
+				var animations = Array();
+				for(var i=0; i<children.length; i++) {
+					animationData.objects[children[i].getId()] = {
+						id: children[i].getId(),
+						className: children[i].className,
+						config: children[i].config
+					}
+					var styles = children[i].getAttribute('style');
+					animations.push({
+						object: children[i].getId(),
+						actions: styles
+					});
+				}
+				animationData.animations.push({
+					keyFrame: curFrame,
+					animations: animations 
+				});
+			});
+			
+			var toolBox = new Sketch();
+			toolBox.access().addClass('tool-box');
+			stage.addChild(toolBox);
+			toolBox.setLocation(0, 0);
+			
+			var buttonIcon = new JOOAvatarIcon({
+				src: 'static/images/image-default.png',
+				getRealObject: function() {
+					var obj = new JOOImage({src: 'static/images/image-default.png'});
+					Wrapper.wrap(obj, DraggableInterface);
+					Wrapper.wrap(obj, ResizableInterface);
+					obj.startDrag();
+					obj.beginEditable();
+					return obj;
+				}
+			});
+			toolBox.addChild(buttonIcon);
+			
+			Wrapper.wrap(toolBox, DraggableInterface);
+			toolBox.startDrag();
+			
+			Wrapper.wrap(drawingArea, DroppableInterface);
+			drawingArea.droppable();
+			SingletonFactory.getInstance(DragDropController).registerDragDrop(buttonIcon, [drawingArea]);
+			SingletonFactory.getInstance(DragDropController).updateDragDrop();
+			
+			var animationData = {
+				objects: {},
+				animations: []
+			};
+			
+			var helpDlg = new JOODialog({modal: true, width: 400, height: 200});
+			helpDlg.setTitle('How to use JAT (Joo Animation Tool)');
+			var helpContent = new Graphic();
+			helpContent.paint('<ul>' +
+				'<li>Step 1: Drag & drop from the toolbox to the main drawing area</li>' +
+				'<li>Step 2: Click Register frame</li>' +
+				'<li>Step 3: Slide the ruler to the next frame</li>' +
+				'<li>Step 4: Drag the object to another position of your choice</li>' +
+				'<li>Repeat step 2-4</li>' +
+			'</ul>');
+			helpDlg.getContentPane().addChild(helpContent);
+			stage.addChild(helpDlg);
+			helpDlg.center();
+			
+			var previewBtn = new JOOButton({lbl: 'Preview'});
+			previewBtn.addEventListener('click', function() {
+				previewAnim(animationData);
+			});
+			
+			previewBtn.setStyle('position', 'fixed');
+			previewBtn.setStyle('top', '50');
+			previewBtn.setStyle('right', '50');
+			stage.addChild(previewBtn);
+			
+			function previewAnim(animationData) {
+				var dlg = new JOODialog({modal: true, width: 800, height: 500});
+				dlg.setTitle('Playing...');
+				var sketch = new Sketch({width: 800, height: 450});
+				sketch.access().addClass('drawing-area');
+				var clip = new JOOMovieClip({data: animationData});
+				sketch.addChild(clip);
+				dlg.getContentPane().addChild(sketch);
+				var replayBtn = new JOOButton({lbl: 'Replay'});
+				replayBtn.addEventListener('click', function () {
+					clip.replay();
+				});
+				dlg.getContentPane().addChild(replayBtn);
+				stage.addChild(dlg);
+				
+				dlg.center();
+				
+				clip.play();
+			}
+		</script>
+</body>
+</html>

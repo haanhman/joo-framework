@@ -40,6 +40,7 @@ AjaxInterface = InterfaceImplementor.extend({
 			}
 			
 			var subject = SingletonFactory.getInstance(Subject);
+			subject.notifyEvent('AjaxBegan');
 			$.ajax({
 				dataType: 'json',
 				url: url,
@@ -59,6 +60,7 @@ AjaxInterface = InterfaceImplementor.extend({
 					}
 				},
 				error: function(ret, textStatus)	{
+					subject.notifyEvent('AjaxError', {ret: ret, statusText: statusText, errorCode: errorCode});
 					subject.notifyEvent('AjaxFinished');
 				},
 				statusCode: {
