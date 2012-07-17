@@ -1,0 +1,116 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link href="static/css/default/ui.css" rel="stylesheet" type="text/css" />
+		<link href="static/css/default/portlet.css" rel="stylesheet" type="text/css" />
+		<link href="static/css/default/sample.css" rel="stylesheet" type="text/css" />
+		<link href="static/js/thirdparty/colorpicker/css/colorpicker.css" rel="stylesheet" type="text/css" />
+	</head>
+	
+    <body>
+        <!-- required libraries -->
+        <script type="text/javascript" src="static/js/lib/jquery-1.7.1.min.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.ui.core.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.ui.widget.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.ui.mouse.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.ui.draggable.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.ui.droppable.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.effects.core.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.effects.bounce.js"></script>
+        <script type="text/javascript" src="static/js/lib/jquery.json-2.2.js"></script>
+		<script type="text/javascript" src="static/js/lib/jquery.cookie.js"></script>
+		<script type="text/javascript" src="static/js/lib/inherit.js"></script>
+		<script type="text/javascript" src="static/js/lib/micro-templating.js"></script>
+		
+		<!-- 3rd party library -->
+		<script type="text/javascript" src="static/js/thirdparty/colorpicker/colorpicker.js"></script>
+		
+        <!-- framework -->
+        <script type="text/javascript" src="static/js/framework/base.js"></script>
+		<script type="text/javascript" src="static/js/framework/ui.base.js"></script>
+		<script type="text/javascript" src="static/js/framework/ui.interfaces.js"></script>
+		<script type="text/javascript" src="static/js/framework/ui.controls.js"></script>
+		<script type="text/javascript" src="static/js/framework/ui.extras.js"></script>
+		<script type="text/javascript" src="static/js/framework/ui.experimental.js"></script>
+        <script type="text/javascript" src="static/js/framework/event.js"></script>
+        <script type="text/javascript" src="static/js/framework/observer.js"></script>
+        <script type="text/javascript" src="static/js/framework/plugins.js"></script>
+        <script type="text/javascript" src="static/js/framework/page.js"></script>
+        <script type="text/javascript" src="static/js/framework/portlet.js"></script>
+        <script type="text/javascript" src="static/js/framework/request.js"></script>
+        <script type="text/javascript" src="static/js/framework/bootstrap.js"></script>
+        <script type="text/javascript" src="static/js/framework/utils.js"></script>
+		<script type="text/javascript" src="static/js/framework/memcached.js"></script>
+		
+		<!-- application bootstrap -->
+		
+		<!-- application plugins -->
+		
+		<!-- application portlets -->
+		<script type="text/javascript" src="static/js/app/portlets/samples/SamplePortlet.js"></script>
+
+		<!-- addons -->
+
+		<!-- entry-point -->
+		
+		<script type="text/javascript" src="static/js/app/appinfo.js"></script>
+
+        <div id="Application-Main"></div>
+		<!-- indicate the application main area, as specified in index.default.js -->
+		
+		<script type="text/javascript">
+			//stage
+			var stage = new Stage({id: 'Application-Main'});
+			stage.setLayout('vertical');
+			var data = {
+				objects: [
+					{id: 'button', className: JOOButton, config: {lbl: 'Object1'}}
+				],
+				animations: [
+					{keyFrame: 25, animations: [
+   						{
+   							object: 'button', 
+   							effects: [
+   								{name: 'bounce', option: {time: 1}}
+   							]
+   						}
+   					]},
+					{keyFrame: 70, animations: [
+						{
+							object: 'button', 
+							actions: 'width: 100px; top: 400px; left: 200px; height: 200px; -webkit-transform: rotate(100deg);',
+							script: function() {
+								this.pause();
+								var _self = this;
+								setTimeout(function() {
+									_self.resume();
+								}, 5000);
+							}
+						}
+					]},
+					{keyFrame: 105, animations: [
+					    {object: 'button', actions: '-webkit-transform: rotate(400deg)'},
+					]},
+					{keyFrame: 135, animations: [
+						{object: 'button', actions: 'width: 20px; height: 20px; left: 1000px; height: 150px;-webkit-transform: rotate(90deg)'},
+					]},
+					{keyFrame: 170, animations: [
+						{object: 'button', actions: 'width: 20px; height: 20px; left: 1000px; -webkit-transform: rotate(90deg)'},
+					]},
+					{keyFrame: 205, animations: [
+						
+					]},
+					{keyFrame: 235, animations: [
+						{object: 'button', actions: 'left: 900px; height: 150px;top: 150px;-webkit-transform: rotate(90deg)'},
+					]},
+				],
+				frames: 235
+			};
+			var clip = new JOOMovieClip({data: data});
+			stage.addChild(clip);
+			clip.play();
+			clip.addEventListener("frameEnded", function() {
+			});
+		</script>
+</body>
+</html>
