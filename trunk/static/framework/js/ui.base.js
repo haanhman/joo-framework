@@ -1751,7 +1751,7 @@ JOOMenu = JOOMenuItem.extend(
 		return this.items;
 	},
 	
-	onclick: function() {
+	onclick: function(e) {
 		e.stopPropagation();
 		this.toggleMenuItems();
 	},
