@@ -195,7 +195,7 @@ ExpressionUtils = {
 	
 	expressSetter: function(obj, expression, value) {
 		if (typeof value == 'string') {
-			value = value.replace(/'/g, "\\'")
+			value = value.replace(/'/g, "\\'");
 		}
 		var s = "obj."+expression+" = '"+value+"'";
 		try {
@@ -255,5 +255,25 @@ JOOUtils = {
 			attrs[attributes[i].nodeName] = attributes[i].nodeValue;
 		}
 		return attrs;
+	},
+	
+	requestFullScreen: function() {
+		if (document.documentElement.requestFullScreen) {  
+			document.documentElement.requestFullScreen();  
+	    } else if (document.documentElement.mozRequestFullScreen) {  
+	    	document.documentElement.mozRequestFullScreen();  
+	    } else if (document.documentElement.webkitRequestFullScreen) {  
+	    	document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);  
+	    }
+	},
+	
+	cancelFullScreen: function() {
+		if (document.cancelFullScreen) {  
+			document.cancelFullScreen();  
+		} else if (document.mozCancelFullScreen) {  
+			document.mozCancelFullScreen();  
+		} else if (document.webkitCancelFullScreen) {  
+			document.webkitCancelFullScreen();  
+		}  
 	}
 };
