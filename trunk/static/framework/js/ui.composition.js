@@ -63,7 +63,7 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 		var config = JOOUtils.getAttributes(composition);
 		
 		var handlers = {};
-		var bindings = undefined;
+		var bindings = [];
 		
 		var isAddTab = false;
 		var isAddItem = false;
@@ -78,7 +78,10 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 			} else if (config[i].indexOf('#{') == 0) {
 				var expression = config[i].substr(2, config[i].length-3);
 				config[i] = ExpressionUtils.express(model, expression);
-				bindings = expression;
+				bindings.push({
+					expression: expression,
+					boundProperty: i
+				});
 			} else if (config[i].indexOf('${') == 0) {
 				var expression = config[i].substr(2, config[i].length-3);
 				config[i] = ExpressionUtils.express(root, expression);
@@ -128,14 +131,14 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 			})(i);
 		}
 		
-		if (bindings != undefined) {
+		for (var i=0, l=bindings.length; i<l; i++) {
 			/*
 			currentObject.dataBindings = bindings;
 			currentObject.addEventListener('change', function() {
 				root.dispatchEvent('bindingchanged', currentObject);
 			});
 			*/
-			root.bindModelView(currentObject, model, bindings);
+			root.bindModelView(currentObject, model, bindings[i].expression, bindings[i].boundProperty);
 		}
 		
 		var varName = $composition.attr('varName');
