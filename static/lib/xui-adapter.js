@@ -1,1 +1,0 @@
-JOOUtils.getResourceManager().setResourceLocator(new XuiResourceLocator());

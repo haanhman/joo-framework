@@ -1,3 +1,0 @@
-SamplePortlet = RenderPortlet.extend({
-	
-});

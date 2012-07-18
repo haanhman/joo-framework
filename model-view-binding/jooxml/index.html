@@ -1,0 +1,54 @@
+<html>
+	<head>
+		<title>Model-View bindings with JOOXML support</title>
+		
+		<link rel="stylesheet" type="text/css" href="framework/joo-2.0.3.min.css" />
+	</head>
+	
+	<body>
+		<div id="Application-Main"></div>
+		
+		<script type="text/html" id="MyStageView">
+			<joo:composition>
+		    	<joo:JOOTextInput varName="input" value="#{myInputValue}" />
+		    </joo:composition>
+		</script>
+		
+		<script type="text/javascript" src="framework/joo-2.0.3r15.js"></script>
+		
+		<script>
+			//create subclass of Stage
+			var MyStage = Stage.extend({
+			    setupDomObject: function(config) {
+			        this._super(config);
+			        
+			        //render the JOOXML
+			        this.renderUIComposition();
+			    }
+			}).implement(CompositionRenderInterface);
+		</script>
+		
+		<script type="text/javascript" src="framework/class-name-injection.js"></script>
+			
+		<script type="text/javascript">
+
+			//initialize model
+			var model = JOOModel.from({
+			    myInputValue: 'Hello, the input is change'
+			});
+
+			//instantiate the stage
+			var stage = new MyStage({
+			    id: 'Application-Main',
+			    model: model
+			});
+			
+			stage.input.addEventListener('change', function() {
+			    //the view changes, let see if the model is change too
+			    console.log(model.myInputValue);
+			});
+			
+			model.myInputValue = "JOO Framework is great!";
+		</script>
+	</body>
+</html>
