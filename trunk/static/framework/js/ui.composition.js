@@ -19,7 +19,7 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 			_self.processElement(this, this, composition[0], model);
 		};
 		
-		obj.prototype.bindModelView = obj.prototype.bindModelView || function(ui, model, path) {
+		obj.prototype.bindModelView = obj.prototype.bindModelView || function(ui, model, path, boundProperty) {
 			ui.setValue(ExpressionUtils.express(model, path));
 			
 			//constraint model to view
@@ -30,10 +30,11 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 					var _currentTarget = ui._currentTarget;
 					ui._currentTarget = this;
 					if (e.type == 'setter') {
-						ui.setValue(ExpressionUtils.express(model, path), {path: e.path, bindingPath: path});
+						var method = ExpressionUtils.getMutatorMethod(ui, boundProperty);
+						method.call(ui, ExpressionUtils.express(model, path), {path: e.path, bindingPath: path});
 					} else {
 						if (typeof ui['partialModelChange'] == 'function') {
-							ui.partialModelChange(model, e);
+							ui.partialModelChange(model, e, boundProperty);
 						}
 					}
 					ui._currentTarget = _currentTarget;
@@ -46,7 +47,9 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 					return;
 				var _currentTarget = model._currentTarget;
 				model._currentTarget = this;
-				ExpressionUtils.expressSetter(model, path, ui.getValue());
+				var method = ExpressionUtils.getAccessorMethod(ui, boundProperty);
+				var val = method.call(ui);
+				ExpressionUtils.expressSetter(model, path, val);
 				model._currentTarget = _currentTarget;
 			});
 		};

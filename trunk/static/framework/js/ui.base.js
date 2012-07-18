@@ -387,7 +387,8 @@ DisplayObject = EventDispatcher.extend(
 //		this.access().addClass('joo-ui');	//for base styles, e.g: all DisplayObject has 'position: absolute'
 		
 		if (config.tooltip)
-			this.setAttribute('title', config.tooltip);
+			this.setTooltip(config.tooltip);
+			
 //		if (!config.absolute) {
 			if (config.x != undefined)
 				this.setX(config.x);
@@ -417,6 +418,14 @@ DisplayObject = EventDispatcher.extend(
 				this.setStyle(i, config.custom[i]);
 			}
 		}
+	},
+	
+	getTooltip: function() {
+		return this.getAttribute('title');
+	},
+	
+	setTooltip: function(tooltip) {
+		this.setAttribute('title', tooltip);
 	},
 	
 	/**
@@ -1014,6 +1023,10 @@ DisplayObjectContainer = DisplayObject.extend(
 		this.layout = layout;
 	},
 	
+	getLayout: function() {
+		return this.layout;
+	},
+	
 	dispose: function(skipRemove) {
 		for(var i=0;i<this.children.length;i++) {
 			this.children[i].dispose(true);
@@ -1048,7 +1061,15 @@ Graphic = DisplayObject.extend(
 	
 	setupDomObject: function(config) {
 		this._super(config);
-		this.repaint(config.html);
+		this.setHtml(config.html);
+	},
+	
+	getHtml: function() {
+		return this.access().html();
+	},
+	
+	setHtml: function(html) {
+		this.repaint(html);
 	},
 	
 	/**
@@ -1682,10 +1703,18 @@ JOOMenuItem = Sketch.extend(
 		if (config.lbl == undefined) {
 			config.lbl = this.id;
 		}
-		this._outputText(config.lbl);
+		this.setLbl(config.lbl);
 		if (config.command != undefined)
 			this.onclick = config.command;
 		this.addEventListener('click', this.onclick);
+	},
+	
+	getLbl: function() {
+		return this.access().html();
+	},
+	
+	setLbl: function(lbl) {
+		this._outputText(lbl);
 	},
 	
 	_outputText: function(label) {
@@ -1933,7 +1962,7 @@ JOOIFrame = Sketch.extend(
 	setupDomObject: function(config) {
 		this._super(config);
 		if (config.src)
-			this.setAttribute('src', config.src);
+			this.setSrc(config.src);
 		this.setAttribute('name', this.getId());
 	},
 	
@@ -1944,7 +1973,7 @@ JOOIFrame = Sketch.extend(
 	setSrc: function(src) {
 		this.setAttribute('src', src);
 	},
-
+	
 	/**
 	 * Get the source of the iframe
 	 * @returns {String} the source of the iframe
@@ -1975,8 +2004,24 @@ JOOForm = Sketch.extend(
 		this._super(config);
 		config.method = config.method || "post";
 		config.encType = config.encType || "application/x-www-form-urlencoded";
-		this.setAttribute("method", config.method);
-		this.setAttribute("enctype", config.encType);
+		this.setMethod(config.method);
+		this.setEncType(config.encType);
+	},
+	
+	setMethod: function(method) {
+		this.setAttribute("method", method);
+	},
+	
+	getMethod: function() {
+		return this.getAttribute("method");
+	},
+	
+	setEncType: function(encType) {
+		this.setAttribute("enctype", encType);
+	},
+	
+	getEncType: function() {
+		return this.getAttribute("enctype");
 	},
 
 	/**

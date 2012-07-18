@@ -16,7 +16,7 @@ JOOText = UIComponent.extend(
 		this._super(config);
 		this.text = new Sketch();
 		if (config.lbl)
-			this.setValue(config.lbl);
+			this.setLbl(config.lbl);
 
 		if (!config.readonly) {
 			this.addEventListener('dblclick', function() {
@@ -68,6 +68,14 @@ JOOText = UIComponent.extend(
 //		}}));
 	},
 	
+	setLbl: function(lbl) {
+		this.setValue(lbl);
+	},
+	
+	getLbl: function() {
+		return this.getValue();
+	},
+	
 	setValue: function(lbl) {
 		this.text.access().html(lbl);
 	},
@@ -106,11 +114,27 @@ JOOVideo = UIComponent.extend(
 	setupDomObject: function(config) {
 		this._super(config);
 		if (config.controls) {
-			this.setAttribute('controls', '');
+			this.setControls(config.controls);
 		}
 		if (config.src) {
-			this.setAttribute('src', config.src);
+			this.setSrc(config.src);
 		}
+	},
+	
+	setControls: function(controls) {
+		this.setAttribute('controls', controls);
+	},
+	
+	getControls: function() {
+		return this.getAttribute('controls');
+	},
+	
+	setSrc: function(src) {
+		this.setAttribute('src', src);
+	},
+	
+	getSrc: function() {
+		return this.getAttribute('src');
 	},
 
 	/**
@@ -201,12 +225,14 @@ JOOImage = UIComponent.extend(
 {
 	setupDomObject: function(config) {
 		this._super(config);
-		this.defaultSrc = config.defaultSrc || "static/images/image-default.png";
+		this.defaultSrc = config.defaultSrc;
 		config.src = config.src || this.defaultSrc;
 		this.setSrc(config.src);
-		this.addEventListener('error', function() {
-			this.setSrc(this.defaultSrc);
-		});
+		if (this.defaultSrc) {
+			this.addEventListener('error', function() {
+				this.setSrc(this.defaultSrc);
+			});
+		}
 	},
 	
 	toHtml: function()	{
@@ -246,9 +272,18 @@ JOOInput = UIComponent.extend(
 	setupDomObject: function(config) {
 		this._super(config);
 		this.access().val(config.value);
-		this.setAttribute('name', config.name);
+		if (config.name)
+			this.setName(config.name);
 		if (config.placeholder)
-		this.setAttribute('placeholder', config.placeholder);
+			this.setPlaceholder(config.placeholder);
+	},
+	
+	setPlaceholder: function(placeholder) {
+		this.setAttribute('placeholder', placeholder);
+	},
+	
+	getPlaceholder: function() {
+		return this.getAttribute('placeholder');
 	},
 
 	/**
@@ -268,6 +303,10 @@ JOOInput = UIComponent.extend(
 	 */
 	getValue: function()	{
 		return this.access().val();
+	},
+	
+	setName: function(name) {
+		this.setAttribute('name', name);
 	},
 	
 	/**
@@ -304,7 +343,7 @@ JOOTextArea = JOOInput.extend	(
 	 * @returns {String} the value of the textarea
 	 */
 	getText: function()	{
-		return this.access().val();
+		return this.getValue();
 	}
 });
 
@@ -317,7 +356,15 @@ JOOLabel = UIComponent.extend	(
 {
 	setupDomObject: function(config) {
 		this._super(config);
-		this.access().html(config.lbl);
+		this.setLbl(config.lbl);
+	},
+	
+	setLbl: function(lbl) {
+		this.access().html(lbl);
+	},
+	
+	getLbl: function() {
+		return this.access().html();
 	},
 	
 	toHtml: function()	{
@@ -329,7 +376,7 @@ JOOLabel = UIComponent.extend	(
 	 * @returns {String} the label's text
 	 */
 	getText: function()	{
-		return this.access().html();
+		return this.getLbl();
 	},
 	
 	/**
@@ -337,7 +384,7 @@ JOOLabel = UIComponent.extend	(
 	 * @param {String} txt the new text
 	 */
 	setText: function(txt)	{
-		this.access().html(txt);
+		this.setLbl(txt);
 	}
 });
 
@@ -425,7 +472,19 @@ JOOSelectOption = Graphic.extend({
 	setupDomObject: function(config) {
 		this._super(config);
 		this.repaint(config.label);
-		this.setAttribute("value", config.value);
+		this.setValue(config.value);
+	},
+	
+	getValue: function() {
+		return this.getAttribute("value");
+	},
+	
+	setValue: function(value) {
+		var old = this.getAttribute("value");
+		if (old != value) {
+			this.setAttribute("value", value);
+			this.dispatchEvent('change');
+		}
 	},
 	
 	toHtml: function() {
@@ -543,7 +602,7 @@ JOOButton = UIComponent.extend(
 	setupDomObject: function(config) {
 		this._super(config);
 		if (config.lbl != undefined) {
-			this.access().html(config.lbl);
+			this.setLbl(config.lbl);
 		}
 		this.addEventListener('click', function(e) {
 			this.onclick(e);
@@ -551,6 +610,14 @@ JOOButton = UIComponent.extend(
 //		this.addEventListener('mousedown', function(e) {
 //			this.access().addClass('focus');
 //		});
+	},
+	
+	setLbl: function(lbl) {
+		this.access().html(lbl);
+	},
+	
+	getLbl: function() {
+		return this.access().html();
 	},
 	
 	toHtml: function()	{
@@ -720,7 +787,6 @@ JOOSprite = UIComponent.extend(
 {
 	setupDomObject: function(config) {
 		this._super(config);
-		this.src = config.src;
 		this.framerate = config.framerate || 30;
 		this.loop = config.loop || false;
 		this.currentFrame = 0;
@@ -730,6 +796,20 @@ JOOSprite = UIComponent.extend(
 		this.spriteHeight = config.spriteHeight;
 		this.speed = config.speed || 1;
 		this.stopped = false;
+		
+		if (config.src)
+			this.setSrc(config.src);
+		this.setWidth(this.spriteWidth);
+		this.setHeight(this.spriteHeight);
+	},
+	
+	setSrc: function(src) {
+		this.src = src;
+		this.access().css('background-image', 'url('+this.src+')');
+	},
+	
+	getSrc: function() {
+		return this.src;
 	},
 
 	/**
@@ -747,11 +827,6 @@ JOOSprite = UIComponent.extend(
 		} 
 		this.currentFrame = this.startFrame;
 		
-		this.setWidth(this.spriteWidth);
-		this.setHeight(this.spriteHeight);
-		if (this.src)
-			this.access().css('background-image', 'url('+this.src+')');
-
 		this.playFrame();
 		this._playWithFramerate(this.framerate);
 	},
