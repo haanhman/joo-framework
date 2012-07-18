@@ -15170,7 +15170,7 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 			_self.processElement(this, this, composition[0], model);
 		};
 		
-		obj.prototype.bindModelView = obj.prototype.bindModelView || function(ui, model, path) {
+		obj.prototype.bindModelView = obj.prototype.bindModelView || function(ui, model, path, boundProperty) {
 			ui.setValue(ExpressionUtils.express(model, path));
 			
 			//constraint model to view
@@ -15181,10 +15181,11 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 					var _currentTarget = ui._currentTarget;
 					ui._currentTarget = this;
 					if (e.type == 'setter') {
-						ui.setValue(ExpressionUtils.express(model, path), {path: e.path, bindingPath: path});
+						var method = ExpressionUtils.getMutatorMethod(ui, boundProperty);
+						method.call(ui, ExpressionUtils.express(model, path), {path: e.path, bindingPath: path});
 					} else {
 						if (typeof ui['partialModelChange'] == 'function') {
-							ui.partialModelChange(model, e);
+							ui.partialModelChange(model, e, boundProperty);
 						}
 					}
 					ui._currentTarget = _currentTarget;
@@ -15197,7 +15198,9 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 					return;
 				var _currentTarget = model._currentTarget;
 				model._currentTarget = this;
-				ExpressionUtils.expressSetter(model, path, ui.getValue());
+				var method = ExpressionUtils.getAccessorMethod(ui, boundProperty);
+				var val = method.call(ui);
+				ExpressionUtils.expressSetter(model, path, val);
 				model._currentTarget = _currentTarget;
 			});
 		};
@@ -15211,7 +15214,7 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 		var config = JOOUtils.getAttributes(composition);
 		
 		var handlers = {};
-		var bindings = undefined;
+		var bindings = [];
 		
 		var isAddTab = false;
 		var isAddItem = false;
@@ -15226,7 +15229,10 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 			} else if (config[i].indexOf('#{') == 0) {
 				var expression = config[i].substr(2, config[i].length-3);
 				config[i] = ExpressionUtils.express(model, expression);
-				bindings = expression;
+				bindings.push({
+					expression: expression,
+					boundProperty: i
+				});
 			} else if (config[i].indexOf('${') == 0) {
 				var expression = config[i].substr(2, config[i].length-3);
 				config[i] = ExpressionUtils.express(root, expression);
@@ -15276,14 +15282,14 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 			})(i);
 		}
 		
-		if (bindings != undefined) {
+		for (var i=0, l=bindings.length; i<l; i++) {
 			/*
 			currentObject.dataBindings = bindings;
 			currentObject.addEventListener('change', function() {
 				root.dispatchEvent('bindingchanged', currentObject);
 			});
 			*/
-			root.bindModelView(currentObject, model, bindings);
+			root.bindModelView(currentObject, model, bindings[i].expression, bindings[i].boundProperty);
 		}
 		
 		var varName = $composition.attr('varName');
@@ -15695,7 +15701,8 @@ DisplayObject = EventDispatcher.extend(
 //		this.access().addClass('joo-ui');	//for base styles, e.g: all DisplayObject has 'position: absolute'
 		
 		if (config.tooltip)
-			this.setAttribute('title', config.tooltip);
+			this.setTooltip(config.tooltip);
+			
 //		if (!config.absolute) {
 			if (config.x != undefined)
 				this.setX(config.x);
@@ -15725,6 +15732,14 @@ DisplayObject = EventDispatcher.extend(
 				this.setStyle(i, config.custom[i]);
 			}
 		}
+	},
+	
+	getTooltip: function() {
+		return this.getAttribute('title');
+	},
+	
+	setTooltip: function(tooltip) {
+		this.setAttribute('title', tooltip);
 	},
 	
 	/**
@@ -16322,6 +16337,10 @@ DisplayObjectContainer = DisplayObject.extend(
 		this.layout = layout;
 	},
 	
+	getLayout: function() {
+		return this.layout;
+	},
+	
 	dispose: function(skipRemove) {
 		for(var i=0;i<this.children.length;i++) {
 			this.children[i].dispose(true);
@@ -16356,7 +16375,15 @@ Graphic = DisplayObject.extend(
 	
 	setupDomObject: function(config) {
 		this._super(config);
-		this.repaint(config.html);
+		this.setHtml(config.html);
+	},
+	
+	getHtml: function() {
+		return this.access().html();
+	},
+	
+	setHtml: function(html) {
+		this.repaint(html);
 	},
 	
 	/**
@@ -16990,10 +17017,18 @@ JOOMenuItem = Sketch.extend(
 		if (config.lbl == undefined) {
 			config.lbl = this.id;
 		}
-		this._outputText(config.lbl);
+		this.setLbl(config.lbl);
 		if (config.command != undefined)
 			this.onclick = config.command;
 		this.addEventListener('click', this.onclick);
+	},
+	
+	getLbl: function() {
+		return this.access().html();
+	},
+	
+	setLbl: function(lbl) {
+		this._outputText(lbl);
 	},
 	
 	_outputText: function(label) {
@@ -17241,7 +17276,7 @@ JOOIFrame = Sketch.extend(
 	setupDomObject: function(config) {
 		this._super(config);
 		if (config.src)
-			this.setAttribute('src', config.src);
+			this.setSrc(config.src);
 		this.setAttribute('name', this.getId());
 	},
 	
@@ -17252,7 +17287,7 @@ JOOIFrame = Sketch.extend(
 	setSrc: function(src) {
 		this.setAttribute('src', src);
 	},
-
+	
 	/**
 	 * Get the source of the iframe
 	 * @returns {String} the source of the iframe
@@ -17283,8 +17318,24 @@ JOOForm = Sketch.extend(
 		this._super(config);
 		config.method = config.method || "post";
 		config.encType = config.encType || "application/x-www-form-urlencoded";
-		this.setAttribute("method", config.method);
-		this.setAttribute("enctype", config.encType);
+		this.setMethod(config.method);
+		this.setEncType(config.encType);
+	},
+	
+	setMethod: function(method) {
+		this.setAttribute("method", method);
+	},
+	
+	getMethod: function() {
+		return this.getAttribute("method");
+	},
+	
+	setEncType: function(encType) {
+		this.setAttribute("enctype", encType);
+	},
+	
+	getEncType: function() {
+		return this.getAttribute("enctype");
 	},
 
 	/**
@@ -18204,7 +18255,7 @@ JOOText = UIComponent.extend(
 		this._super(config);
 		this.text = new Sketch();
 		if (config.lbl)
-			this.setValue(config.lbl);
+			this.setLbl(config.lbl);
 
 		if (!config.readonly) {
 			this.addEventListener('dblclick', function() {
@@ -18256,6 +18307,14 @@ JOOText = UIComponent.extend(
 //		}}));
 	},
 	
+	setLbl: function(lbl) {
+		this.setValue(lbl);
+	},
+	
+	getLbl: function() {
+		return this.getValue();
+	},
+	
 	setValue: function(lbl) {
 		this.text.access().html(lbl);
 	},
@@ -18294,11 +18353,27 @@ JOOVideo = UIComponent.extend(
 	setupDomObject: function(config) {
 		this._super(config);
 		if (config.controls) {
-			this.setAttribute('controls', '');
+			this.setControls(config.controls);
 		}
 		if (config.src) {
-			this.setAttribute('src', config.src);
+			this.setSrc(config.src);
 		}
+	},
+	
+	setControls: function(controls) {
+		this.setAttribute('controls', controls);
+	},
+	
+	getControls: function() {
+		return this.getAttribute('controls');
+	},
+	
+	setSrc: function(src) {
+		this.setAttribute('src', src);
+	},
+	
+	getSrc: function() {
+		return this.getAttribute('src');
 	},
 
 	/**
@@ -18389,12 +18464,14 @@ JOOImage = UIComponent.extend(
 {
 	setupDomObject: function(config) {
 		this._super(config);
-		this.defaultSrc = config.defaultSrc || "static/images/image-default.png";
+		this.defaultSrc = config.defaultSrc;
 		config.src = config.src || this.defaultSrc;
 		this.setSrc(config.src);
-		this.addEventListener('error', function() {
-			this.setSrc(this.defaultSrc);
-		});
+		if (this.defaultSrc) {
+			this.addEventListener('error', function() {
+				this.setSrc(this.defaultSrc);
+			});
+		}
 	},
 	
 	toHtml: function()	{
@@ -18434,9 +18511,18 @@ JOOInput = UIComponent.extend(
 	setupDomObject: function(config) {
 		this._super(config);
 		this.access().val(config.value);
-		this.setAttribute('name', config.name);
+		if (config.name)
+			this.setName(config.name);
 		if (config.placeholder)
-		this.setAttribute('placeholder', config.placeholder);
+			this.setPlaceholder(config.placeholder);
+	},
+	
+	setPlaceholder: function(placeholder) {
+		this.setAttribute('placeholder', placeholder);
+	},
+	
+	getPlaceholder: function() {
+		return this.getAttribute('placeholder');
 	},
 
 	/**
@@ -18456,6 +18542,10 @@ JOOInput = UIComponent.extend(
 	 */
 	getValue: function()	{
 		return this.access().val();
+	},
+	
+	setName: function(name) {
+		this.setAttribute('name', name);
 	},
 	
 	/**
@@ -18492,7 +18582,7 @@ JOOTextArea = JOOInput.extend	(
 	 * @returns {String} the value of the textarea
 	 */
 	getText: function()	{
-		return this.access().val();
+		return this.getValue();
 	}
 });
 
@@ -18505,7 +18595,15 @@ JOOLabel = UIComponent.extend	(
 {
 	setupDomObject: function(config) {
 		this._super(config);
-		this.access().html(config.lbl);
+		this.setLbl(config.lbl);
+	},
+	
+	setLbl: function(lbl) {
+		this.access().html(lbl);
+	},
+	
+	getLbl: function() {
+		return this.access().html();
 	},
 	
 	toHtml: function()	{
@@ -18517,7 +18615,7 @@ JOOLabel = UIComponent.extend	(
 	 * @returns {String} the label's text
 	 */
 	getText: function()	{
-		return this.access().html();
+		return this.getLbl();
 	},
 	
 	/**
@@ -18525,7 +18623,7 @@ JOOLabel = UIComponent.extend	(
 	 * @param {String} txt the new text
 	 */
 	setText: function(txt)	{
-		this.access().html(txt);
+		this.setLbl(txt);
 	}
 });
 
@@ -18613,7 +18711,19 @@ JOOSelectOption = Graphic.extend({
 	setupDomObject: function(config) {
 		this._super(config);
 		this.repaint(config.label);
-		this.setAttribute("value", config.value);
+		this.setValue(config.value);
+	},
+	
+	getValue: function() {
+		return this.getAttribute("value");
+	},
+	
+	setValue: function(value) {
+		var old = this.getAttribute("value");
+		if (old != value) {
+			this.setAttribute("value", value);
+			this.dispatchEvent('change');
+		}
 	},
 	
 	toHtml: function() {
@@ -18731,7 +18841,7 @@ JOOButton = UIComponent.extend(
 	setupDomObject: function(config) {
 		this._super(config);
 		if (config.lbl != undefined) {
-			this.access().html(config.lbl);
+			this.setLbl(config.lbl);
 		}
 		this.addEventListener('click', function(e) {
 			this.onclick(e);
@@ -18739,6 +18849,14 @@ JOOButton = UIComponent.extend(
 //		this.addEventListener('mousedown', function(e) {
 //			this.access().addClass('focus');
 //		});
+	},
+	
+	setLbl: function(lbl) {
+		this.access().html(lbl);
+	},
+	
+	getLbl: function() {
+		return this.access().html();
 	},
 	
 	toHtml: function()	{
@@ -18908,7 +19026,6 @@ JOOSprite = UIComponent.extend(
 {
 	setupDomObject: function(config) {
 		this._super(config);
-		this.src = config.src;
 		this.framerate = config.framerate || 30;
 		this.loop = config.loop || false;
 		this.currentFrame = 0;
@@ -18918,6 +19035,20 @@ JOOSprite = UIComponent.extend(
 		this.spriteHeight = config.spriteHeight;
 		this.speed = config.speed || 1;
 		this.stopped = false;
+		
+		if (config.src)
+			this.setSrc(config.src);
+		this.setWidth(this.spriteWidth);
+		this.setHeight(this.spriteHeight);
+	},
+	
+	setSrc: function(src) {
+		this.src = src;
+		this.access().css('background-image', 'url('+this.src+')');
+	},
+	
+	getSrc: function() {
+		return this.src;
 	},
 
 	/**
@@ -18935,11 +19066,6 @@ JOOSprite = UIComponent.extend(
 		} 
 		this.currentFrame = this.startFrame;
 		
-		this.setWidth(this.spriteWidth);
-		this.setHeight(this.spriteHeight);
-		if (this.src)
-			this.access().css('background-image', 'url('+this.src+')');
-
 		this.playFrame();
 		this._playWithFramerate(this.framerate);
 	},
@@ -23402,7 +23528,7 @@ ExpressionUtils = {
 	
 	expressSetter: function(obj, expression, value) {
 		if (typeof value == 'string') {
-			value = value.replace(/'/g, "\\'")
+			value = value.replace(/'/g, "\\'");
 		}
 		var s = "obj."+expression+" = '"+value+"'";
 		try {
@@ -23462,6 +23588,26 @@ JOOUtils = {
 			attrs[attributes[i].nodeName] = attributes[i].nodeValue;
 		}
 		return attrs;
+	},
+	
+	requestFullScreen: function() {
+		if (document.documentElement.requestFullScreen) {  
+			document.documentElement.requestFullScreen();  
+	    } else if (document.documentElement.mozRequestFullScreen) {  
+	    	document.documentElement.mozRequestFullScreen();  
+	    } else if (document.documentElement.webkitRequestFullScreen) {  
+	    	document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);  
+	    }
+	},
+	
+	cancelFullScreen: function() {
+		if (document.cancelFullScreen) {  
+			document.cancelFullScreen();  
+		} else if (document.mozCancelFullScreen) {  
+			document.mozCancelFullScreen();  
+		} else if (document.webkitCancelFullScreen) {  
+			document.webkitCancelFullScreen();  
+		}  
 	}
 };
 Memcached = Class.extend(
