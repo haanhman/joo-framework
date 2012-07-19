@@ -1644,8 +1644,8 @@ JOODialog = UIComponent.extend(
 		this.addChild(this.contentPane);
 		
 		var _self = this;
-		var closeBtn = new JOOCloseButton({absolute: true});
-		closeBtn.onclick = function() {
+		this.closeBtn = new JOOCloseButton({absolute: true});
+		this.closeBtn.onclick = function() {
 			_self.dispatchEvent('closing');
 			if (config.closemethod == 'do_nothing') return;
 			if (!config.closemethod) config.closemethod = "close";
@@ -1653,7 +1653,7 @@ JOODialog = UIComponent.extend(
 		};
 		var label = new JOOLabel();
 		this.titleBar.addChild(label);
-		this.titleBar.addChild(closeBtn);
+		this.titleBar.addChild(this.closeBtn);
 		
 		if (config.title != undefined)
 			this.setTitle(config.title);
