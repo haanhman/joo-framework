@@ -959,8 +959,8 @@ JOOBasicUploader = UIComponent.extend({
 		var form = new CustomDisplayObject({html: "<form enctype='multipart/form-data' target='"+iframeId+"' action='"+this.endpoint+"' method='post'></form>"});
 		form.addChild(this.fileInput);
 		var _self = this;
-		this.fileInput.addEventListener('change', function() {
-			_self.dispatchEvent('inputchange');
+		this.fileInput.addEventListener('change', function(e) {
+			_self.dispatchEvent('inputchange', e);
 			if (config.autosubmit)
 				form.access().submit();
 		});
