@@ -15630,7 +15630,7 @@ DisplayObject = EventDispatcher.extend(
 		var skipped = ['stageUpdated'];	//stageUpdated is internal event and should not be propagated
 		var result = this._super.apply(this, args);
 		if (result) {
-			if (this._parent && !eventData.isBubbleStop 
+			if (this._parent && !eventData.isPropagationStopped() 
 					&& skipped.indexOf(eventType) == -1) {
 				this._parent.dispatchEvent.apply(this._parent, args);
 			}
@@ -19893,7 +19893,10 @@ JOODialog = UIComponent.extend(
 		var _self = this;
 		var closeBtn = new JOOCloseButton({absolute: true});
 		closeBtn.onclick = function() {
-			_self.close();
+			_self.dispatchEvent('closing');
+			if (config.closemethod == 'do_nothing') return;
+			if (!config.closemethod) config.closemethod = "close";
+			_self[config.closemethod].apply(_self);
 		};
 		var label = new JOOLabel();
 		this.titleBar.addChild(label);
@@ -19958,7 +19961,6 @@ JOODialog = UIComponent.extend(
 	 * Close the dialog.
 	 */
 	close: function() {
-		this.dispatchEvent('closing');
 		if (this.modalSketch != undefined)
 			this.modalSketch.selfRemove();
 		this.selfRemove();
