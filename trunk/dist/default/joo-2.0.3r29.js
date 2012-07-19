@@ -15171,7 +15171,8 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 		};
 		
 		obj.prototype.bindModelView = obj.prototype.bindModelView || function(ui, model, path, boundProperty) {
-			ui.setValue(ExpressionUtils.express(model, path));
+			var method = ExpressionUtils.getMutatorMethod(ui, boundProperty);
+			method.call(ui, ExpressionUtils.express(model, path), {path: path, bindingPath: path});
 			
 			//constraint model to view
 			model.addEventListener('change', function(e) {
