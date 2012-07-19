@@ -930,6 +930,8 @@ JOOFileInput = JOOInput.extend({
 	
 	setupDomObject: function(config) {
 		this._super(config);
+		if (config.multiple)
+			this.setAttribute('multiple', config.multiple);
 	},
 	
 	toHtml: function() {
@@ -951,15 +953,17 @@ JOOBasicUploader = UIComponent.extend({
 	setupDomObject: function(config) {
 		this.endpoint = config.endpoint || "";
 		this._super(config);
-		this.fileInput = new JOOFileInput({name: config.name});
+		this.fileInput = new JOOFileInput({name: config.name, multiple: config.multiple});
 		
 		var iframeId = this.getId()+"-iframe";
 		var form = new CustomDisplayObject({html: "<form enctype='multipart/form-data' target='"+iframeId+"' action='"+this.endpoint+"' method='post'></form>"});
 		form.addChild(this.fileInput);
-		this.fileInput.addEventListener('change', function() {
-			form.access().submit();
-		});
 		var _self = this;
+		this.fileInput.addEventListener('change', function() {
+			_self.dispatchEvent('inputchange');
+			if (config.autosubmit)
+				form.access().submit();
+		});
 		form.addEventListener('submit', function(e) {
 			var frame = _self.access().find('iframe');
 			$(frame).one('load', function() {

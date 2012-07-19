@@ -10120,6 +10120,9 @@ DisplayObject = EventDispatcher.extend(
 			eventData.stopPropagation = function() {
 				this.isBubbleStop = true;
 			};
+			eventData.isPropagationStopped = function() {
+				return this.isBubbleStop;
+			};
 		}
 		var args = [event, eventData];
 		var eventType = event.split('.')[0];
@@ -10127,7 +10130,7 @@ DisplayObject = EventDispatcher.extend(
 		var skipped = ['stageUpdated'];	//stageUpdated is internal event and should not be propagated
 		var result = this._super.apply(this, args);
 		if (result) {
-			if (this._parent && !eventData.isBubbleStop 
+			if (this._parent && !eventData.isPropagationStopped() 
 					&& skipped.indexOf(eventType) == -1) {
 				this._parent.dispatchEvent.apply(this._parent, args);
 			}
@@ -10201,7 +10204,8 @@ DisplayObject = EventDispatcher.extend(
 //		this.access().addClass('joo-ui');	//for base styles, e.g: all DisplayObject has 'position: absolute'
 		
 		if (config.tooltip)
-			this.setAttribute('title', config.tooltip);
+			this.setTooltip(config.tooltip);
+			
 //		if (!config.absolute) {
 			if (config.x != undefined)
 				this.setX(config.x);
@@ -10231,6 +10235,14 @@ DisplayObject = EventDispatcher.extend(
 				this.setStyle(i, config.custom[i]);
 			}
 		}
+	},
+	
+	getTooltip: function() {
+		return this.getAttribute('title');
+	},
+	
+	setTooltip: function(tooltip) {
+		this.setAttribute('title', tooltip);
 	},
 	
 	/**
@@ -10828,6 +10840,10 @@ DisplayObjectContainer = DisplayObject.extend(
 		this.layout = layout;
 	},
 	
+	getLayout: function() {
+		return this.layout;
+	},
+	
 	dispose: function(skipRemove) {
 		for(var i=0;i<this.children.length;i++) {
 			this.children[i].dispose(true);
@@ -10862,7 +10878,15 @@ Graphic = DisplayObject.extend(
 	
 	setupDomObject: function(config) {
 		this._super(config);
-		this.repaint(config.html);
+		this.setHtml(config.html);
+	},
+	
+	getHtml: function() {
+		return this.access().html();
+	},
+	
+	setHtml: function(html) {
+		this.repaint(html);
 	},
 	
 	/**
@@ -10963,6 +10987,15 @@ UIComponent = DisplayObjectContainer.extend({
 	setupDomObject: function(config) {
 		this._super(config);
 		this.setupContextMenu();
+	},
+	
+	removeAllChildren: function() {
+		for(var i=this.children.length-1; i>=0; i--) {
+			if (this.children[i] != this.getContextMenu()) {
+				this.children[i].dispose();
+			}
+		}
+		this.children = [this.getContextMenu()];
 	},
 	
 	toHtml: function() {
@@ -11496,10 +11529,18 @@ JOOMenuItem = Sketch.extend(
 		if (config.lbl == undefined) {
 			config.lbl = this.id;
 		}
-		this._outputText(config.lbl);
+		this.setLbl(config.lbl);
 		if (config.command != undefined)
 			this.onclick = config.command;
 		this.addEventListener('click', this.onclick);
+	},
+	
+	getLbl: function() {
+		return this.access().html();
+	},
+	
+	setLbl: function(lbl) {
+		this._outputText(lbl);
 	},
 	
 	_outputText: function(label) {
@@ -11565,7 +11606,7 @@ JOOMenu = JOOMenuItem.extend(
 		return this.items;
 	},
 	
-	onclick: function() {
+	onclick: function(e) {
 		e.stopPropagation();
 		this.toggleMenuItems();
 	},
@@ -11747,7 +11788,7 @@ JOOIFrame = Sketch.extend(
 	setupDomObject: function(config) {
 		this._super(config);
 		if (config.src)
-			this.setAttribute('src', config.src);
+			this.setSrc(config.src);
 		this.setAttribute('name', this.getId());
 	},
 	
@@ -11758,7 +11799,7 @@ JOOIFrame = Sketch.extend(
 	setSrc: function(src) {
 		this.setAttribute('src', src);
 	},
-
+	
 	/**
 	 * Get the source of the iframe
 	 * @returns {String} the source of the iframe
@@ -11789,8 +11830,24 @@ JOOForm = Sketch.extend(
 		this._super(config);
 		config.method = config.method || "post";
 		config.encType = config.encType || "application/x-www-form-urlencoded";
-		this.setAttribute("method", config.method);
-		this.setAttribute("enctype", config.encType);
+		this.setMethod(config.method);
+		this.setEncType(config.encType);
+	},
+	
+	setMethod: function(method) {
+		this.setAttribute("method", method);
+	},
+	
+	getMethod: function() {
+		return this.getAttribute("method");
+	},
+	
+	setEncType: function(encType) {
+		this.setAttribute("enctype", encType);
+	},
+	
+	getEncType: function() {
+		return this.getAttribute("enctype");
 	},
 
 	/**
@@ -12710,7 +12767,7 @@ JOOText = UIComponent.extend(
 		this._super(config);
 		this.text = new Sketch();
 		if (config.lbl)
-			this.setValue(config.lbl);
+			this.setLbl(config.lbl);
 
 		if (!config.readonly) {
 			this.addEventListener('dblclick', function() {
@@ -12762,6 +12819,14 @@ JOOText = UIComponent.extend(
 //		}}));
 	},
 	
+	setLbl: function(lbl) {
+		this.setValue(lbl);
+	},
+	
+	getLbl: function() {
+		return this.getValue();
+	},
+	
 	setValue: function(lbl) {
 		this.text.access().html(lbl);
 	},
@@ -12800,11 +12865,27 @@ JOOVideo = UIComponent.extend(
 	setupDomObject: function(config) {
 		this._super(config);
 		if (config.controls) {
-			this.setAttribute('controls', '');
+			this.setControls(config.controls);
 		}
 		if (config.src) {
-			this.setAttribute('src', config.src);
+			this.setSrc(config.src);
 		}
+	},
+	
+	setControls: function(controls) {
+		this.setAttribute('controls', controls);
+	},
+	
+	getControls: function() {
+		return this.getAttribute('controls');
+	},
+	
+	setSrc: function(src) {
+		this.setAttribute('src', src);
+	},
+	
+	getSrc: function() {
+		return this.getAttribute('src');
 	},
 
 	/**
@@ -12895,12 +12976,14 @@ JOOImage = UIComponent.extend(
 {
 	setupDomObject: function(config) {
 		this._super(config);
-		this.defaultSrc = config.defaultSrc || "static/images/image-default.png";
+		this.defaultSrc = config.defaultSrc;
 		config.src = config.src || this.defaultSrc;
 		this.setSrc(config.src);
-		this.addEventListener('error', function() {
-			this.setSrc(this.defaultSrc);
-		});
+		if (this.defaultSrc) {
+			this.addEventListener('error', function() {
+				this.setSrc(this.defaultSrc);
+			});
+		}
 	},
 	
 	toHtml: function()	{
@@ -12940,9 +13023,18 @@ JOOInput = UIComponent.extend(
 	setupDomObject: function(config) {
 		this._super(config);
 		this.access().val(config.value);
-		this.setAttribute('name', config.name);
+		if (config.name)
+			this.setName(config.name);
 		if (config.placeholder)
-		this.setAttribute('placeholder', config.placeholder);
+			this.setPlaceholder(config.placeholder);
+	},
+	
+	setPlaceholder: function(placeholder) {
+		this.setAttribute('placeholder', placeholder);
+	},
+	
+	getPlaceholder: function() {
+		return this.getAttribute('placeholder');
 	},
 
 	/**
@@ -12962,6 +13054,10 @@ JOOInput = UIComponent.extend(
 	 */
 	getValue: function()	{
 		return this.access().val();
+	},
+	
+	setName: function(name) {
+		this.setAttribute('name', name);
 	},
 	
 	/**
@@ -12998,7 +13094,7 @@ JOOTextArea = JOOInput.extend	(
 	 * @returns {String} the value of the textarea
 	 */
 	getText: function()	{
-		return this.access().val();
+		return this.getValue();
 	}
 });
 
@@ -13011,7 +13107,15 @@ JOOLabel = UIComponent.extend	(
 {
 	setupDomObject: function(config) {
 		this._super(config);
-		this.access().html(config.lbl);
+		this.setLbl(config.lbl);
+	},
+	
+	setLbl: function(lbl) {
+		this.access().html(lbl);
+	},
+	
+	getLbl: function() {
+		return this.access().html();
 	},
 	
 	toHtml: function()	{
@@ -13023,7 +13127,7 @@ JOOLabel = UIComponent.extend	(
 	 * @returns {String} the label's text
 	 */
 	getText: function()	{
-		return this.access().html();
+		return this.getLbl();
 	},
 	
 	/**
@@ -13031,7 +13135,7 @@ JOOLabel = UIComponent.extend	(
 	 * @param {String} txt the new text
 	 */
 	setText: function(txt)	{
-		this.access().html(txt);
+		this.setLbl(txt);
 	}
 });
 
@@ -13119,7 +13223,19 @@ JOOSelectOption = Graphic.extend({
 	setupDomObject: function(config) {
 		this._super(config);
 		this.repaint(config.label);
-		this.setAttribute("value", config.value);
+		this.setValue(config.value);
+	},
+	
+	getValue: function() {
+		return this.getAttribute("value");
+	},
+	
+	setValue: function(value) {
+		var old = this.getAttribute("value");
+		if (old != value) {
+			this.setAttribute("value", value);
+			this.dispatchEvent('change');
+		}
 	},
 	
 	toHtml: function() {
@@ -13237,7 +13353,7 @@ JOOButton = UIComponent.extend(
 	setupDomObject: function(config) {
 		this._super(config);
 		if (config.lbl != undefined) {
-			this.access().html(config.lbl);
+			this.setLbl(config.lbl);
 		}
 		this.addEventListener('click', function(e) {
 			this.onclick(e);
@@ -13245,6 +13361,14 @@ JOOButton = UIComponent.extend(
 //		this.addEventListener('mousedown', function(e) {
 //			this.access().addClass('focus');
 //		});
+	},
+	
+	setLbl: function(lbl) {
+		this.access().html(lbl);
+	},
+	
+	getLbl: function() {
+		return this.access().html();
 	},
 	
 	toHtml: function()	{
@@ -13414,7 +13538,6 @@ JOOSprite = UIComponent.extend(
 {
 	setupDomObject: function(config) {
 		this._super(config);
-		this.src = config.src;
 		this.framerate = config.framerate || 30;
 		this.loop = config.loop || false;
 		this.currentFrame = 0;
@@ -13424,6 +13547,20 @@ JOOSprite = UIComponent.extend(
 		this.spriteHeight = config.spriteHeight;
 		this.speed = config.speed || 1;
 		this.stopped = false;
+		
+		if (config.src)
+			this.setSrc(config.src);
+		this.setWidth(this.spriteWidth);
+		this.setHeight(this.spriteHeight);
+	},
+	
+	setSrc: function(src) {
+		this.src = src;
+		this.access().css('background-image', 'url('+this.src+')');
+	},
+	
+	getSrc: function() {
+		return this.src;
 	},
 
 	/**
@@ -13441,11 +13578,6 @@ JOOSprite = UIComponent.extend(
 		} 
 		this.currentFrame = this.startFrame;
 		
-		this.setWidth(this.spriteWidth);
-		this.setHeight(this.spriteHeight);
-		if (this.src)
-			this.access().css('background-image', 'url('+this.src+')');
-
 		this.playFrame();
 		this._playWithFramerate(this.framerate);
 	},
@@ -13549,6 +13681,8 @@ JOOFileInput = JOOInput.extend({
 	
 	setupDomObject: function(config) {
 		this._super(config);
+		if (config.multiple)
+			this.setAttribute('multiple', config.multiple);
 	},
 	
 	toHtml: function() {
@@ -13570,15 +13704,17 @@ JOOBasicUploader = UIComponent.extend({
 	setupDomObject: function(config) {
 		this.endpoint = config.endpoint || "";
 		this._super(config);
-		this.fileInput = new JOOFileInput({name: config.name});
+		this.fileInput = new JOOFileInput({name: config.name, multiple: config.multiple});
 		
 		var iframeId = this.getId()+"-iframe";
 		var form = new CustomDisplayObject({html: "<form enctype='multipart/form-data' target='"+iframeId+"' action='"+this.endpoint+"' method='post'></form>"});
 		form.addChild(this.fileInput);
-		this.fileInput.addEventListener('change', function() {
-			form.access().submit();
-		});
 		var _self = this;
+		this.fileInput.addEventListener('change', function() {
+			_self.dispatchEvent('inputchange');
+			if (config.autosubmit)
+				form.access().submit();
+		});
 		form.addEventListener('submit', function(e) {
 			var frame = _self.access().find('iframe');
 			$(frame).one('load', function() {
@@ -14261,7 +14397,10 @@ JOODialog = UIComponent.extend(
 		var _self = this;
 		var closeBtn = new JOOCloseButton({absolute: true});
 		closeBtn.onclick = function() {
-			_self.close();
+			_self.dispatchEvent('closing');
+			if (config.closemethod == 'do_nothing') return;
+			if (!config.closemethod) config.closemethod = "close";
+			_self[config.closemethod].apply(_self);
 		};
 		var label = new JOOLabel();
 		this.titleBar.addChild(label);
@@ -14326,7 +14465,6 @@ JOODialog = UIComponent.extend(
 	 * Close the dialog.
 	 */
 	close: function() {
-		this.dispatchEvent('closing');
 		if (this.modalSketch != undefined)
 			this.modalSketch.selfRemove();
 		this.selfRemove();
@@ -15281,7 +15419,7 @@ ExpressionUtils = {
 	
 	expressSetter: function(obj, expression, value) {
 		if (typeof value == 'string') {
-			value = value.replace(/'/g, "\\'")
+			value = value.replace(/'/g, "\\'");
 		}
 		var s = "obj."+expression+" = '"+value+"'";
 		try {
@@ -15341,6 +15479,26 @@ JOOUtils = {
 			attrs[attributes[i].nodeName] = attributes[i].nodeValue;
 		}
 		return attrs;
+	},
+	
+	requestFullScreen: function() {
+		if (document.documentElement.requestFullScreen) {  
+			document.documentElement.requestFullScreen();  
+	    } else if (document.documentElement.mozRequestFullScreen) {  
+	    	document.documentElement.mozRequestFullScreen();  
+	    } else if (document.documentElement.webkitRequestFullScreen) {  
+	    	document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);  
+	    }
+	},
+	
+	cancelFullScreen: function() {
+		if (document.cancelFullScreen) {  
+			document.cancelFullScreen();  
+		} else if (document.mozCancelFullScreen) {  
+			document.mozCancelFullScreen();  
+		} else if (document.webkitCancelFullScreen) {  
+			document.webkitCancelFullScreen();  
+		}  
 	}
 };
 ClassMapping = {};
