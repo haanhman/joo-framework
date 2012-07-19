@@ -1642,7 +1642,10 @@ JOODialog = UIComponent.extend(
 		var _self = this;
 		var closeBtn = new JOOCloseButton({absolute: true});
 		closeBtn.onclick = function() {
-			_self.close();
+			_self.dispatchEvent('closing');
+			if (config.closemethod == 'do_nothing') return;
+			if (!config.closemethod) config.closemethod = "close";
+			_self[config.closemethod].apply(_self);
 		};
 		var label = new JOOLabel();
 		this.titleBar.addChild(label);
@@ -1707,7 +1710,6 @@ JOODialog = UIComponent.extend(
 	 * Close the dialog.
 	 */
 	close: function() {
-		this.dispatchEvent('closing');
 		if (this.modalSketch != undefined)
 			this.modalSketch.selfRemove();
 		this.selfRemove();
