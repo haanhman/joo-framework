@@ -215,7 +215,7 @@ input.joo-ui, textarea.joo-ui, [contentEditable=true].joo-ui {
 }
 
 .joo-joodialog .joo-jooclosebutton.joo-ui, .joo-jooclosebutton {
-	background: url(../../images/close.png) no-repeat;
+	background: url(../static/images/close.png) no-repeat;
 	cursor: pointer;
 	height: 15px;
 	position: absolute;
