@@ -306,6 +306,9 @@ DisplayObject = EventDispatcher.extend(
 			eventData.stopPropagation = function() {
 				this.isBubbleStop = true;
 			};
+			eventData.isPropagationStopped = function() {
+				return this.isBubbleStop;
+			};
 		}
 		var args = [event, eventData];
 		var eventType = event.split('.')[0];
@@ -313,7 +316,7 @@ DisplayObject = EventDispatcher.extend(
 		var skipped = ['stageUpdated'];	//stageUpdated is internal event and should not be propagated
 		var result = this._super.apply(this, args);
 		if (result) {
-			if (this._parent && !eventData.isBubbleStop 
+			if (this._parent && !eventData.isPropagationStopped() 
 					&& skipped.indexOf(eventType) == -1) {
 				this._parent.dispatchEvent.apply(this._parent, args);
 			}
@@ -1170,6 +1173,15 @@ UIComponent = DisplayObjectContainer.extend({
 	setupDomObject: function(config) {
 		this._super(config);
 		this.setupContextMenu();
+	},
+	
+	removeAllChildren: function() {
+		for(var i=this.children.length-1; i>=0; i--) {
+			if (this.children[i] != this.getContextMenu()) {
+				this.children[i].dispose();
+			}
+		}
+		this.children = [this.getContextMenu()];
 	},
 	
 	toHtml: function() {
