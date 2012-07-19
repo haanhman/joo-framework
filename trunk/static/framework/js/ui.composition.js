@@ -122,7 +122,7 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 		
 		for(var i in handlers) {
 			(function(i) {
-				currentObject.addEventListener(i, function() {
+				currentObject.addEventListener(i, function(event) {
 					try {
 						handlers[i].apply(root, arguments);
 					} catch (err) {

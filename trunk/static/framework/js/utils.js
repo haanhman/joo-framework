@@ -275,5 +275,11 @@ JOOUtils = {
 		} else if (document.webkitCancelFullScreen) {  
 			document.webkitCancelFullScreen();  
 		}  
-	}
+	},
+	
+	readFileAsDataURL: function(file, callback) {
+		var reader = new FileReader();
+		reader.onload = callback;
+		reader.readAsDataURL(file);
+	},
 };
