@@ -62,6 +62,8 @@ JOOModel = EventDispatcher.extend({
 	_bindings: function(obj, i, path) {
 		if (i == 'className' || i == 'ancestors' || i == 'listeners' || i =='_bindingName_') 
 			return;
+		if (obj instanceof JOOModel && obj != this)
+			return;
 		if (path == "") {
 			path = i;
 		} else {
