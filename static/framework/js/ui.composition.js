@@ -34,6 +34,10 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 						var method = ExpressionUtils.getMutatorMethod(ui, boundProperty);
 						method.call(ui, ExpressionUtils.express(model, path), {path: e.path, bindingPath: path});
 					} else {
+						var fn = 'partialModelChange' + boundProperty[0].toUpperCase()+boundProperty.substr(1);
+						if (typeof ui[fn] == 'function') {
+							ui[fn].call(ui, model, e);
+						}
 						if (typeof ui['partialModelChange'] == 'function') {
 							ui.partialModelChange(model, e, boundProperty);
 						}
