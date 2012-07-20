@@ -1658,8 +1658,10 @@ JOODialog = UIComponent.extend(
 		if (config.title != undefined)
 			this.setTitle(config.title);
 		
-		this.draggable({handle: this.titleBar.access()});
-		this.startDrag();
+		if (!config.stick) {
+			this.draggable({handle: this.titleBar.access()});
+			this.startDrag();
+		}
 		this.addEventListener('stageUpdated', function() {
 			this.afterAdded();
 		});
@@ -1818,7 +1820,6 @@ SliderIcon = Sketch.extend({
 		this.setWidth(18);
 		this.setHeight(18);
 		
-		var _self = this;
 		this.draggable({containment:'parent'});
 		
 		this.addEventListener("mousedown", function(e) {
@@ -2046,5 +2047,201 @@ JOOColorPicker = JOOInput.extend(
 	
 	toHtml: function(){
 		return "<div></div>";
+	}
+});
+
+JOORadioButtonGroup = UnorderedList.extend({
+	setupDomObject : function(config) {
+		this._super(config);
+		this.name = config.name;
+		this._value = null;
+	},
+	addItem : function(item) {
+		var _item = item;
+		if (!( item instanceof JOORadioButtonItem)) {
+			_item = new JOORadioButtonItem({
+				name : this.name,
+				checked : false,
+				lbl : item
+			})
+		}
+		this._super(_item);
+		var _self = this;
+		_item.input.addEventListener('change', function(e) {
+			_self.dispatchEvent('change', {
+				item : _item,
+				value : item.input ? (item.input.getValue ? item.input.getValue() : undefined) : undefined
+			});
+			e.stopPropagation();
+		});
+		return _item;
+	},
+	getItemByValue : function(value) {
+		for (var i = 0, l = this.data.length; i < l; i++) {
+			if (this.data[i].getValue() == value)
+				return this.data[i];
+		}
+	},
+	setChecked : function(item) {
+		if (this.data.indexOf(item) == -1) {
+			return;
+		}
+		item.input.setChecked(true);
+		this.dispatchEvent('changeValue', {
+			item : item,
+			value : item.input ? (item.input.getValue ? item.input.getValue() : undefined) : undefined
+		});
+	},
+	getChecked : function() {
+		for (var i = 0; i < this.data.length; i++) {
+			if (this.data[i].input.getChecked())
+				return this.data[i];
+		}
+		return undefined;
+	}
+});
+JOORadioButtonItem = ListItem.extend({
+	setupDomObject : function(config) {
+		config.showLabel = false;
+		this._super(config);
+		this.lbl = new JOOLabel({
+			lbl : config.lbl
+		});
+		this.input = new JOORadioButton({
+			name : config.name,
+			value : config.value,
+			checked : config.checked
+		});
+
+		this.addChild(this.input);
+		this.addChild(this.lbl);
+	},
+
+	setValue : function(value) {
+		this.input.config.value = value;
+		return this;
+	},
+
+	getValue : function() {
+		return this.input.config.value;
+	}
+});
+JOORadioButton = JOOInput.extend({
+	toHtml : function() {
+		return '<input />';
+	},
+	setupDomObject : function(config) {
+		this._super(config);
+		this.setAttribute('type', 'radio');
+		this.setChecked(config.checked);
+	},
+	setChecked : function(value) {
+		this.access().prop('checked', value);
+	},
+	getChecked : function() {
+		return this.access().prop('checked');
+	}
+});
+UnorderedList = Sketch.extend({
+	setupBase : function(config) {
+		this._super(config);
+		this.data = [];
+		this.labelField = 'label';
+		if (config.labelField && config.labelField != "") {
+			this.labelField = config.labelField;
+		}
+	},
+	emptyList : function() {
+		while (this.children.length > 0) {
+			this.removeChild(this.children[0]);
+		}
+		this.data = [];
+	},
+	clearView : function() {
+		while (this.children.length > 0) {
+			this.detachChild(this.children[0]);
+		}
+	},
+	toHtml : function() {
+		return '<ul></ul>';
+	},
+	addItem : function(ele) {
+		if (this.data.indexOf(ele) == -1) {
+			this.data.push(ele);
+			var item = ele;
+			if (!( ele instanceof ListItem)) {
+				item = new ListItem({
+					lbl : ( typeof ele == 'string') ? ele : ele[this.labelField]
+				});
+			}
+			this.addChild(item);
+			var _self = this;
+			item.addEventListener('click', function() {
+				_self.selectedItem = item;
+				_self.dispatchEvent('select', ele);
+			});
+		}
+
+	},
+	removeItem : function(item) {
+		var index = this.data.indexOf(item);
+		if (index != -1) {
+			if (item == this.selectedItem)
+				this.selectedItem = null;
+			this.removeChild(item);
+			this.data.splice(index, 1);
+		}
+	},
+	refresh : function() {
+		this.clearView();
+		for (var i = 0; i < this.data.length; i++) {
+			this.addChild(this.data[i]);
+		}
+	},
+	setChildIndex : function(child, index) {
+		var currIndex = this.data.indexOf(child);
+		if (currIndex != -1) {
+			this.data.splice(currIndex, 1);
+			this.data.splice(index, 0, child);
+			this.refresh();
+		}
+	},
+
+	getChildIndexByDomObject : function(domObject) {
+		for (var i = 0, l = this.data.length; i < l; i++) {
+			var child = this.data[i].access()[0];
+			if (child == domObject) {
+				return i;
+			}
+		}
+		return undefined;
+	},
+
+	refreshByDisplay : function() {
+		var arr = [];
+		var data = this.data;
+		var findListItem = function(id) {
+			for (var i = 0, l = data.length; i < l; i++) {
+				if (data[i].id == id) {
+					return data[i];
+				}
+			}
+			return undefined;
+		}
+		var lis = this.access().children('li');
+		for (var i = 0, l = lis.length; i < l; i++) {
+			var item = findListItem($(lis[i]).attr('id'));
+			if (!item)
+				continue;
+			arr.push(item);
+		};
+
+		this.data = arr;
+		this.refresh();
+	}
+});
+OrderedList = UnorderedList.extend({
+	toHtml : function() {
+		return '<ol></ol>';
 	}
 });

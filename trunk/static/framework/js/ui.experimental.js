@@ -201,7 +201,7 @@ JOOMovieClip = JOOSprite.extend({
 	buildScript: function(){
 		if(this.data.scripts){
 			for(var i in this.data.scripts){
-				this.scripts[i] = new Function(this.data.scripts[i])
+				this.scripts[i] = new Function(this.data.scripts[i]);
 			}
 		}
 	},

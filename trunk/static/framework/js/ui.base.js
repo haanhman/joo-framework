@@ -2016,8 +2016,18 @@ JOOForm = Sketch.extend(
 		this._super(config);
 		config.method = config.method || "post";
 		config.encType = config.encType || "application/x-www-form-urlencoded";
+		if (config.action)
+			this.setAction(config.action);
 		this.setMethod(config.method);
 		this.setEncType(config.encType);
+	},
+	
+	setAction: function(action) {
+		this.setAttribute("action", action);
+	},
+	
+	getAction: function() {
+		return this.getAttribute("action");
 	},
 	
 	setMethod: function(method) {
@@ -2048,10 +2058,10 @@ JOOForm = Sketch.extend(
 	}
 });
 
-ContainerWrapper = Class.extend({
-	
-	wrap: function(container, obj) {
-		container.addChild(obj);
-		return container;
-	}
-});
+//ContainerWrapper = Class.extend({
+//	
+//	wrap: function(container, obj) {
+//		container.addChild(obj);
+//		return container;
+//	}
+//});
