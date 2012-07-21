@@ -6,11 +6,13 @@
 AjaxInterface = InterfaceImplementor.extend({
 	
 	implement: function(obj)	{
-		obj.prototype.onAjax = obj.prototype.onAjax || function(url, params, type, callbacks, cache, cacheTime)	{
+		obj.prototype.onAjax = obj.prototype.onAjax || function(url, params, type, callbacks, options)	{
+			options = options || {};
 			if (type == undefined)
 				type = 'GET';
 			var success = callbacks.onSuccess;
 			var fail = callbacks.onFailure;
+			var error = callbacks.onError;
 			var accessDenied = callbacks.onAccessDenied;
 			
 			var memcacheKey = 'ajax.'+url;
@@ -22,13 +24,13 @@ AjaxInterface = InterfaceImplementor.extend({
 			//var root = SingletonFactory.getInstance(Application).getSystemProperties().get('host.root');
 			//var url = root+'/'+controller+'/'+action;
 			//try to get from mem cached
-			if (type == 'GET' && cache == true)	{
+			if (type == 'GET' && options.cache == true)	 {
 				var memcache = SingletonFactory.getInstance(Memcached);
 				var value = memcache.retrieve(memcacheKey);
 				if (value != undefined)	{
 					var now = new Date();
 					var cacheTimestamp = value.timestamp;
-					if ((now.getTime() - cacheTimestamp) < cacheTime)	{
+					if ((now.getTime() - cacheTimestamp) < options.cacheTime)	{
 						var subject = SingletonFactory.getInstance(Subject);
 						subject.notifyEvent('AjaxQueryFetched', {result: value.ret, url: url});
 						AjaxHandler.handleResponse(value.ret, success, fail, url);
@@ -48,7 +50,7 @@ AjaxInterface = InterfaceImplementor.extend({
 				args: args,
 				target: _self
 			});
-			$.ajax({
+			var _options = {
 				dataType: 'json',
 				url: url,
 				type: type,
@@ -72,6 +74,8 @@ AjaxInterface = InterfaceImplementor.extend({
 					}
 				},
 				error: function(ret, statusText, errorCode)	{
+					if (error)
+						error(ret, statusText, errorCode);
 					subject.notifyEvent('AjaxError', {ret: ret, 
 						statusText: statusText, 
 						errorCode: errorCode,
@@ -93,7 +97,11 @@ AjaxInterface = InterfaceImplementor.extend({
 							accessDenied.call(undefined);
 					}
 				}
-			});
+			};
+			for(var i in options) {
+				_options[i] = options[i];
+			}
+			$.ajax(_options);
 		};
 	}
 });
