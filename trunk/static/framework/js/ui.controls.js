@@ -2049,100 +2049,22 @@ JOOColorPicker = JOOInput.extend(
 		return "<div></div>";
 	}
 });
-
-JOORadioButtonGroup = UnorderedList.extend({
-	setupDomObject : function(config) {
+ListItem = UIComponent.extend({
+	
+	setupDomObject: function(config) {
 		this._super(config);
-		this.name = config.name;
-		this._value = null;
-	},
-	addItem : function(item) {
-		var _item = item;
-		if (!( item instanceof JOORadioButtonItem)) {
-			_item = new JOORadioButtonItem({
-				name : this.name,
-				checked : false,
-				lbl : item
-			})
-		}
-		this._super(_item);
-		var _self = this;
-		_item.input.addEventListener('change', function(e) {
-			_self.dispatchEvent('change', {
-				item : _item,
-				value : item.input ? (item.input.getValue ? item.input.getValue() : undefined) : undefined
-			});
-			e.stopPropagation();
-		});
-		return _item;
-	},
-	getItemByValue : function(value) {
-		for (var i = 0, l = this.data.length; i < l; i++) {
-			if (this.data[i].getValue() == value)
-				return this.data[i];
+		this.label = new JOOLabel({lbl: config.lbl});
+		if (config.showLabel) {
+			this.addChild(this.label);
 		}
 	},
-	setChecked : function(item) {
-		if (this.data.indexOf(item) == -1) {
-			return;
-		}
-		item.input.setChecked(true);
-		this.dispatchEvent('changeValue', {
-			item : item,
-			value : item.input ? (item.input.getValue ? item.input.getValue() : undefined) : undefined
-		});
-	},
-	getChecked : function() {
-		for (var i = 0; i < this.data.length; i++) {
-			if (this.data[i].input.getChecked())
-				return this.data[i];
-		}
-		return undefined;
+	
+	toHtml: function() {
+		return "<li></li>";
 	}
 });
-JOORadioButtonItem = ListItem.extend({
-	setupDomObject : function(config) {
-		config.showLabel = false;
-		this._super(config);
-		this.lbl = new JOOLabel({
-			lbl : config.lbl
-		});
-		this.input = new JOORadioButton({
-			name : config.name,
-			value : config.value,
-			checked : config.checked
-		});
-
-		this.addChild(this.input);
-		this.addChild(this.lbl);
-	},
-
-	setValue : function(value) {
-		this.input.config.value = value;
-		return this;
-	},
-
-	getValue : function() {
-		return this.input.config.value;
-	}
-});
-JOORadioButton = JOOInput.extend({
-	toHtml : function() {
-		return '<input />';
-	},
-	setupDomObject : function(config) {
-		this._super(config);
-		this.setAttribute('type', 'radio');
-		this.setChecked(config.checked);
-	},
-	setChecked : function(value) {
-		this.access().prop('checked', value);
-	},
-	getChecked : function() {
-		return this.access().prop('checked');
-	}
-});
-UnorderedList = Sketch.extend({
+UnorderedList = UIComponent.extend({
+	
 	setupBase : function(config) {
 		this._super(config);
 		this.data = [];
@@ -2243,5 +2165,97 @@ UnorderedList = Sketch.extend({
 OrderedList = UnorderedList.extend({
 	toHtml : function() {
 		return '<ol></ol>';
+	}
+});
+JOORadioButtonGroup = UnorderedList.extend({
+	setupDomObject : function(config) {
+		this._super(config);
+		this.name = config.name;
+		this._value = null;
+	},
+	addItem : function(item) {
+		var _item = item;
+		if (!( item instanceof JOORadioButtonItem)) {
+			_item = new JOORadioButtonItem({
+				name : this.name,
+				checked : false,
+				lbl : item
+			});
+		}
+		this._super(_item);
+		var _self = this;
+		_item.input.addEventListener('change', function(e) {
+			_self.dispatchEvent('change', {
+				item : _item,
+				value : item.input ? (item.input.getValue ? item.input.getValue() : undefined) : undefined
+			});
+			e.stopPropagation();
+		});
+		return _item;
+	},
+	getItemByValue : function(value) {
+		for (var i = 0, l = this.data.length; i < l; i++) {
+			if (this.data[i].getValue() == value)
+				return this.data[i];
+		}
+	},
+	setChecked : function(item) {
+		if (this.data.indexOf(item) == -1) {
+			return;
+		}
+		item.input.setChecked(true);
+		this.dispatchEvent('changeValue', {
+			item : item,
+			value : item.input ? (item.input.getValue ? item.input.getValue() : undefined) : undefined
+		});
+	},
+	getChecked : function() {
+		for (var i = 0; i < this.data.length; i++) {
+			if (this.data[i].input.getChecked())
+				return this.data[i];
+		}
+		return undefined;
+	}
+});
+JOORadioButtonItem = ListItem.extend({
+	setupDomObject : function(config) {
+		config.showLabel = false;
+		this._super(config);
+		this.lbl = new JOOLabel({
+			lbl : config.lbl
+		});
+		this.input = new JOORadioButton({
+			name : config.name,
+			value : config.value,
+			checked : config.checked
+		});
+
+		this.addChild(this.input);
+		this.addChild(this.lbl);
+	},
+
+	setValue : function(value) {
+		this.input.config.value = value;
+		return this;
+	},
+
+	getValue : function() {
+		return this.input.config.value;
+	}
+});
+JOORadioButton = JOOInput.extend({
+	toHtml : function() {
+		return '<input />';
+	},
+	setupDomObject : function(config) {
+		this._super(config);
+		this.setAttribute('type', 'radio');
+		this.setChecked(config.checked);
+	},
+	setChecked : function(value) {
+		this.access().prop('checked', value);
+	},
+	getChecked : function() {
+		return this.access().prop('checked');
 	}
 });
