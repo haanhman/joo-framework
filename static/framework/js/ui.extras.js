@@ -252,8 +252,8 @@ JOOImageWrapper = Panel.extend({
 	setupDomObject: function(config) {
 		this._super(config);
 		this.img = new JOOImage({src: config.src});
-		this.addChild(img);
-		this.setAttribute('src', img.getAttribute('src'));
+		this.addChild(this.img);
+		this.setAttribute('src', this.img.getAttribute('src'));
 	}
 });
 
@@ -280,12 +280,13 @@ JOOSearchUI = Sketch.extend({
 				this[this.config.searchServices[i].name] = new JOOAccordion({lbl: this.config.searchServices[i].name});
 				this.searchSketch.addChild(this[this.config.searchServices[i].name]);
 			}
+			var _self = this;
 			this.searchInput.addEventListener('keydown', function(e) {
 				if (e.keyCode == 13) {
 					e.stopPropagation();
 					e.preventDefault();
-					for(var i in this.searchServices) {
-						this.config.searchServices[i].run({query: this.getValue()});
+					for(var i in _self.config.searchServices) {
+						_self.config.searchServices[i].run({query: this.getValue()});
 					}
 				}
 			});
@@ -304,7 +305,7 @@ JOOSearchUI = Sketch.extend({
 	
 	_getImageWrapper: function(retImg, cls) {
 		var _self = this;
-		var imgPanel = new JOOImageWrapper({extclasses: cls});
+		var imgPanel = new JOOImageWrapper({extclasses: cls, src: retImg});
 		imgPanel.addEventListener('click', function() {
 			_self.value = this.getAttribute('src');
 			_self.dispatchEvent('imageclick');
@@ -431,7 +432,7 @@ JOOMediaBrowser = JOODialog.extend({
 	
 	_getImageWrapper: function(retImg, cls) {
 		var _self = this;
-		var imgPanel = new JOOImageWrapper({extclasses: cls});
+		var imgPanel = new JOOImageWrapper({extclasses: cls, src: retImg});
 		imgPanel.addEventListener('click', function() {
 			_self.value = this.getAttribute('src');
 			_self.dispatchEvent('change');
