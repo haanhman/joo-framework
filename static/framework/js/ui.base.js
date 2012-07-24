@@ -310,15 +310,14 @@ DisplayObject = EventDispatcher.extend(
 				return this.isBubbleStop;
 			};
 		}
-		var args = [event, eventData];
 		var eventType = event.split('.')[0];
 		
 		var skipped = ['stageUpdated'];	//stageUpdated is internal event and should not be propagated
-		var result = this._super.apply(this, args);
+		var result = this._super.apply(this, arguments);
 		if (result) {
 			if (this._parent && !eventData.isPropagationStopped() 
 					&& skipped.indexOf(eventType) == -1) {
-				this._parent.dispatchEvent.apply(this._parent, args);
+				this._parent.dispatchEvent.apply(this._parent, arguments);
 			}
 		}
 	},
