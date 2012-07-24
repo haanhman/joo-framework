@@ -74,20 +74,35 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 		var isAddItem = false;
 		var tabTitle = undefined;
 		
+		var ns = 'joo.ui.composition';
+		if (config['config-id']) {
+			var dataStore = SingletonFactory.getInstance(DataStore);
+			if (!dataStore.getStore(ns)) {
+				dataStore.registerStore(ns, 'Dom', {
+					id: 'UICompositionConfig'
+				});
+			}
+			var cfg = dataStore.fetch(ns, config['config-id']) || {};
+			for(var i in config) {
+				cfg[i] = config[i];
+			}
+			config = cfg;
+		}
+		
 		for(var i in config) {
 			if (i.indexOf('handler:') != -1) {
 				var event = i.substr(8);
 				var fn = config[i];
 				handlers[event] = new Function(fn);
 				delete config[i];
-			} else if (config[i].indexOf('#{') == 0) {
+			} else if (typeof config[i] == 'string' && config[i].indexOf('#{') == 0) {
 				var expression = config[i].substr(2, config[i].length-3);
 				config[i] = ExpressionUtils.express(model, expression);
 				bindings.push({
 					expression: expression,
 					boundProperty: i
 				});
-			} else if (config[i].indexOf('${') == 0) {
+			} else if (typeof config[i] == 'string' && config[i].indexOf('${') == 0) {
 				var expression = config[i].substr(2, config[i].length-3);
 				config[i] = ExpressionUtils.express(root, expression);
 //				bindings = expression;
@@ -104,6 +119,11 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 		case "joo:var":
 			var varName = $composition.attr('name');
 			currentObject = obj[varName];
+			for(var i in config) {
+				var mutator = ExpressionUtils.getMutatorMethod(currentObject, i);
+				if (mutator)
+					mutator.call(currentObject, config[i]);
+			}
 			break;
 		case "joo:addtab":
 			isAddTab = true;
@@ -113,7 +133,7 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 			isAddItem = true;
 			break;
 		default:
-			if (config.custom) {
+			if (config.custom && typeof config.custom != 'object') {
 				config.custom = eval('('+config.custom+')');
 			}
 			var className = ClassMapping[tagName.split(':')[1]];
