@@ -247,6 +247,73 @@ DragDropController = Class.extend({
 	}
 });
 
+JOOImageWrapper = Panel.extend({
+	
+	setupDomObject: function(config) {
+		this._super(config);
+		this.img = new JOOImage({src: config.src});
+		this.addChild(img);
+		this.setAttribute('src', img.getAttribute('src'));
+	}
+});
+
+JOOSearchUI = Sketch.extend({
+	
+	setupDomObject: function(config) {
+		this._super(config);
+		this.searchInput = new JOOTextInput({width: '100%', height: 20});
+		this.searchSketch = new Sketch({height: 140});
+		this.searchSketch.setStyle('overflow', 'auto');
+		this.addChild(this.searchInput);
+		this.addChild(this.searchSketch);
+		
+		this.setupServices();
+	},
+	
+	setupServices: function() {
+		if (this.config.searchServices) {
+			var _self = this;
+			for(var i in this.config.searchServices) {
+				this.config.searchServices[i].addEventListener('success', function(ret) {
+					_self.addSearchImages(this.name, ret);
+				});
+				this[this.config.searchServices[i].name] = new JOOAccordion({lbl: this.config.searchServices[i].name});
+				this.searchSketch.addChild(this[this.config.searchServices[i].name]);
+			}
+			this.searchInput.addEventListener('keydown', function(e) {
+				if (e.keyCode == 13) {
+					e.stopPropagation();
+					e.preventDefault();
+					for(var i in this.searchServices) {
+						this.config.searchServices[i].run({query: this.getValue()});
+					}
+				}
+			});
+		}
+	},
+	
+	addSearchImages: function(name, ret) {
+		this[name].getContentPane().removeAllChildren();
+		if (ret.length > 0) {
+			for(var i in ret) {
+				var imgPanel = this._getImageWrapper(ret[i], 'joo-search-imgwrapper');
+				this[name].getContentPane().addChild(imgPanel);
+			}
+		}
+	},
+	
+	_getImageWrapper: function(retImg, cls) {
+		var _self = this;
+		var imgPanel = new JOOImageWrapper({extclasses: cls});
+		imgPanel.addEventListener('click', function() {
+			_self.value = this.getAttribute('src');
+			_self.dispatchEvent('imageclick');
+		});
+		return imgPanel;
+	}
+
+});
+
 JOOMediaBrowser = JOODialog.extend({
 	
 	setupDomObject: function(config) {
@@ -269,13 +336,7 @@ JOOMediaBrowser = JOODialog.extend({
 				tab.addTab('Uploaded', this.browseSketch);
 			}
 			if (this.searchServices) {
-				var sk = new Sketch({height: 160});
-				this.searchInput = new JOOTextInput({width: '100%', height: 20});
-				this.searchSketch = new Sketch({height: 140});
-				this.searchSketch.setStyle('overflow', 'auto');
-				sk.addChild(this.searchInput);
-				sk.addChild(this.searchSketch);
-				tab.addTab('Search', sk);
+				tab.addTab('Search', new JOOSearchUI({height: 160, services: config.searchServices}));
 			}
 			this.getContentPane().addChild(tab);
 		}
@@ -337,26 +398,6 @@ JOOMediaBrowser = JOODialog.extend({
 			});
 		}
 		
-		if (this.searchServices) {
-			var _self = this;
-			for(var i in this.searchServices) {
-				this.searchServices[i].addEventListener('success', function(ret) {
-					_self.addSearchImages(this.name, ret);
-				});
-				this[this.searchServices[i].name] = new JOOAccordion({lbl: this.searchServices[i].name});
-				this.searchSketch.addChild(this[this.searchServices[i].name]);
-			}
-			this.searchInput.addEventListener('keydown', function(e) {
-				if (e.keyCode == 13) {
-					e.stopPropagation();
-					e.preventDefault();
-					for(var i in _self.searchServices) {
-						_self.searchServices[i].run({query: this.getValue()});
-					}
-				}
-			});
-		}
-		
 		if (this.autofetch) {
 			this.addEventListener('stageUpdated', function() {
 				this.fetch();
@@ -376,18 +417,6 @@ JOOMediaBrowser = JOODialog.extend({
 		this.value = value;
 	},
 	
-	addSearchImages: function(name, ret) {
-		while(this[name].getContentPane().children.length > 0) {
-			this[name].getContentPane().removeChildAt(0);
-		}
-		if (ret.length > 0) {
-			for(var i in ret) {
-				var imgPanel = this._getImageWrapper(ret[i], 'joo-search-imgwrapper');
-				this[name].getContentPane().addChild(imgPanel);
-			}
-		}
-	},
-	
 	addBrowseImages: function(ret) {
 		while(this.browseSketch.children.length > 0) {
 			this.browseSketch.removeChildAt(0);
@@ -402,11 +431,7 @@ JOOMediaBrowser = JOODialog.extend({
 	
 	_getImageWrapper: function(retImg, cls) {
 		var _self = this;
-		var imgPanel = new Panel();
-		imgPanel.access().addClass(cls);
-		var img = new JOOImage({src: retImg});
-		imgPanel.addChild(img);
-		imgPanel.setAttribute('src', img.getAttribute('src'));
+		var imgPanel = new JOOImageWrapper({extclasses: cls});
 		imgPanel.addEventListener('click', function() {
 			_self.value = this.getAttribute('src');
 			_self.dispatchEvent('change');
