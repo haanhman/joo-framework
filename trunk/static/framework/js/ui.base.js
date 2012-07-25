@@ -404,10 +404,11 @@ DisplayObject = EventDispatcher.extend(
 			this.setStyle('background-color', config['background-color']);
 		
 		if (config.extclasses) {
-			var cls = config.extclasses.split(',');
-			for(var i=0; i<cls.length; i++) {
-				this.access().addClass(cls[i]);
-			}
+			this.setExtclasses(config.extclasses);
+		}
+		
+		if (config.extstyles) {
+			this.setExtstyles(config.extstyles);
 		}
 
 		if (config.width != undefined)
@@ -420,6 +421,26 @@ DisplayObject = EventDispatcher.extend(
 				this.setStyle(i, config.custom[i]);
 			}
 		}
+	},
+	
+	setExtstyles: function(styles) {
+		this.extstyles = styles;
+		this.access().attr('style', this.access().attr('style') + ';' + styles);
+	},
+	
+	getExtstyles: function() {
+		return this.extstyles;
+	},
+	
+	setExtclasses: function(cls) {
+		if (this.extclasses)
+			this.access().removeClass(this.extclasses);
+		this.extclasses = cls;
+		this.access().addClass(cls);
+	},
+	
+	getExtclasses: function() {
+		return this.extclasses; 
 	},
 	
 	getTooltip: function() {
@@ -1715,8 +1736,12 @@ JOOMenuItem = Sketch.extend(
 			config.lbl = this.id;
 		}
 		this.setLbl(config.lbl);
-		if (config.command != undefined)
+		if (config.command != undefined) {
+//			if (typeof config.command == 'string') {
+//				config.command = new Function(config.command);
+//			}
 			this.onclick = config.command;
+		}
 		this.addEventListener('click', this.onclick);
 	},
 	

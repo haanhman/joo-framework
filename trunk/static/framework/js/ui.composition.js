@@ -106,6 +106,11 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 				var expression = config[i].substr(2, config[i].length-3);
 				config[i] = ExpressionUtils.express(root, expression);
 //				bindings = expression;
+			} else if (i == 'command' && typeof config[i] == 'string') {
+				var fn = new Function(config[i]);
+				config[i] = function() {
+					fn.apply(root, arguments);
+				};
 			}
 		}
 		
