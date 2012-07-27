@@ -373,8 +373,9 @@ DisplayObject = EventDispatcher.extend(
 	 * @param {object} config configuration parameters
 	 */
 	setupDomObject: function(config) {
-		this.domObject = JOOUtils.accessCustom(this.toHtml());
-		this.setAttribute('id', this.id);
+		this.domObject = config.domObject || JOOUtils.accessCustom(this.toHtml());
+		if (!config.domObject)
+			this.setAttribute('id', this.id);
 //		var c = this.inheritedCSSClasses? this.classes.length : 1;
 //		for(var i=0; i<c; i++) {
 //			this.access().addClass('joo-'+this.classes[i].toLowerCase());
