@@ -62,10 +62,19 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 	
 	processElement: function(root, obj, composition, model) {
 		var $composition = $(composition);
-		var tagName = composition.tagName.toLowerCase();
-		var children = $composition.children();
-		var currentObject = obj;
-		var config = JOOUtils.getAttributes(composition);
+		var currentObject = undefined;
+		var children = Array();
+		var config = {};
+		var tagName = undefined;
+		if (composition.nodeType == 3) {	//text node
+			currentObject = new DisplayObject({domObject: $composition});
+			tagName = "text";
+		} else {
+			tagName = composition.tagName.toLowerCase();
+			children = $composition.contents();
+			currentObject = obj;
+			config = JOOUtils.getAttributes(composition);
+		}
 		
 		var handlers = {};
 		var bindings = [];
@@ -138,14 +147,20 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 			isAddItem = true;
 			break;
 		default:
-			if (config.custom && typeof config.custom != 'object') {
-				config.custom = eval('('+config.custom+')');
-			}
-			var className = ClassMapping[tagName.split(':')[1]];
-			if (className) {
-				currentObject = new window[className](config);
+			if (tagName.indexOf("joo:") == 0) {
+				if (config.custom && typeof config.custom != 'object') {
+					config.custom = eval('('+config.custom+')');
+				}
+				var className = ClassMapping[tagName.split(':')[1]];
+				if (className) {
+					currentObject = new window[className](config);
+				} else {
+					throw "Undefined UI Tag: "+tagName;
+				}
 			} else {
-				throw "Undefined UI Tag: "+tagName;
+				if (tagName != "text") {
+					currentObject = new CustomDisplayObject({html: $composition});
+				}
 			}
 		}
 		
