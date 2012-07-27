@@ -1,0 +1,57 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link href="framework/joo-2.0.3.min.css" rel="stylesheet" type="text/css" />
+		<title>JOO Version 2</title>
+	</head>
+	
+    <body>
+        <!-- required libraries -->
+        <script type="text/javascript" src="framework/joo-2.0.3r32.js"></script>
+		
+		<script type="text/javascript">
+			SampleDialog = JOODialog.extend({
+				
+				setupDomObject: function(config) {
+					this._super(config);
+					this.renderUIComposition();
+				},
+				
+				divClick: function() {
+					alert('click me');
+				}
+			}).implement(CompositionRenderInterface);
+		</script>
+		
+		<script type="text/javascript" src="framework/class-name-injection.js"></script>
+		
+
+		<script type="text/html" id="SampleDialogView">
+			<joo:composition title="Composition!">
+				<joo:var name="contentPane">
+					<joo:Sketch background-color="red" width=250 height=150>
+						<joo:JOOButton lbl="Click me!" varName="btn1"></joo:JOOButton>
+						Oh shit! Are you a text node?
+						<joo:JOOButton lbl="Click me!" varName="btn1"></joo:JOOButton>
+						Yes, that's shit!
+						<div handler:click="this.divClick()" varName="mydiv" class="itchy">Hello, i'm div. 
+							I can have varName and handler.
+							Click me!
+							<span varName="myspan">I'm span</span>
+						</div>
+					</joo:Sketch>
+				</joo:var>
+			</joo:composition>
+		</script>
+
+		<div id="Application-Main"></div>
+		
+		<script type="text/javascript">
+			var stage = new Stage({id: "Application-Main"});
+			var dialog = new SampleDialog();
+			stage.addChild(dialog);
+			dialog.mydiv.setStyle('color', 'yellow');
+			dialog.myspan.setStyle('color', 'blue');
+		</script>
+</body>
+</html>
