@@ -29,12 +29,16 @@
 		<script type="text/html" id="SampleDialogView">
 			<joo:composition title="Composition!">
 				<joo:var name="contentPane">
-					<joo:Sketch background-color="red" width=250 height=150>
-						<joo:JOOButton lbl="Click me!" varName="btn1"></joo:JOOButton>
+					<joo:Sketch width=250 height=150 extstyles="color: black">
+						<div>
+							<joo:JOOButton lbl="Click me!" varName="btn1"></joo:JOOButton>
+						</div>
 						Oh shit! Are you a text node?
-						<joo:JOOButton lbl="Click me!" varName="btn1"></joo:JOOButton>
+						<div>
+							<joo:JOOButton lbl="Click me!" varName="btn1"></joo:JOOButton>
+						</div>
 						Yes, that's shit!
-						<div handler:click="this.divClick()" varName="mydiv" class="itchy">Hello, i'm div. 
+						<div handler:click="this.divClick()" varName="mydiv" class="mydiv">Hello, i'm native div. 
 							I can have varName and handler.
 							Click me!
 							<span varName="myspan">I'm span</span>
@@ -50,8 +54,9 @@
 			var stage = new Stage({id: "Application-Main"});
 			var dialog = new SampleDialog();
 			stage.addChild(dialog);
-			dialog.mydiv.setStyle('color', 'yellow');
-			dialog.myspan.setStyle('color', 'blue');
+			dialog.mydiv.setStyle('color', 'blue');
+			dialog.myspan.setStyle('color', 'cyan');
+			dialog.center();
 		</script>
 </body>
 </html>
