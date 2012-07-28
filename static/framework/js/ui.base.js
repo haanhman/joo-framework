@@ -861,11 +861,13 @@ DisplayObjectContainer = DisplayObject.extend(
 		switch (option) {
 			case 'topLeft':{
 				this.setStyle('-webkit-transform-origin', '0 0');
+				this.setStyle('-moz-transform-origin', '0 0');
 				this.setLocation(this.getX() + deltaX, this.getY() + deltaY);
 				break;
 			}
 			case 'center': {
 				this.setStyle('-webkit-transform-origin', "50% 50%");
+				this.setStyle('-moz-transform-origin', "50% 50%");
 				this.setLocation(this.getX() - deltaX, this.getY() - deltaY);
 				break;
 			}
