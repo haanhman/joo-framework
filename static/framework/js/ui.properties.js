@@ -207,7 +207,9 @@ JOOPropertiesDialog = JOODialog.extend({
 	
 	removeTarget: function(target) {
 		if (target != undefined) {
-			target.removeEventListener(this.onTargetStyle);
+			target.removeEventListener('stylechange',this.onTargetStyle);
+			target._parent.removeEventListener('stylechange',this.onTargetStyle);
+			target._parent.removeEventListener('dragstop',this.onTargetStyle);
 		}
 		if (this.target == target) {
 			this.target = undefined;
@@ -217,7 +219,9 @@ JOOPropertiesDialog = JOODialog.extend({
 	
 	setTarget: function(target) {
 		if (this.target != undefined) {
-			this.target.removeEventListener(this.onTargetStyle); 
+			this.target.removeEventListener('stylechange',this.onTargetStyle);
+			this.target._parent.removeEventListener('stylechange',this.onTargetStyle);
+			this.target._parent.removeEventListener('dragstop',this.onTargetStyle);
 		}
 		if (this.target != target) {
 			if(this.target){
