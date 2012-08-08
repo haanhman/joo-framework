@@ -264,7 +264,7 @@ RenderInterface = InterfaceImplementor.extend({
 //			if(this.viewId == undefined || this.model == undefined){
 //				throw "No viewId or model for rendering";
 //			}
-			return tmpl(this.viewId, this.model);
+			return JOOUtils.tmpl(this.viewId, this.model);
 		};
 
 		/**
@@ -290,7 +290,7 @@ RenderInterface = InterfaceImplementor.extend({
 		 * @returns {String} the rendered view of the component
 		 */
 		obj.prototype.renderView = obj.prototype.renderView || function(view, model)	{
-			return tmpl((this.viewId || this.getName())+"-"+view, model);
+			return JOOUtils.tmpl((this.viewId || this.getName())+"-"+view, model);
 		};
 		
 		/**

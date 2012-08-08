@@ -15,7 +15,7 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 		 */
 		obj.prototype.renderUIComposition = obj.prototype.renderUIComposition || function() {
 			var model = this.config.model || {};
-			var composition = $(tmpl(this.className+"View", model));
+			var composition = $(JOOUtils.tmpl(this.className+"View", model));
 			_self.processElement(this, this, composition[0], model);
 		};
 		
