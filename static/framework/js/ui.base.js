@@ -1216,7 +1216,7 @@ UIRenderInterface = InterfaceImplementor.extend({
 	
 	implement: function(obj) {
 		obj.prototype.render = obj.prototype.render || function() {
-			tmpl('UI-'+obj.className, obj.config);
+			JOOUtils.tmpl('UI-'+obj.className, obj.config);
 		};
 	}
 });
