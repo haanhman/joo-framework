@@ -750,6 +750,8 @@ DisplayObject = EventDispatcher.extend(
 	 * @private
 	 */
 	dispose: function(skipRemove) {
+		if (this.dead) 
+			return;
 		this.dispatchEvent('dispose');
 		
 		if (!skipRemove) {
