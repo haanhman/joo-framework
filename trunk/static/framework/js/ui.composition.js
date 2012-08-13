@@ -166,13 +166,26 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 		
 		for(var i in handlers) {
 			(function(i) {
-				currentObject.addEventListener(i, function(event) {
-					try {
-						handlers[i].apply(root, arguments);
-					} catch (err) {
-						log(err);
-					}
-				});
+				if (i.indexOf('touch') != -1) {	//in some platforms such as iOS, binding touch events won't take effect
+													//if elements not existed in DOM
+					currentObject.addEventListener('stageUpdated', function() {
+						currentObject.addEventListener(i, function(event) {
+							try {
+								handlers[i].apply(root, arguments);
+							} catch (err) {
+								log(err);
+							}
+						});
+					});
+				} else {
+					currentObject.addEventListener(i, function(event) {
+						try {
+							handlers[i].apply(root, arguments);
+						} catch (err) {
+							log(err);
+						}
+					});
+				}
 			})(i);
 		}
 		

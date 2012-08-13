@@ -823,7 +823,7 @@ JOOSprite = UIComponent.extend(
 		this.startFrame = start || 0;
 		this.endFrame = end;
 		if(end == undefined){
-			this.endFrame = this.verticalFramesNo * this.horizontalFramesNo; 
+			this.endFrame = this.verticalFramesNo * this.horizontalFramesNo - 1; 
 		} 
 		this.currentFrame = this.startFrame;
 		
@@ -906,7 +906,7 @@ JOOSprite = UIComponent.extend(
 		var x = frame % this.horizontalFramesNo;
 		var y = 0;
 		if (this.currentFrame != 0)
-			Math.ceil(frame / this.horizontalFramesNo);
+			y = Math.floor(frame / this.horizontalFramesNo);
 		var xPos = -x*this.spriteWidth+"px";
 		var yPos = -y*this.spriteHeight+"px";
 		this.access().css('background-position', xPos+' '+yPos);
