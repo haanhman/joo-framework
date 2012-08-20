@@ -61,6 +61,9 @@ JOOKeyBindings = Class.extend({
 	},
 	
 	_toKeyCode: function(key) {
+		var r = key.match(/{(.*)}/);
+		if (r && r.length >= 2)
+			return parseInt(r[1]);
 		return key.toUpperCase().charCodeAt(0);
 	},
 	
