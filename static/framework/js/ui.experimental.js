@@ -290,15 +290,17 @@ JOOMovieClip = JOOSprite.extend({
 //	},
 	
 	play: function() {
-		if (this.played) {
-			this._super();
-			return;
-		}
-		var _self = this;
-		setTimeout(function() {
-			_self.played = true;
-			_self.play();
-		}, 10);
+//		if (this.played) {
+//			this._super();
+//			return;
+//		}
+//		var _self = this;
+//		setTimeout(function() {
+//			_self.played = true;
+//			_self.play();
+//		}, 10);
+		this.played = true;
+		this._super();
 	},
 	
 	onFrame: function(frame) {
