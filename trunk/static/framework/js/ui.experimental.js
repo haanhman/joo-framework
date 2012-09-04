@@ -415,11 +415,19 @@ JOOSpriteAnimation = UIComponent.extend({
 		this.addChild(this.sprite);
 		var _self = this;
 		setTimeout(function(){
-			_self.sprite.play(config.startFrame,config.endFrame);
-		},300);
+			_self.sprite.play(config.startFrame, config.endFrame);
+		}, 300);
 	},
 	
 	toHtml: function() {
 		return "<div></div>";
+	}
+});	
+
+JOOKeyframeAnimationEngine = Class.extend({
+	
+	init: function(config) {
+		this.obj = config.obj;
+		this.animation = config.animation;
 	}
 });

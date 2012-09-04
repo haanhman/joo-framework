@@ -82,10 +82,10 @@ JOOModel = EventDispatcher.extend({
 	
 	bindForArray: function(obj, path) {
 		var _self = this;
-	    var length = obj.length;
-	    obj.__defineGetter__("length", function() {
-			return length;
-		});
+//	    var length = obj.length;
+//	    obj.__defineGetter__("length", function() {
+//			return length;
+//		});
 	    this.hookUp(obj, 'push', path, function(item) {
 	    	_self._bindings(obj, obj.length-1, path);
 	    });
@@ -116,19 +116,35 @@ JOOModel = EventDispatcher.extend({
 		
 		obj.__path__ = path;
 		
-		if (!obj.__lookupGetter__(i)) {
-			obj.__defineGetter__(i, function() {
-		        return obj[prop];
-		    });
-		}
-		if (!obj.__lookupSetter__(i)) {
-			obj.__defineSetter__(i, function(val) {
-				var oldValue = obj[prop];
-				if (oldValue != val) {
-					obj[prop] = val;
-					_self.dispatchEvent('change', {type: 'setter', value: val, prop: i, path: path});
+		if (obj['__lookupGetter__']) {
+			if (!obj.__lookupGetter__(i)) {
+				obj.__defineGetter__(i, function() {
+			        return obj[prop];
+			    });
+			}
+			if (!obj.__lookupSetter__(i)) {
+				obj.__defineSetter__(i, function(val) {
+					var oldValue = obj[prop];
+					if (oldValue != val) {
+						obj[prop] = val;
+						_self.dispatchEvent('change', {type: 'setter', value: val, prop: i, path: path});
+					}
+			    });
+			}
+		} else {
+			Object.defineProperty(obj, i , {
+				get: function() {
+					return obj[prop];
+				},
+				
+				set: function(val) {
+					var oldValue = obj[prop];
+					if (oldValue != val) {
+						obj[prop] = val;
+						_self.dispatchEvent('change', {type: 'setter', value: val, prop: i, path: path});
+					}
 				}
-		    });
+			});
 		}
 	}
 });
