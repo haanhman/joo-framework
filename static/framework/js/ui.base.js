@@ -631,6 +631,8 @@ DisplayObject = EventDispatcher.extend(
 	 * @param {Boolean} silent whether event is omitted or dispatched
 	 */
 	setStyle: function(k, v, silent) {
+		if (this.dead) 
+			return;
 		if (silent)
 			this.access().silentCss(k, v);
 		else

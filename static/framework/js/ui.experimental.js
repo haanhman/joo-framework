@@ -257,7 +257,7 @@ JOOMovieClip = JOOSprite.extend({
 			this.animations[delay] = this.animations[delay] || new Array();
 			this.animations[delay].push(this.data.animations[i]);
 		}
-		this.horizontalFramesNo = this.data.frames;
+		this.horizontalFramesNo = this.data.frames + 1;
 		this.verticalFramesNo = 1;
 	},
 	
