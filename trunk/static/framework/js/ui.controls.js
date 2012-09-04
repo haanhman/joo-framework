@@ -170,8 +170,10 @@ JOOVideo = UIComponent.extend(
 	},
 	
 	dispose: function(skipRemove){
-		this.stop();
-		this._super(skipRemove);
+		try {
+			this.stop();
+			this._super(skipRemove);
+		} catch (err) {}
 	}
 });
 
