@@ -422,7 +422,7 @@ JOOSpriteAnimation = UIComponent.extend({
 	toHtml: function() {
 		return "<div></div>";
 	}
-});	
+});
 
 JOOKeyframeAnimationEngine = Class.extend({
 	
