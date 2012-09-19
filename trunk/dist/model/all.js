@@ -12511,43 +12511,6 @@ function is_array(input){
     return Class;
   };
 })();
-//micro template based on John Resg code
-function tmpl(tmpl_id,data){
-	try {
-		if ( typeof tmpl.cache == 'undefined' ) {
-			tmpl.cache = new Array();
-	    }
-		if( tmpl.cache[tmpl_id]!=null ){
-			var fn = tmpl.cache[tmpl_id];
-			return fn(data);		
-		}
-		str = document.getElementById(tmpl_id).innerHTML;
-		str = str.replace(/\\/g, "@SPC@");
-		str = str.replace(/'/g, "&apos;");
-		fnStr = "var p=[],print=function(){p.push.apply(p,arguments);};" +
-	    
-	    // Introduce the data as local variables using with(){}
-	    "with(obj){p.push('" +
-	    
-	    // Convert the template into pure JavaScript
-	    str
-	      .replace(/[\r\t\n]/g, " ")
-	      .split("<%").join("\t")
-	      .replace(/((^|%>)[^\t]*)'/g, "$1\r")
-	      .replace(/\t=(.*?)%>/g, "',$1,'")
-	      .split("\t").join("');")
-	      .split("%>").join("p.push('")
-	      .split("\r").join("\\'")
-	  + "');}return p.join('');";
-		fnStr = fnStr.replace(/@SPC@/g, "\\");
-		var fn = new Function("obj", fnStr);
-		tmpl.cache[tmpl_id] = fn;
-		return fn(data);
-	} catch (e) {
-		log(e+":"+tmpl_id, 'rendering');
-		return "";
-	}
-}
 /**
  * KineticJS JavaScript Library v3.7.3
  * http://www.kineticjs.com/
@@ -14944,11 +14907,13 @@ CloneableInterface = InterfaceImplementor.extend({
 AjaxInterface = InterfaceImplementor.extend({
 	
 	implement: function(obj)	{
-		obj.prototype.onAjax = obj.prototype.onAjax || function(url, params, type, callbacks, cache, cacheTime)	{
+		obj.prototype.onAjax = obj.prototype.onAjax || function(url, params, type, callbacks, options)	{
+			options = options || {};
 			if (type == undefined)
 				type = 'GET';
 			var success = callbacks.onSuccess;
 			var fail = callbacks.onFailure;
+			var error = callbacks.onError;
 			var accessDenied = callbacks.onAccessDenied;
 			
 			var memcacheKey = 'ajax.'+url;
@@ -14960,13 +14925,13 @@ AjaxInterface = InterfaceImplementor.extend({
 			//var root = SingletonFactory.getInstance(Application).getSystemProperties().get('host.root');
 			//var url = root+'/'+controller+'/'+action;
 			//try to get from mem cached
-			if (type == 'GET' && cache == true)	{
+			if (type == 'GET' && options.cache == true)	 {
 				var memcache = SingletonFactory.getInstance(Memcached);
 				var value = memcache.retrieve(memcacheKey);
 				if (value != undefined)	{
 					var now = new Date();
 					var cacheTimestamp = value.timestamp;
-					if ((now.getTime() - cacheTimestamp) < cacheTime)	{
+					if ((now.getTime() - cacheTimestamp) < options.cacheTime)	{
 						var subject = SingletonFactory.getInstance(Subject);
 						subject.notifyEvent('AjaxQueryFetched', {result: value.ret, url: url});
 						AjaxHandler.handleResponse(value.ret, success, fail, url);
@@ -14986,7 +14951,7 @@ AjaxInterface = InterfaceImplementor.extend({
 				args: args,
 				target: _self
 			});
-			$.ajax({
+			var _options = {
 				dataType: 'json',
 				url: url,
 				type: type,
@@ -15010,6 +14975,8 @@ AjaxInterface = InterfaceImplementor.extend({
 					}
 				},
 				error: function(ret, statusText, errorCode)	{
+					if (error)
+						error(ret, statusText, errorCode);
 					subject.notifyEvent('AjaxError', {ret: ret, 
 						statusText: statusText, 
 						errorCode: errorCode,
@@ -15031,7 +14998,11 @@ AjaxInterface = InterfaceImplementor.extend({
 							accessDenied.call(undefined);
 					}
 				}
-			});
+			};
+			for(var i in options) {
+				_options[i] = options[i];
+			}
+			$.ajax(_options);
 		};
 	}
 });
@@ -15079,7 +15050,7 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 		 */
 		obj.prototype.renderUIComposition = obj.prototype.renderUIComposition || function() {
 			var model = this.config.model || {};
-			var composition = $(tmpl(this.className+"View", model));
+			var composition = $(JOOUtils.tmpl(this.className+"View", model));
 			_self.processElement(this, this, composition[0], model);
 		};
 		
@@ -15098,6 +15069,10 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 						var method = ExpressionUtils.getMutatorMethod(ui, boundProperty);
 						method.call(ui, ExpressionUtils.express(model, path), {path: e.path, bindingPath: path});
 					} else {
+						var fn = 'partialModelChange' + boundProperty[0].toUpperCase()+boundProperty.substr(1);
+						if (typeof ui[fn] == 'function') {
+							ui[fn].call(ui, model, e);
+						}
 						if (typeof ui['partialModelChange'] == 'function') {
 							ui.partialModelChange(model, e, boundProperty);
 						}
@@ -15122,10 +15097,19 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 	
 	processElement: function(root, obj, composition, model) {
 		var $composition = $(composition);
-		var tagName = composition.tagName.toLowerCase();
-		var children = $composition.children();
-		var currentObject = obj;
-		var config = JOOUtils.getAttributes(composition);
+		var currentObject = undefined;
+		var children = Array();
+		var config = {};
+		var tagName = undefined;
+		if (composition.nodeType == 3) {	//text node
+			currentObject = new DisplayObject({domObject: $composition});
+			tagName = "text";
+		} else {
+			tagName = composition.tagName.toLowerCase();
+			children = $composition.contents();
+			currentObject = obj;
+			config = JOOUtils.getAttributes(composition);
+		}
 		
 		var handlers = {};
 		var bindings = [];
@@ -15134,23 +15118,43 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 		var isAddItem = false;
 		var tabTitle = undefined;
 		
+		var ns = 'joo.ui.composition';
+		if (config['config-id']) {
+			var dataStore = SingletonFactory.getInstance(DataStore);
+			if (!dataStore.getStore(ns)) {
+				dataStore.registerStore(ns, 'Dom', {
+					id: 'UICompositionConfig'
+				});
+			}
+			var cfg = dataStore.fetch(ns, config['config-id']) || {};
+			for(var i in config) {
+				cfg[i] = config[i];
+			}
+			config = cfg;
+		}
+		
 		for(var i in config) {
 			if (i.indexOf('handler:') != -1) {
 				var event = i.substr(8);
 				var fn = config[i];
 				handlers[event] = new Function(fn);
 				delete config[i];
-			} else if (config[i].indexOf('#{') == 0) {
+			} else if (typeof config[i] == 'string' && config[i].indexOf('#{') == 0) {
 				var expression = config[i].substr(2, config[i].length-3);
 				config[i] = ExpressionUtils.express(model, expression);
 				bindings.push({
 					expression: expression,
 					boundProperty: i
 				});
-			} else if (config[i].indexOf('${') == 0) {
+			} else if (typeof config[i] == 'string' && config[i].indexOf('${') == 0) {
 				var expression = config[i].substr(2, config[i].length-3);
 				config[i] = ExpressionUtils.express(root, expression);
 //				bindings = expression;
+			} else if (i == 'command' && typeof config[i] == 'string') {
+				var fn = new Function(config[i]);
+				config[i] = function() {
+					fn.apply(root, arguments);
+				};
 			}
 		}
 		
@@ -15164,6 +15168,11 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 		case "joo:var":
 			var varName = $composition.attr('name');
 			currentObject = obj[varName];
+			for(var i in config) {
+				var mutator = ExpressionUtils.getMutatorMethod(currentObject, i);
+				if (mutator)
+					mutator.call(currentObject, config[i]);
+			}
 			break;
 		case "joo:addtab":
 			isAddTab = true;
@@ -15173,26 +15182,45 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 			isAddItem = true;
 			break;
 		default:
-			if (config.custom) {
-				config.custom = eval('('+config.custom+')');
-			}
-			var className = ClassMapping[tagName.split(':')[1]];
-			if (className) {
-				currentObject = new window[className](config);
+			if (tagName.indexOf("joo:") == 0) {
+				if (config.custom && typeof config.custom != 'object') {
+					config.custom = eval('('+config.custom+')');
+				}
+				var className = ClassMapping[tagName.split(':')[1]];
+				if (className) {
+					currentObject = new window[className](config);
+				} else {
+					throw "Undefined UI Tag: "+tagName;
+				}
 			} else {
-				throw "Undefined UI Tag: "+tagName;
+				if (tagName != "text") {
+					currentObject = new CustomDisplayObject({html: $composition});
+				}
 			}
 		}
 		
 		for(var i in handlers) {
 			(function(i) {
-				currentObject.addEventListener(i, function() {
-					try {
-						handlers[i].apply(root, arguments);
-					} catch (err) {
-						log(err);
-					}
-				});
+				if (i.indexOf('touch') != -1) {	//in some platforms such as iOS, binding touch events won't take effect
+													//if elements not existed in DOM
+					currentObject.addEventListener('stageUpdated', function() {
+						currentObject.addEventListener(i, function(event) {
+							try {
+								handlers[i].apply(root, arguments);
+							} catch (err) {
+								log(err);
+							}
+						});
+					});
+				} else {
+					currentObject.addEventListener(i, function(event) {
+						try {
+							handlers[i].apply(root, arguments);
+						} catch (err) {
+							log(err);
+						}
+					});
+				}
 			})(i);
 		}
 		
@@ -15538,15 +15566,14 @@ DisplayObject = EventDispatcher.extend(
 				return this.isBubbleStop;
 			};
 		}
-		var args = [event, eventData];
 		var eventType = event.split('.')[0];
 		
 		var skipped = ['stageUpdated'];	//stageUpdated is internal event and should not be propagated
-		var result = this._super.apply(this, args);
+		var result = this._super.apply(this, arguments);
 		if (result) {
 			if (this._parent && !eventData.isPropagationStopped() 
 					&& skipped.indexOf(eventType) == -1) {
-				this._parent.dispatchEvent.apply(this._parent, args);
+				this._parent.dispatchEvent.apply(this._parent, arguments);
 			}
 		}
 	},
@@ -15602,8 +15629,9 @@ DisplayObject = EventDispatcher.extend(
 	 * @param {object} config configuration parameters
 	 */
 	setupDomObject: function(config) {
-		this.domObject = JOOUtils.accessCustom(this.toHtml());
-		this.setAttribute('id', this.id);
+		this.domObject = config.domObject || JOOUtils.accessCustom(this.toHtml());
+		if (!config.domObject)
+			this.setAttribute('id', this.id);
 //		var c = this.inheritedCSSClasses? this.classes.length : 1;
 //		for(var i=0; i<c; i++) {
 //			this.access().addClass('joo-'+this.classes[i].toLowerCase());
@@ -15633,10 +15661,11 @@ DisplayObject = EventDispatcher.extend(
 			this.setStyle('background-color', config['background-color']);
 		
 		if (config.extclasses) {
-			var cls = config.extclasses.split(',');
-			for(var i=0; i<cls.length; i++) {
-				this.access().addClass(cls[i]);
-			}
+			this.setExtclasses(config.extclasses);
+		}
+		
+		if (config.extstyles) {
+			this.setExtstyles(config.extstyles);
 		}
 
 		if (config.width != undefined)
@@ -15649,6 +15678,26 @@ DisplayObject = EventDispatcher.extend(
 				this.setStyle(i, config.custom[i]);
 			}
 		}
+	},
+	
+	setExtstyles: function(styles) {
+		this.extstyles = styles;
+		this.access().attr('style', this.access().attr('style') + ';' + styles);
+	},
+	
+	getExtstyles: function() {
+		return this.extstyles;
+	},
+	
+	setExtclasses: function(cls) {
+		if (this.extclasses)
+			this.access().removeClass(this.extclasses);
+		this.extclasses = cls;
+		this.access().addClass(cls);
+	},
+	
+	getExtclasses: function() {
+		return this.extclasses; 
 	},
 	
 	getTooltip: function() {
@@ -15838,6 +15887,8 @@ DisplayObject = EventDispatcher.extend(
 	 * @param {Boolean} silent whether event is omitted or dispatched
 	 */
 	setStyle: function(k, v, silent) {
+		if (this.dead) 
+			return;
 		if (silent)
 			this.access().silentCss(k, v);
 		else
@@ -15957,6 +16008,8 @@ DisplayObject = EventDispatcher.extend(
 	 * @private
 	 */
 	dispose: function(skipRemove) {
+		if (this.dead) 
+			return;
 		this.dispatchEvent('dispose');
 		
 		if (!skipRemove) {
@@ -16068,11 +16121,13 @@ DisplayObjectContainer = DisplayObject.extend(
 		switch (option) {
 			case 'topLeft':{
 				this.setStyle('-webkit-transform-origin', '0 0');
+				this.setStyle('-moz-transform-origin', '0 0');
 				this.setLocation(this.getX() + deltaX, this.getY() + deltaY);
 				break;
 			}
 			case 'center': {
 				this.setStyle('-webkit-transform-origin', "50% 50%");
+				this.setStyle('-moz-transform-origin', "50% 50%");
 				this.setLocation(this.getX() - deltaX, this.getY() - deltaY);
 				break;
 			}
@@ -16259,6 +16314,8 @@ DisplayObjectContainer = DisplayObject.extend(
 	},
 	
 	dispose: function(skipRemove) {
+	    if (this.dead)
+	        return;
 		for(var i=0;i<this.children.length;i++) {
 			this.children[i].dispose(true);
 		}
@@ -16421,7 +16478,7 @@ UIRenderInterface = InterfaceImplementor.extend({
 	
 	implement: function(obj) {
 		obj.prototype.render = obj.prototype.render || function() {
-			tmpl('UI-'+obj.className, obj.config);
+			JOOUtils.tmpl('UI-'+obj.className, obj.config);
 		};
 	}
 });
@@ -16944,8 +17001,12 @@ JOOMenuItem = Sketch.extend(
 			config.lbl = this.id;
 		}
 		this.setLbl(config.lbl);
-		if (config.command != undefined)
+		if (config.command != undefined) {
+//			if (typeof config.command == 'string') {
+//				config.command = new Function(config.command);
+//			}
 			this.onclick = config.command;
+		}
 		this.addEventListener('click', this.onclick);
 	},
 	
@@ -17244,8 +17305,18 @@ JOOForm = Sketch.extend(
 		this._super(config);
 		config.method = config.method || "post";
 		config.encType = config.encType || "application/x-www-form-urlencoded";
+		if (config.action)
+			this.setAction(config.action);
 		this.setMethod(config.method);
 		this.setEncType(config.encType);
+	},
+	
+	setAction: function(action) {
+		this.setAttribute("action", action);
+	},
+	
+	getAction: function() {
+		return this.getAttribute("action");
 	},
 	
 	setMethod: function(method) {
@@ -17276,13 +17347,13 @@ JOOForm = Sketch.extend(
 	}
 });
 
-ContainerWrapper = Class.extend({
-	
-	wrap: function(container, obj) {
-		container.addChild(obj);
-		return container;
-	}
-});
+//ContainerWrapper = Class.extend({
+//	
+//	wrap: function(container, obj) {
+//		container.addChild(obj);
+//		return container;
+//	}
+//});
 /**
  * @class An interface which allows UI Component to be selectable.
  * @interface
@@ -18335,8 +18406,10 @@ JOOVideo = UIComponent.extend(
 	},
 	
 	dispose: function(skipRemove){
-		this.stop();
-		this._super(skipRemove);
+		try {
+			this.stop();
+			this._super(skipRemove);
+		} catch (err) {}
 	}
 });
 
@@ -18988,7 +19061,7 @@ JOOSprite = UIComponent.extend(
 		this.startFrame = start || 0;
 		this.endFrame = end;
 		if(end == undefined){
-			this.endFrame = this.verticalFramesNo * this.horizontalFramesNo; 
+			this.endFrame = this.verticalFramesNo * this.horizontalFramesNo - 1; 
 		} 
 		this.currentFrame = this.startFrame;
 		
@@ -19071,7 +19144,7 @@ JOOSprite = UIComponent.extend(
 		var x = frame % this.horizontalFramesNo;
 		var y = 0;
 		if (this.currentFrame != 0)
-			Math.ceil(frame / this.horizontalFramesNo);
+			y = Math.floor(frame / this.horizontalFramesNo);
 		var xPos = -x*this.spriteWidth+"px";
 		var yPos = -y*this.spriteHeight+"px";
 		this.access().css('background-position', xPos+' '+yPos);
@@ -19124,8 +19197,8 @@ JOOBasicUploader = UIComponent.extend({
 		var form = new CustomDisplayObject({html: "<form enctype='multipart/form-data' target='"+iframeId+"' action='"+this.endpoint+"' method='post'></form>"});
 		form.addChild(this.fileInput);
 		var _self = this;
-		this.fileInput.addEventListener('change', function() {
-			_self.dispatchEvent('inputchange');
+		this.fileInput.addEventListener('change', function(e) {
+			_self.dispatchEvent('inputchange', e);
 			if (config.autosubmit)
 				form.access().submit();
 		});
@@ -19809,8 +19882,8 @@ JOODialog = UIComponent.extend(
 		this.addChild(this.contentPane);
 		
 		var _self = this;
-		var closeBtn = new JOOCloseButton({absolute: true});
-		closeBtn.onclick = function() {
+		this.closeBtn = new JOOCloseButton({absolute: true});
+		this.closeBtn.onclick = function() {
 			_self.dispatchEvent('closing');
 			if (config.closemethod == 'do_nothing') return;
 			if (!config.closemethod) config.closemethod = "close";
@@ -19818,13 +19891,15 @@ JOODialog = UIComponent.extend(
 		};
 		var label = new JOOLabel();
 		this.titleBar.addChild(label);
-		this.titleBar.addChild(closeBtn);
+		this.titleBar.addChild(this.closeBtn);
 		
 		if (config.title != undefined)
 			this.setTitle(config.title);
 		
-		this.draggable({handle: this.titleBar.access()});
-		this.startDrag();
+		if (!config.stick) {
+			this.draggable({handle: this.titleBar.access()});
+			this.startDrag();
+		}
 		this.addEventListener('stageUpdated', function() {
 			this.afterAdded();
 		});
@@ -19983,7 +20058,6 @@ SliderIcon = Sketch.extend({
 		this.setWidth(18);
 		this.setHeight(18);
 		
-		var _self = this;
 		this.draggable({containment:'parent'});
 		
 		this.addEventListener("mousedown", function(e) {
@@ -20213,6 +20287,216 @@ JOOColorPicker = JOOInput.extend(
 		return "<div></div>";
 	}
 });
+ListItem = UIComponent.extend({
+	
+	setupDomObject: function(config) {
+		this._super(config);
+		this.label = new JOOLabel({lbl: config.lbl});
+		if (config.showLabel) {
+			this.addChild(this.label);
+		}
+	},
+	
+	toHtml: function() {
+		return "<li></li>";
+	}
+});
+UnorderedList = UIComponent.extend({
+	
+	setupBase : function(config) {
+		this._super(config);
+		this.data = [];
+		this.labelField = 'label';
+		if (config.labelField && config.labelField != "") {
+			this.labelField = config.labelField;
+		}
+	},
+	emptyList : function() {
+		while (this.children.length > 0) {
+			this.removeChild(this.children[0]);
+		}
+		this.data = [];
+	},
+	clearView : function() {
+		while (this.children.length > 0) {
+			this.detachChild(this.children[0]);
+		}
+	},
+	toHtml : function() {
+		return '<ul></ul>';
+	},
+	addItem : function(ele) {
+		if (this.data.indexOf(ele) == -1) {
+			this.data.push(ele);
+			var item = ele;
+			if (!( ele instanceof ListItem)) {
+				item = new ListItem({
+					lbl : ( typeof ele == 'string') ? ele : ele[this.labelField]
+				});
+			}
+			this.addChild(item);
+			var _self = this;
+			item.addEventListener('click', function() {
+				_self.selectedItem = item;
+				_self.dispatchEvent('select', ele);
+			});
+		}
+
+	},
+	removeItem : function(item) {
+		var index = this.data.indexOf(item);
+		if (index != -1) {
+			if (item == this.selectedItem)
+				this.selectedItem = null;
+			this.removeChild(item);
+			this.data.splice(index, 1);
+		}
+	},
+	refresh : function() {
+		this.clearView();
+		for (var i = 0; i < this.data.length; i++) {
+			this.addChild(this.data[i]);
+		}
+	},
+	setChildIndex : function(child, index) {
+		var currIndex = this.data.indexOf(child);
+		if (currIndex != -1) {
+			this.data.splice(currIndex, 1);
+			this.data.splice(index, 0, child);
+			this.refresh();
+		}
+	},
+
+	getChildIndexByDomObject : function(domObject) {
+		for (var i = 0, l = this.data.length; i < l; i++) {
+			var child = this.data[i].access()[0];
+			if (child == domObject) {
+				return i;
+			}
+		}
+		return undefined;
+	},
+
+	refreshByDisplay : function() {
+		var arr = [];
+		var data = this.data;
+		var findListItem = function(id) {
+			for (var i = 0, l = data.length; i < l; i++) {
+				if (data[i].id == id) {
+					return data[i];
+				}
+			}
+			return undefined;
+		}
+		var lis = this.access().children('li');
+		for (var i = 0, l = lis.length; i < l; i++) {
+			var item = findListItem($(lis[i]).attr('id'));
+			if (!item)
+				continue;
+			arr.push(item);
+		};
+
+		this.data = arr;
+		this.refresh();
+	}
+});
+OrderedList = UnorderedList.extend({
+	toHtml : function() {
+		return '<ol></ol>';
+	}
+});
+JOORadioButtonGroup = UnorderedList.extend({
+	setupDomObject : function(config) {
+		this._super(config);
+		this.name = config.name;
+		this._value = null;
+	},
+	addItem : function(item) {
+		var _item = item;
+		if (!( item instanceof JOORadioButtonItem)) {
+			_item = new JOORadioButtonItem({
+				name : this.name,
+				checked : false,
+				lbl : item
+			});
+		}
+		this._super(_item);
+		var _self = this;
+		_item.input.addEventListener('change', function(e) {
+			_self.dispatchEvent('change', {
+				item : _item,
+				value : item.input ? (item.input.getValue ? item.input.getValue() : undefined) : undefined
+			});
+			e.stopPropagation();
+		});
+		return _item;
+	},
+	getItemByValue : function(value) {
+		for (var i = 0, l = this.data.length; i < l; i++) {
+			if (this.data[i].getValue() == value)
+				return this.data[i];
+		}
+	},
+	setChecked : function(item) {
+		if (this.data.indexOf(item) == -1) {
+			return;
+		}
+		item.input.setChecked(true);
+		this.dispatchEvent('changeValue', {
+			item : item,
+			value : item.input ? (item.input.getValue ? item.input.getValue() : undefined) : undefined
+		});
+	},
+	getChecked : function() {
+		for (var i = 0; i < this.data.length; i++) {
+			if (this.data[i].input.getChecked())
+				return this.data[i];
+		}
+		return undefined;
+	}
+});
+JOORadioButtonItem = ListItem.extend({
+	setupDomObject : function(config) {
+		config.showLabel = false;
+		this._super(config);
+		this.lbl = new JOOLabel({
+			lbl : config.lbl
+		});
+		this.input = new JOORadioButton({
+			name : config.name,
+			value : config.value,
+			checked : config.checked
+		});
+
+		this.addChild(this.input);
+		this.addChild(this.lbl);
+	},
+
+	setValue : function(value) {
+		this.input.config.value = value;
+		return this;
+	},
+
+	getValue : function() {
+		return this.input.config.value;
+	}
+});
+JOORadioButton = JOOInput.extend({
+	toHtml : function() {
+		return '<input />';
+	},
+	setupDomObject : function(config) {
+		this._super(config);
+		this.setAttribute('type', 'radio');
+		this.setChecked(config.checked);
+	},
+	setChecked : function(value) {
+		this.access().prop('checked', value);
+	},
+	getChecked : function() {
+		return this.access().prop('checked');
+	}
+});
 JOOPropertyElement = JOOInput.extend({
 	
 	setupDomObject: function(config) {
@@ -20422,7 +20706,9 @@ JOOPropertiesDialog = JOODialog.extend({
 	
 	removeTarget: function(target) {
 		if (target != undefined) {
-			target.removeEventListener(this.onTargetStyle);
+			target.removeEventListener('stylechange',this.onTargetStyle);
+			target._parent.removeEventListener('stylechange',this.onTargetStyle);
+			target._parent.removeEventListener('dragstop',this.onTargetStyle);
 		}
 		if (this.target == target) {
 			this.target = undefined;
@@ -20432,7 +20718,9 @@ JOOPropertiesDialog = JOODialog.extend({
 	
 	setTarget: function(target) {
 		if (this.target != undefined) {
-			this.target.removeEventListener(this.onTargetStyle); 
+			this.target.removeEventListener('stylechange',this.onTargetStyle);
+			this.target._parent.removeEventListener('stylechange',this.onTargetStyle);
+			this.target._parent.removeEventListener('dragstop',this.onTargetStyle);
 		}
 		if (this.target != target) {
 			if(this.target){
@@ -20786,6 +21074,74 @@ DragDropController = Class.extend({
 	}
 });
 
+JOOImageWrapper = Panel.extend({
+	
+	setupDomObject: function(config) {
+		this._super(config);
+		this.img = new JOOImage({src: config.src});
+		this.addChild(this.img);
+		this.setAttribute('src', this.img.getAttribute('src'));
+	}
+});
+
+JOOSearchUI = Sketch.extend({
+	
+	setupDomObject: function(config) {
+		this._super(config);
+		this.searchInput = new JOOTextInput({width: '100%', height: 20});
+		this.searchSketch = new Sketch({height: 140});
+		this.searchSketch.setStyle('overflow', 'auto');
+		this.addChild(this.searchInput);
+		this.addChild(this.searchSketch);
+		
+		this.setupServices();
+	},
+	
+	setupServices: function() {
+		if (this.config.searchServices) {
+			var _self = this;
+			for(var i in this.config.searchServices) {
+				this.config.searchServices[i].addEventListener('success', function(ret) {
+					_self.addSearchImages(this.name, ret);
+				});
+				this[this.config.searchServices[i].name] = new JOOAccordion({lbl: this.config.searchServices[i].name});
+				this.searchSketch.addChild(this[this.config.searchServices[i].name]);
+			}
+			var _self = this;
+			this.searchInput.addEventListener('keydown', function(e) {
+				if (e.keyCode == 13) {
+					e.stopPropagation();
+					e.preventDefault();
+					for(var i in _self.config.searchServices) {
+						_self.config.searchServices[i].run({query: this.getValue()});
+					}
+				}
+			});
+		}
+	},
+	
+	addSearchImages: function(name, ret) {
+		this[name].getContentPane().removeAllChildren();
+		if (ret.length > 0) {
+			for(var i in ret) {
+				var imgPanel = this._getImageWrapper(ret[i], 'joo-search-imgwrapper');
+				this[name].getContentPane().addChild(imgPanel);
+			}
+		}
+	},
+	
+	_getImageWrapper: function(retImg, cls) {
+		var _self = this;
+		var imgPanel = new JOOImageWrapper({extclasses: cls, src: retImg});
+		imgPanel.addEventListener('click', function() {
+			_self.value = this.getAttribute('src');
+			_self.dispatchEvent('imageclick');
+		});
+		return imgPanel;
+	}
+
+});
+
 JOOMediaBrowser = JOODialog.extend({
 	
 	setupDomObject: function(config) {
@@ -20808,13 +21164,7 @@ JOOMediaBrowser = JOODialog.extend({
 				tab.addTab('Uploaded', this.browseSketch);
 			}
 			if (this.searchServices) {
-				var sk = new Sketch({height: 160});
-				this.searchInput = new JOOTextInput({width: '100%', height: 20});
-				this.searchSketch = new Sketch({height: 140});
-				this.searchSketch.setStyle('overflow', 'auto');
-				sk.addChild(this.searchInput);
-				sk.addChild(this.searchSketch);
-				tab.addTab('Search', sk);
+				tab.addTab('Search', new JOOSearchUI({height: 160, services: config.searchServices}));
 			}
 			this.getContentPane().addChild(tab);
 		}
@@ -20876,26 +21226,6 @@ JOOMediaBrowser = JOODialog.extend({
 			});
 		}
 		
-		if (this.searchServices) {
-			var _self = this;
-			for(var i in this.searchServices) {
-				this.searchServices[i].addEventListener('success', function(ret) {
-					_self.addSearchImages(this.name, ret);
-				});
-				this[this.searchServices[i].name] = new JOOAccordion({lbl: this.searchServices[i].name});
-				this.searchSketch.addChild(this[this.searchServices[i].name]);
-			}
-			this.searchInput.addEventListener('keydown', function(e) {
-				if (e.keyCode == 13) {
-					e.stopPropagation();
-					e.preventDefault();
-					for(var i in _self.searchServices) {
-						_self.searchServices[i].run({query: this.getValue()});
-					}
-				}
-			});
-		}
-		
 		if (this.autofetch) {
 			this.addEventListener('stageUpdated', function() {
 				this.fetch();
@@ -20915,18 +21245,6 @@ JOOMediaBrowser = JOODialog.extend({
 		this.value = value;
 	},
 	
-	addSearchImages: function(name, ret) {
-		while(this[name].getContentPane().children.length > 0) {
-			this[name].getContentPane().removeChildAt(0);
-		}
-		if (ret.length > 0) {
-			for(var i in ret) {
-				var imgPanel = this._getImageWrapper(ret[i], 'joo-search-imgwrapper');
-				this[name].getContentPane().addChild(imgPanel);
-			}
-		}
-	},
-	
 	addBrowseImages: function(ret) {
 		while(this.browseSketch.children.length > 0) {
 			this.browseSketch.removeChildAt(0);
@@ -20941,11 +21259,7 @@ JOOMediaBrowser = JOODialog.extend({
 	
 	_getImageWrapper: function(retImg, cls) {
 		var _self = this;
-		var imgPanel = new Panel();
-		imgPanel.access().addClass(cls);
-		var img = new JOOImage({src: retImg});
-		imgPanel.addChild(img);
-		imgPanel.setAttribute('src', img.getAttribute('src'));
+		var imgPanel = new JOOImageWrapper({extclasses: cls, src: retImg});
 		imgPanel.addEventListener('click', function() {
 			_self.value = this.getAttribute('src');
 			_self.dispatchEvent('change');
@@ -21224,7 +21538,7 @@ JOOMovieClip = JOOSprite.extend({
 	buildScript: function(){
 		if(this.data.scripts){
 			for(var i in this.data.scripts){
-				this.scripts[i] = new Function(this.data.scripts[i])
+				this.scripts[i] = new Function(this.data.scripts[i]);
 			}
 		}
 	},
@@ -21249,7 +21563,7 @@ JOOMovieClip = JOOSprite.extend({
 		for(var i in objDef.attributes){
 			obj.setAttribute(i,objDef.attributes[i]);
 		}
-		obj.setStyle("display","none");
+		obj.setStyle("display", "none");
 		if(!obj.getStyle("position")){ obj.setStyle("position","absolute"); }
 		if (objDef.type == "composition") {
 			//obj.setLayout('absolute');
@@ -21280,7 +21594,7 @@ JOOMovieClip = JOOSprite.extend({
 			this.animations[delay] = this.animations[delay] || new Array();
 			this.animations[delay].push(this.data.animations[i]);
 		}
-		this.horizontalFramesNo = this.data.frames;
+		this.horizontalFramesNo = this.data.frames + 1;
 		this.verticalFramesNo = 1;
 	},
 	
@@ -21293,35 +21607,9 @@ JOOMovieClip = JOOSprite.extend({
 		}
 	},
 	
-//	pause: function() {
-//		this._stripOldAnimationsMeta();
-//		for (var i in this.animationsMeta) {
-//			var meta = this.animationsMeta[i];
-//			meta.object.setCSS3Style('transition-duration', '');
-//			var styles = meta.object.getAttribute('style').split(';');
-//			for(var j in styles) {
-//				var kv = styles[j].split(':');
-//				if (kv && kv.length == 2) {
-//					console.log();
-//					if (kv[0].indexOf('transition') == -1) {
-//						meta.object.setStyle(kv[0], meta.object.getStyle(kv[0]));
-//					}
-//				}
-//			}
-//		}
-//		this._super();
-//	},
-	
 	play: function() {
-		if (this.played) {
-			this._super();
-			return;
-		}
-		var _self = this;
-		setTimeout(function() {
-			_self.played = true;
-			_self.play();
-		}, 10);
+		this.played = true;
+		this._super();
 	},
 	
 	onFrame: function(frame) {
@@ -21334,10 +21622,6 @@ JOOMovieClip = JOOSprite.extend({
 					this.playAnimation(animations[i], 0);
 			}
 		}
-		//for(var i in this.animations) {
-			//var animation = this.animations[i];
-			//this.playAnimation(animation, 0);
-		//}
 	},
 	
 	callScript: function(animation) {
@@ -21366,8 +21650,7 @@ JOOMovieClip = JOOSprite.extend({
 			obj = obj.children[objRef[i]];
 		}
 		var actions = this.actions[animation.action_ref];
-		var _self = this;
-		obj.setCSS3Style('transition-timing-function', 'linear');
+//		obj.setCSS3Style('transition-timing-function', 'linear');
 		this.animationsMeta.push(new JOOAnimationData({
 			object: obj,
 			delay: animation.delay,
@@ -21375,31 +21658,22 @@ JOOMovieClip = JOOSprite.extend({
 			end: actions.end, 
 			duration: actions.duration
 		}));
-		_self.doPlayAnimation([obj, actions, time, animation]);
-		
-		//setTimeout(function(args) {
-			//_self.doPlayAnimation(args);
-			// var i = setInterval(function(args) {
-			// 	_self.doPlayAnimation(args);
-			// }, args[1].interval, args);
-			// _self.intervals.push(i);
-		//}, animation.delay, [obj, actions, time, animation]);
+		this.doPlayAnimation([obj, actions, time, animation]);
 	},
 	
 	doPlayAnimation: function(args) {
 		var _obj = args[0];
 		var _actions = args[1];
-		_obj.setCSS3Style('transition-property', '');
-		_obj.setCSS3Style('transition-duration', '');
+//		_obj.setCSS3Style('transition-property', '');
+//		_obj.setCSS3Style('transition-duration', '');
 		var keys = this.setStyles(_obj, _actions.start);
-		_obj.getStyle('-webkit-transform');
-		
-		var duration = _actions.duration / this.framerate * 1000;
-		_obj.setCSS3Style('transition-duration', duration+'ms');
-		_obj.setCSS3Style('transition-property', keys.join(','));
-		//console.log(_obj.className,JSON.stringify(_obj.getStyle('-webkit-transition-duration')));
-		
-		this.setStyles(_obj, _actions.end);
+//		_obj.getStyle('-webkit-transform');
+//		
+//		var duration = _actions.duration / this.framerate * 1000;
+//		_obj.setCSS3Style('transition-duration', duration+'ms');
+//		_obj.setCSS3Style('transition-property', keys.join(','));
+//		
+//		this.setStyles(_obj, _actions.end);
 	},
 	
 	setStyles: function(obj, actions) {
@@ -21436,12 +21710,20 @@ JOOSpriteAnimation = UIComponent.extend({
 		this.addChild(this.sprite);
 		var _self = this;
 		setTimeout(function(){
-			_self.sprite.play(config.startFrame,config.endFrame);
-		},300);
+			_self.sprite.play(config.startFrame, config.endFrame);
+		}, 300);
 	},
 	
 	toHtml: function() {
 		return "<div></div>";
+	}
+});
+
+JOOKeyframeAnimationEngine = Class.extend({
+	
+	init: function(config) {
+		this.obj = config.obj;
+		this.animation = config.animation;
 	}
 });
 /**
@@ -21617,6 +21899,8 @@ JOOModel = EventDispatcher.extend({
 	_bindings: function(obj, i, path) {
 		if (i == 'className' || i == 'ancestors' || i == 'listeners' || i =='_bindingName_') 
 			return;
+		if (obj instanceof JOOModel && obj != this)
+			return;
 		if (path == "") {
 			path = i;
 		} else {
@@ -21635,10 +21919,10 @@ JOOModel = EventDispatcher.extend({
 	
 	bindForArray: function(obj, path) {
 		var _self = this;
-	    var length = obj.length;
-	    obj.__defineGetter__("length", function() {
-			return length;
-		});
+//	    var length = obj.length;
+//	    obj.__defineGetter__("length", function() {
+//			return length;
+//		});
 	    this.hookUp(obj, 'push', path, function(item) {
 	    	_self._bindings(obj, obj.length-1, path);
 	    });
@@ -21669,19 +21953,35 @@ JOOModel = EventDispatcher.extend({
 		
 		obj.__path__ = path;
 		
-		if (!obj.__lookupGetter__(i)) {
-			obj.__defineGetter__(i, function() {
-		        return obj[prop];
-		    });
-		}
-		if (!obj.__lookupSetter__(i)) {
-			obj.__defineSetter__(i, function(val) {
-				var oldValue = obj[prop];
-				if (oldValue != val) {
-					obj[prop] = val;
-					_self.dispatchEvent('change', {type: 'setter', value: val, prop: i, path: path});
+		if (obj['__lookupGetter__']) {
+			if (!obj.__lookupGetter__(i)) {
+				obj.__defineGetter__(i, function() {
+			        return obj[prop];
+			    });
+			}
+			if (!obj.__lookupSetter__(i)) {
+				obj.__defineSetter__(i, function(val) {
+					var oldValue = obj[prop];
+					if (oldValue != val) {
+						obj[prop] = val;
+						_self.dispatchEvent('change', {type: 'setter', value: val, prop: i, path: path});
+					}
+			    });
+			}
+		} else {
+			Object.defineProperty(obj, i , {
+				get: function() {
+					return obj[prop];
+				},
+				
+				set: function(val) {
+					var oldValue = obj[prop];
+					if (oldValue != val) {
+						obj[prop] = val;
+						_self.dispatchEvent('change', {type: 'setter', value: val, prop: i, path: path});
+					}
 				}
-		    });
+			});
 		}
 	}
 });
@@ -22541,7 +22841,7 @@ RenderInterface = InterfaceImplementor.extend({
 //			if(this.viewId == undefined || this.model == undefined){
 //				throw "No viewId or model for rendering";
 //			}
-			return tmpl(this.viewId, this.model);
+			return JOOUtils.tmpl(this.viewId, this.model);
 		};
 
 		/**
@@ -22567,7 +22867,7 @@ RenderInterface = InterfaceImplementor.extend({
 		 * @returns {String} the rendered view of the component
 		 */
 		obj.prototype.renderView = obj.prototype.renderView || function(view, model)	{
-			return tmpl((this.viewId || this.getName())+"-"+view, model);
+			return JOOUtils.tmpl((this.viewId || this.getName())+"-"+view, model);
 		};
 		
 		/**
@@ -23540,6 +23840,50 @@ JOOUtils = {
 		} else if (document.webkitCancelFullScreen) {  
 			document.webkitCancelFullScreen();  
 		}  
+	},
+	
+	readFileAsDataURL: function(file, callback) {
+		var reader = new FileReader();
+		reader.onload = callback;
+		reader.readAsDataURL(file);
+	},
+	
+	//micro template based on John Resg code
+	tmpl: function (tmpl_id,data) {
+		try {
+			if ( typeof JOOUtils.tmpl.cache == 'undefined' ) {
+				JOOUtils.tmpl.cache = new Array();
+		    }
+			if( JOOUtils.tmpl.cache[tmpl_id]!=null ){
+				var fn = JOOUtils.tmpl.cache[tmpl_id];
+				return fn(data);
+			}
+			str = document.getElementById(tmpl_id).innerHTML;
+			str = str.replace(/\\/g, "@SPC@");
+			str = str.replace(/'/g, "&apos;");
+			fnStr = "var p=[],print=function(){p.push.apply(p,arguments);};" +
+		    
+		    // Introduce the data as local variables using with(){}
+		    "with(obj){p.push('" +
+		    
+		    // Convert the template into pure JavaScript
+		    str
+		      .replace(/[\r\t\n]/g, " ")
+		      .split("<%").join("\t")
+		      .replace(/((^|%>)[^\t]*)'/g, "$1\r")
+		      .replace(/\t=(.*?)%>/g, "',$1,'")
+		      .split("\t").join("');")
+		      .split("%>").join("p.push('")
+		      .split("\r").join("\\'")
+		  + "');}return p.join('');";
+			fnStr = fnStr.replace(/@SPC@/g, "\\");
+			var fn = new Function("obj", fnStr);
+			JOOUtils.tmpl.cache[tmpl_id] = fn;
+			return fn(data);
+		} catch (e) {
+			log(e+":"+tmpl_id, 'rendering');
+			return "";
+		}
 	}
 };
 Memcached = Class.extend(
