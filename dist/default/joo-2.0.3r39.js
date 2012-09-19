@@ -12746,6 +12746,8 @@ DisplayObject = EventDispatcher.extend(
 	},
 	
 	dispatchEvent: function(event, eventData) {
+	    if (!InteractionControlHelper.getInteractionAbility())
+	        return;
 		if (!eventData) eventData = {};
 		if (typeof eventData['stopPropagation'] == 'undefined') {
 			eventData.stopPropagation = function() {
@@ -14543,6 +14545,16 @@ JOOForm = Sketch.extend(
 //		return container;
 //	}
 //});
+
+InteractionControlHelper = {
+    setInteractionAbility: function(enable) {
+        this.disable = !enable;
+    },
+    
+    getInteractionAbility: function() {
+        return !this.disable;
+    }
+};
 /**
  * @class An interface which allows UI Component to be selectable.
  * @interface
