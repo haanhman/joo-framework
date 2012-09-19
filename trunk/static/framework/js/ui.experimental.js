@@ -226,7 +226,7 @@ JOOMovieClip = JOOSprite.extend({
 		for(var i in objDef.attributes){
 			obj.setAttribute(i,objDef.attributes[i]);
 		}
-		obj.setStyle("display","none");
+		obj.setStyle("display", "none");
 		if(!obj.getStyle("position")){ obj.setStyle("position","absolute"); }
 		if (objDef.type == "composition") {
 			//obj.setLayout('absolute');
@@ -270,35 +270,7 @@ JOOMovieClip = JOOSprite.extend({
 		}
 	},
 	
-//	pause: function() {
-//		this._stripOldAnimationsMeta();
-//		for (var i in this.animationsMeta) {
-//			var meta = this.animationsMeta[i];
-//			meta.object.setCSS3Style('transition-duration', '');
-//			var styles = meta.object.getAttribute('style').split(';');
-//			for(var j in styles) {
-//				var kv = styles[j].split(':');
-//				if (kv && kv.length == 2) {
-//					console.log();
-//					if (kv[0].indexOf('transition') == -1) {
-//						meta.object.setStyle(kv[0], meta.object.getStyle(kv[0]));
-//					}
-//				}
-//			}
-//		}
-//		this._super();
-//	},
-	
 	play: function() {
-//		if (this.played) {
-//			this._super();
-//			return;
-//		}
-//		var _self = this;
-//		setTimeout(function() {
-//			_self.played = true;
-//			_self.play();
-//		}, 10);
 		this.played = true;
 		this._super();
 	},
@@ -313,10 +285,6 @@ JOOMovieClip = JOOSprite.extend({
 					this.playAnimation(animations[i], 0);
 			}
 		}
-		//for(var i in this.animations) {
-			//var animation = this.animations[i];
-			//this.playAnimation(animation, 0);
-		//}
 	},
 	
 	callScript: function(animation) {
@@ -345,8 +313,7 @@ JOOMovieClip = JOOSprite.extend({
 			obj = obj.children[objRef[i]];
 		}
 		var actions = this.actions[animation.action_ref];
-		var _self = this;
-		obj.setCSS3Style('transition-timing-function', 'linear');
+//		obj.setCSS3Style('transition-timing-function', 'linear');
 		this.animationsMeta.push(new JOOAnimationData({
 			object: obj,
 			delay: animation.delay,
@@ -354,31 +321,22 @@ JOOMovieClip = JOOSprite.extend({
 			end: actions.end, 
 			duration: actions.duration
 		}));
-		_self.doPlayAnimation([obj, actions, time, animation]);
-		
-		//setTimeout(function(args) {
-			//_self.doPlayAnimation(args);
-			// var i = setInterval(function(args) {
-			// 	_self.doPlayAnimation(args);
-			// }, args[1].interval, args);
-			// _self.intervals.push(i);
-		//}, animation.delay, [obj, actions, time, animation]);
+		this.doPlayAnimation([obj, actions, time, animation]);
 	},
 	
 	doPlayAnimation: function(args) {
 		var _obj = args[0];
 		var _actions = args[1];
-		_obj.setCSS3Style('transition-property', '');
-		_obj.setCSS3Style('transition-duration', '');
+//		_obj.setCSS3Style('transition-property', '');
+//		_obj.setCSS3Style('transition-duration', '');
 		var keys = this.setStyles(_obj, _actions.start);
-		_obj.getStyle('-webkit-transform');
-		
-		var duration = _actions.duration / this.framerate * 1000;
-		_obj.setCSS3Style('transition-duration', duration+'ms');
-		_obj.setCSS3Style('transition-property', keys.join(','));
-		//console.log(_obj.className,JSON.stringify(_obj.getStyle('-webkit-transition-duration')));
-		
-		this.setStyles(_obj, _actions.end);
+//		_obj.getStyle('-webkit-transform');
+//		
+//		var duration = _actions.duration / this.framerate * 1000;
+//		_obj.setCSS3Style('transition-duration', duration+'ms');
+//		_obj.setCSS3Style('transition-property', keys.join(','));
+//		
+//		this.setStyles(_obj, _actions.end);
 	},
 	
 	setStyles: function(obj, actions) {
