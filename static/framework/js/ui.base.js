@@ -1058,6 +1058,8 @@ DisplayObjectContainer = DisplayObject.extend(
 	},
 	
 	dispose: function(skipRemove) {
+	    if (this.dead)
+	        return;
 		for(var i=0;i<this.children.length;i++) {
 			this.children[i].dispose(true);
 		}
