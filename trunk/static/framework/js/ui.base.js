@@ -301,7 +301,7 @@ DisplayObject = EventDispatcher.extend(
 	},
 	
 	dispatchEvent: function(event, eventData) {
-	    if (!InteractionControlHelper.getInteractionAbility())
+	    if (!InteractionControlHelper.getInteractionAbility(event))
 	        return;
 		if (!eventData) eventData = {};
 		if (typeof eventData['stopPropagation'] == 'undefined') {
@@ -2102,11 +2102,18 @@ JOOForm = Sketch.extend(
 //});
 
 InteractionControlHelper = {
+	
+	setDisableList: function(list) {
+		this.list = list;
+	},
+	
     setInteractionAbility: function(enable) {
         this.disable = !enable;
     },
     
-    getInteractionAbility: function() {
-        return !this.disable;
+    getInteractionAbility: function(event) {
+    	if (this.list)
+    		return !this.disable;
+    	return (!this.disable || !this.list[event]);
     }
 };
