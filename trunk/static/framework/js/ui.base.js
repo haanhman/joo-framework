@@ -2112,7 +2112,7 @@ InteractionControlHelper = {
     },
     
     getInteractionAbility: function(event) {
-    	if (this.list)
+    	if (!this.list)
     		return !this.disable;
     	return (!this.disable || !this.list[event]);
     }
