@@ -905,14 +905,14 @@ JOOSprite = UIComponent.extend(
 	 * @param frame
 	 */
 	onFrame: function(frame) {
-		var x = frame % this.horizontalFramesNo;
-		var y = 0;
-		if (this.currentFrame != 0)
-			y = Math.floor(frame / this.horizontalFramesNo);
-		var xPos = -x*this.spriteWidth+"px";
-		var yPos = -y*this.spriteHeight+"px";
-		this.access().css('background-position', xPos+' '+yPos);
-	},
+  		var x = frame % this.horizontalFramesNo;
+  		var y = 0;
+  		if (this.currentFrame != 0)
+   			y = Math.floor(frame / this.horizontalFramesNo);
+  		var xPos = -y*this.spriteWidth+"px";
+  		var yPos = -x*this.spriteHeight+"px";
+  		this.access().css('background-position', xPos+' '+yPos);
+ 	},
 	
 	toHtml: function() {
 		return "<div></div>";
