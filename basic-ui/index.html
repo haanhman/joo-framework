@@ -1,0 +1,95 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link href="framework/joo-2.0.3.min.css" rel="stylesheet" type="text/css" />
+		<title>JOO Version 2</title>
+	</head>
+	
+    <body>
+        <!-- required libraries -->
+        <script type="text/javascript" src="framework/joo-2.0.3r41.js"></script>
+		
+		<script type="text/javascript" src="framework/class-name-injection.js"></script>
+		
+		<div id="Application-Main">
+			
+		</div>
+		
+		<script type="text/javascript">
+			//Define the Stage, Stage is the root of all JOO UI
+			var stage = new Stage({id: "Application-Main"});
+			//create a new button. Its label is defined by config parameter 'lbl'
+			var button = new JOOButton({
+				lbl: 'Xep hinh'
+			});
+			//add to the stage. an UI element is visible only when it is added to the stage
+			stage.addChild(button);
+			
+			//every UI element is constructed with a config object, and the config
+			//can be inherited from parent class.
+			//e.g JOOButton is a subclass of DisplayObject, and DisplayObject accepts width and height
+			//parameters in the config object, so we can pass to the JOOButton, too
+			var button1 = new JOOButton({
+				lbl: 'Chia tay',
+				width: 100,
+				height: 50
+			});
+			stage.addChild(button1);
+			
+			//All UI element is a descendant of EventDispatcher, which has the ability to dispatch
+			//and listen to events. We can define new events and there are many existing JOO events
+			//such as stageUpdated
+			//an object can listen to DOM events as well as custom events. To fire the custom events,
+			//use dispatchEvent method
+			
+			//listen to click event
+			button.addEventListener('click', function() {
+				//in this scope, 'this' refers to the object being listened
+				alert(this.config.lbl);
+			});
+			button1.addEventListener('click', function() {
+				alert(this.config.lbl);
+			});
+			
+			//UI element can be defined and extended from existing UI class, e.g: Sketch, DisplayObject
+			//DisplayObjectContainer...
+			//Define a UI element which is a native button
+			var customUI = DisplayObject.extend({
+				
+				/**
+				 * Callback when the object is ready to added to stage, listen to events, ...
+				 */
+				setupDomObject: function(config) {
+					//calling superclass init method
+					this._super(config);
+					
+					//when the object is added to stage, it will dispatch 'stageUpdated' event
+					this.addEventListener('stageUpdated', function(e) {
+						alert('object is added');
+						
+						//dispatch another events
+						this.dispatchEvent('another_event');
+					});
+				},
+				
+				/**
+				 * Define the rendered HTML of the UI class
+				 */
+				toHtml: function() {
+					return "<button>"+this.config.lbl+"</button>";
+				}
+			});
+			
+			//now create a button, and create new custom UI everytime user clicks it
+			var button2 = new JOOButton({
+				lbl: 'Create new Custom UI'
+			});
+			stage.addChild(button2);
+			button2.addEventListener('click', function(e) {
+				stage.addChild(new customUI({
+					lbl: 'Abcdef'
+				}));
+			});
+		</script>
+</body>
+</html>
