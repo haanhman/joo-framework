@@ -11,8 +11,8 @@
  */
 JOOText = UIComponent.extend(
 /** @lends JOOText# */
-{	
-	setupDomObject: function(config) {
+{
+	setupDomObject : function(config) {
 		this._super(config);
 		this.text = new Sketch();
 		if (config.lbl)
@@ -32,7 +32,7 @@ JOOText = UIComponent.extend(
 					this._parent.dispatchEvent('change');
 			});
 		}
-		
+
 		this.text.access().addClass("text");
 		if (!config.readonly && config.blurEvent) {
 			this.addEventListener(config.blurEvent, function() {
@@ -40,43 +40,43 @@ JOOText = UIComponent.extend(
 			});
 		}
 		this.addChild(this.text);
-		
-		this.text.addEventListener("stageUpdated", function(){
+
+		this.text.addEventListener("stageUpdated", function() {
 			var _div = document.getElementById(this.getId());
 			_div.onfocus = function() {
-			    window.setTimeout(function() {
-			        var sel, range;
-			        if (window.getSelection && document.createRange) {
-			            range = document.createRange();
-			            range.selectNodeContents(_div);
-			            sel = window.getSelection();
-			            sel.removeAllRanges();
-			            sel.addRange(range);
-			        } else if (document.body.createTextRange) {
-			            range = document.body.createTextRange();
-			            range.moveToElementText(_div);
-			            range.select();
-			        }
-			    }, 1);
+				window.setTimeout(function() {
+					var sel, range;
+					if (window.getSelection && document.createRange) {
+						range = document.createRange();
+						range.selectNodeContents(_div);
+						sel = window.getSelection();
+						sel.removeAllRanges();
+						sel.addRange(range);
+					} else if (document.body.createTextRange) {
+						range = document.body.createTextRange();
+						range.moveToElementText(_div);
+						range.select();
+					}
+				}, 1);
 			};
 		});
-//		this.attachContextMenu();
-//		var _self = this;
-//		this.getContextMenu().addItem(new JOOMenuItem({label: 'Edit text', command: function() {
-//			_self.enableEdit(true);
-//			_self.getContextMenu().hide();
-//		}}));
+		//		this.attachContextMenu();
+		//		var _self = this;
+		//		this.getContextMenu().addItem(new JOOMenuItem({label: 'Edit text', command: function() {
+		//			_self.enableEdit(true);
+		//			_self.getContextMenu().hide();
+		//		}}));
 	},
-	
-	setLbl: function(lbl) {
+
+	setLbl : function(lbl) {
 		this.setValue(lbl);
 	},
-	
-	getLbl: function() {
+
+	getLbl : function() {
 		return this.getValue();
 	},
-	
-	setValue: function(lbl) {
+
+	setValue : function(lbl) {
 		this.text.access().html(lbl);
 	},
 
@@ -84,7 +84,7 @@ JOOText = UIComponent.extend(
 	 * Get the value of the text
 	 * @returns {String} the text value
 	 */
-	getValue: function() {
+	getValue : function() {
 		return this.text.access().html();
 	},
 
@@ -92,7 +92,7 @@ JOOText = UIComponent.extend(
 	 * Enable/Disable editing
 	 * @param {Boolean} b Whether the editing is enable
 	 */
-	enableEdit: function(b) {
+	enableEdit : function(b) {
 		if (b)
 			this.text.access().focus();
 		this.text.access()[0].contentEditable = b;
@@ -105,13 +105,13 @@ JOOText = UIComponent.extend(
  * <ul>
  * 	<li><code>src</code> The source of the video</li>
  * 	<li><code>controls</code> Whether the controls are visible</li>
- * </ul> 
- * @augments UIComponent 
+ * </ul>
+ * @augments UIComponent
  */
 JOOVideo = UIComponent.extend(
-/** @lends JOOVideo# */		
+/** @lends JOOVideo# */
 {
-	setupDomObject: function(config) {
+	setupDomObject : function(config) {
 		this._super(config);
 		if (config.controls) {
 			this.setControls(config.controls);
@@ -120,60 +120,61 @@ JOOVideo = UIComponent.extend(
 			this.setSrc(config.src);
 		}
 	},
-	
-	setControls: function(controls) {
+
+	setControls : function(controls) {
 		this.setAttribute('controls', controls);
 	},
-	
-	getControls: function() {
+
+	getControls : function() {
 		return this.getAttribute('controls');
 	},
-	
-	setSrc: function(src) {
+
+	setSrc : function(src) {
 		this.setAttribute('src', src);
 	},
-	
-	getSrc: function() {
+
+	getSrc : function() {
 		return this.getAttribute('src');
 	},
 
 	/**
 	 * Play the video
 	 */
-	play: function() {
-		if(!this._domObject){
+	play : function() {
+		if (!this._domObject) {
 			this._domObject = document.getElementById(this.getId());
 		}
-		if(this._domObject){
+		if (this._domObject) {
 			this._domObject.play();
 		}
 	},
-	
-	stop: function(){
-		if(!this._domObject){
+
+	stop : function() {
+		if (!this._domObject) {
 			this._domObject = document.getElementById(this.getId());
 		}
 		this._domObject.pause();
 		this._domObject.currentTime = 0.0;
 	},
-	
-	pause: function(){
-		if(!this._domObject){
+
+	pause : function() {
+		if (!this._domObject) {
 			this._domObject = document.getElementById(this.getId());
 		}
 		this._domObject.pause();
 		return this._domObject.currentTime;
 	},
-	
-	toHtml: function() {
+
+	toHtml : function() {
 		return "<video></video>";
 	},
-	
-	dispose: function(skipRemove){
+
+	dispose : function(skipRemove) {
 		try {
 			this.stop();
 			this._super(skipRemove);
-		} catch (err) {}
+		} catch (err) {
+		}
 	}
 });
 
@@ -182,8 +183,8 @@ JOOVideo = UIComponent.extend(
  * @augments JOOVideo
  */
 JOOAudio = JOOVideo.extend({
-	
-	toHtml: function() {
+
+	toHtml : function() {
 		return "<audio></audio>";
 	}
 });
@@ -198,16 +199,16 @@ JOOAudio = JOOVideo.extend({
  * @augments UIComponent
  */
 JOOLink = UIComponent.extend({
-	
-	setupDomObject: function(config) {
+
+	setupDomObject : function(config) {
 		this._super(config);
 		if (config.href)
 			this.setAttribute('href', config.href);
 		if (config.lbl)
 			this.access().html(config.lbl);
 	},
-	
-	toHtml: function() {
+
+	toHtml : function() {
 		return "<a></a>";
 	}
 });
@@ -216,7 +217,7 @@ JOOLink = UIComponent.extend({
  * @class A counterpart of <code>HTML IMG</code> element.
  * <p>It supports additional configuration parameters</p>
  * <ul>
- * 	<li><code>defaultSrc</code> The default source of the image, 
+ * 	<li><code>defaultSrc</code> The default source of the image,
  * 	if the provided source is broken</li>
  * 	<li><code>src</code> The source of the image</li>
  * </ul>
@@ -225,7 +226,7 @@ JOOLink = UIComponent.extend({
 JOOImage = UIComponent.extend(
 /** @lends JOOImage# */
 {
-	setupDomObject: function(config) {
+	setupDomObject : function(config) {
 		this._super(config);
 		this.defaultSrc = config.defaultSrc;
 		config.src = config.src || this.defaultSrc;
@@ -236,8 +237,8 @@ JOOImage = UIComponent.extend(
 			});
 		}
 	},
-	
-	toHtml: function()	{
+
+	toHtml : function() {
 		return "<img />";
 	},
 
@@ -245,7 +246,7 @@ JOOImage = UIComponent.extend(
 	 * Get the source of the image
 	 * @returns {String} the image source
 	 */
-	getSrc: function()	{
+	getSrc : function() {
 		return this.getAttribute('src');
 	},
 
@@ -253,7 +254,7 @@ JOOImage = UIComponent.extend(
 	 * Change the source of the image
 	 * @param {String} src the new image source
 	 */
-	setSrc: function(src) {
+	setSrc : function(src) {
 		this.setAttribute('src', src);
 	}
 });
@@ -269,22 +270,41 @@ JOOImage = UIComponent.extend(
  * @augments UIComponent
  */
 JOOInput = UIComponent.extend(
-/** @lends JOOInput# */		
+/** @lends JOOInput# */
 {
-	setupDomObject: function(config) {
+	setupDomObject : function(config) {
 		this._super(config);
 		this.access().val(config.value);
 		if (config.name)
 			this.setName(config.name);
 		if (config.placeholder)
 			this.setPlaceholder(config.placeholder);
+		if (config.required != undefined)
+			this.setRequired(config.required);
+		if (config.type)
+			this.setType(config.type);
 	},
-	
-	setPlaceholder: function(placeholder) {
+
+	setType : function(type) {
+		this.setAttribute('type', type);
+	},
+
+	getType : function() {
+		return this.getAttribute('type');
+	},
+
+	setRequired : function(required) {
+		if (required)
+			this.setAttribute('required', 'required');
+		else
+			this.access().removeAttr('required');
+	},
+
+	setPlaceholder : function(placeholder) {
 		this.setAttribute('placeholder', placeholder);
 	},
-	
-	getPlaceholder: function() {
+
+	getPlaceholder : function() {
 		return this.getAttribute('placeholder');
 	},
 
@@ -292,37 +312,37 @@ JOOInput = UIComponent.extend(
 	 * Change the value of the input
 	 * @param {Object} value new value
 	 */
-	setValue: function(value) {
+	setValue : function(value) {
 		var oldValue = this.access().val();
 		if (oldValue != value) {
 			this.access().val(value).change();
 		}
 	},
-	
+
 	/**
 	 * Get the value of the input
 	 * @returns {Object} the input value
 	 */
-	getValue: function()	{
+	getValue : function() {
 		return this.access().val();
 	},
-	
-	setName: function(name) {
+
+	setName : function(name) {
 		this.setAttribute('name', name);
 	},
-	
+
 	/**
 	 * Get the name of the input
 	 * @returns {String} the input name
 	 */
-	getName: function() {
+	getName : function() {
 		return this.getAttribute('name');
 	},
-	
+
 	/**
 	 * Focus the input
 	 */
-	focus: function()	{
+	focus : function() {
 		this.access().focus();
 	}
 });
@@ -332,11 +352,11 @@ JOOInput = UIComponent.extend(
  * for user to enter text. It is the counterpart
  * of <code>HTML TEXTAREA</code> element.
  */
-JOOTextArea = JOOInput.extend	(
-/** @lends JOOTextArea# */		
+JOOTextArea = JOOInput.extend(
+/** @lends JOOTextArea# */
 {
-	
-	toHtml: function()	{
+
+	toHtml : function() {
 		return "<textarea></textarea>";
 	},
 
@@ -344,7 +364,7 @@ JOOTextArea = JOOInput.extend	(
 	 * Alias of <code>getValue</code>
 	 * @returns {String} the value of the textarea
 	 */
-	getText: function()	{
+	getText : function() {
 		return this.getValue();
 	}
 });
@@ -353,39 +373,52 @@ JOOTextArea = JOOInput.extend	(
  * @class A counterpart of <code>HTML LABEL</code> element.
  * @augments UIComponent
  */
-JOOLabel = UIComponent.extend	(
-/** @lends JOOLabel# */		
+JOOLabel = UIComponent.extend(
+/** @lends JOOLabel# */
 {
-	setupDomObject: function(config) {
+	setupDomObject : function(config) {
 		this._super(config);
 		this.setLbl(config.lbl);
+		if (config['for']) {
+			this.setFor(config['for']);
+		}
 	},
-	
-	setLbl: function(lbl) {
+
+	setFor : function(obj) {
+		if ( obj instanceof JOOCheckbox) {
+			this.addEventListener('click', function() {
+				obj.setState(!obj.state);
+			});
+		} else {
+			this.setAttribute('for', obj.getId());
+		}
+	},
+
+	setLbl : function(lbl) {
 		this.access().html(lbl);
 	},
-	
-	getLbl: function() {
+
+	getLbl : function() {
 		return this.access().html();
 	},
-	
-	toHtml: function()	{
+
+	toHtml : function() {
 		return "<label></label>";
 	},
-	
+
 	/**
 	 * Get the text of the label
 	 * @returns {String} the label's text
 	 */
-	getText: function()	{
+	getText : function() {
 		return this.getLbl();
 	},
-	
+
 	/**
 	 * Change the text of the label
 	 * @param {String} txt the new text
 	 */
-	setText: function(txt)	{
+	setText : function(txt) {
 		this.setLbl(txt);
 	}
 });
@@ -395,8 +428,8 @@ JOOLabel = UIComponent.extend	(
  * @augments JOOInput
  */
 JOOTextInput = JOOInput.extend({
-	
-	toHtml: function()	{
+
+	toHtml : function() {
 		return "<input type='text' />";
 	}
 });
@@ -406,8 +439,8 @@ JOOTextInput = JOOInput.extend({
  * @augments JOOInput
  */
 JOOPasswordInput = JOOInput.extend({
-	
-	toHtml: function()	{
+
+	toHtml : function() {
 		return "<input type='password' />";
 	}
 });
@@ -422,74 +455,74 @@ JOOPasswordInput = JOOInput.extend({
  * @augments JOOInput
  */
 JOOInputBox = JOOInput.extend(
-/** @lends JOOInput# */		
+/** @lends JOOInput# */
 {
-	setupDomObject: function(config) {
+	setupDomObject : function(config) {
 		this._super(config);
 		this.label = config.labelObject || new JOOLabel(config);
 		this.input = config.inputObject || new JOOTextInput(config);
 		this.addChild(this.label);
 		this.addChild(this.input);
 	},
-	
+
 	/**
 	 * Get the value of the input
 	 * @returns {Object} the input value
 	 */
-	getValue: function()	{
+	getValue : function() {
 		return this.input.getValue();
 	},
-	
+
 	/**
 	 * Change the value of the input
 	 * @param value {Object} the new input value
 	 */
-	setValue: function(value) {
+	setValue : function(value) {
 		this.input.setValue(value);
 	},
-	
+
 	/**
-	 * Get the text of the label 
+	 * Get the text of the label
 	 * @returns {String} the label's text
 	 */
-	getLabel: function() {
+	getLabel : function() {
 		return this.label.getValue();
 	},
-	
+
 	/**
 	 * Get the name of the input
 	 * @returns the input's name
 	 */
-	getName: function() {
+	getName : function() {
 		return this.input.getName();
 	},
-	
-	focus: function()	{
+
+	focus : function() {
 		this.input.focus();
 	}
 });
 
 JOOSelectOption = Graphic.extend({
-	
-	setupDomObject: function(config) {
+
+	setupDomObject : function(config) {
 		this._super(config);
 		this.repaint(config.label);
 		this.setValue(config.value);
 	},
-	
-	getValue: function() {
+
+	getValue : function() {
 		return this.getAttribute("value");
 	},
-	
-	setValue: function(value) {
+
+	setValue : function(value) {
 		var old = this.getAttribute("value");
 		if (old != value) {
 			this.setAttribute("value", value);
 			this.dispatchEvent('change');
 		}
 	},
-	
-	toHtml: function() {
+
+	toHtml : function() {
 		return "<option></option>";
 	}
 });
@@ -507,54 +540,54 @@ JOOSelectOption = Graphic.extend({
  * @augments JOOInput
  */
 JOOInputSelect = JOOInput.extend({
-	
-	setupDomObject: function(config) {
+
+	setupDomObject : function(config) {
 		this._super(config);
-		
+
 		this.options = Array();
 		var options = config.options || {};
-		for(var i=0; i<options.length; i++) {
+		for (var i = 0; i < options.length; i++) {
 			this.addOption(options[i]);
 		}
 		this.selectedIndex = config.selectedIndex || 0;
-		if(config.selectedIndex == undefined && config.selectedValue != undefined){
+		if (config.selectedIndex == undefined && config.selectedValue != undefined) {
 			this.selectedIndex = 0;
-			for(var i=0;i<this.options.length;i++){
-				if(this.options[i].value == config.selectedValue){
+			for (var i = 0; i < this.options.length; i++) {
+				if (this.options[i].value == config.selectedValue) {
 					this.selectedIndex = i;
 					break;
 				}
 			}
 		}
-		
+
 		this.addEventListener("change", function(e) {
 			if (e != undefined)
-				this.selectedIndex = e.currentTarget.options.selectedIndex; 
+				this.selectedIndex = e.currentTarget.options.selectedIndex;
 		});
 		this.access().val(config.selectedValue);
 	},
-	
+
 	/**
 	 * Add an option to the select box.
 	 * @param {Object} param new option, with <code>label</code> and <code>value</code> properties.
 	 */
-	addOption: function(param){
+	addOption : function(param) {
 		this.options.push(param);
-		if (param.order != undefined){
-			for(var i=this.options.length-2;i>=param.order;i--){
-				this.options[i] = this.options[i+1];
+		if (param.order != undefined) {
+			for (var i = this.options.length - 2; i >= param.order; i--) {
+				this.options[i] = this.options[i + 1];
 			}
 		}
 		this.addChild(new JOOSelectOption(param));
 	},
-	
+
 	/**
 	 * Change the value of the select box
 	 * @param {String} val new value of the select box.
 	 */
-	setValue: function(val) {
+	setValue : function(val) {
 		this.access().val(val);
-		this.selectedIndex = this.access().find("option:selected").index()-1;
+		this.selectedIndex = this.access().find("option:selected").index() - 1;
 		this.dispatchEvent("change");
 	},
 
@@ -562,7 +595,7 @@ JOOInputSelect = JOOInput.extend({
 	 * Change the value of the select box to an option by its index.
 	 * @param {Number} idx the index of the option.
 	 */
-	setValueByIndex: function(idx) {
+	setValueByIndex : function(idx) {
 		this.selectedIndex = idx;
 		this.access().find("option").eq(idx).attr("selected", "selected");
 		this.dispatchEvent("change");
@@ -572,19 +605,19 @@ JOOInputSelect = JOOInput.extend({
 	 * Get the value of the select box.
 	 * @returns {String} the select box's value.
 	 */
-	getValue: function() {
+	getValue : function() {
 		return this.access().val();
 	},
-	
+
 	/**
 	 * Refresh the select box.
 	 */
-	refresh: function(){
+	refresh : function() {
 		this.access().html(this.toHtml());
-		this.selectedIndex = this.access().find("option:selected").index()-1;
+		this.selectedIndex = this.access().find("option:selected").index() - 1;
 	},
-	
-	toHtml: function(){
+
+	toHtml : function() {
 		return "<select></select>";
 	}
 });
@@ -598,10 +631,10 @@ JOOInputSelect = JOOInput.extend({
  * @augments UIComponent
  */
 JOOButton = UIComponent.extend(
-/** @lends JOOButton# */		
+/** @lends JOOButton# */
 {
-	
-	setupDomObject: function(config) {
+
+	setupDomObject : function(config) {
 		this._super(config);
 		if (config.lbl != undefined) {
 			this.setLbl(config.lbl);
@@ -609,28 +642,29 @@ JOOButton = UIComponent.extend(
 		this.addEventListener('click', function(e) {
 			this.onclick(e);
 		});
-//		this.addEventListener('mousedown', function(e) {
-//			this.access().addClass('focus');
-//		});
+		//		this.addEventListener('mousedown', function(e) {
+		//			this.access().addClass('focus');
+		//		});
 	},
-	
-	setLbl: function(lbl) {
+
+	setLbl : function(lbl) {
 		this.access().html(lbl);
 	},
-	
-	getLbl: function() {
+
+	getLbl : function() {
 		return this.access().html();
 	},
-	
-	toHtml: function()	{
+
+	toHtml : function() {
 		return "<a></a>";
 	},
-	
+
 	/**
 	 * Command attached to the button.
 	 * @param e the event object
 	 */
-	onclick: function(e) {}
+	onclick : function(e) {
+	}
 });
 
 /**
@@ -639,8 +673,8 @@ JOOButton = UIComponent.extend(
  * @augments JOOButton
  */
 JOOCustomButton = JOOButton.extend({
-	
-	setupDomObject: function(config) {
+
+	setupDomObject : function(config) {
 		this.inheritedCSSClasses = false;
 		this._super(config);
 	}
@@ -657,12 +691,12 @@ JOOCustomButton = JOOButton.extend({
 JOOToggleButton = JOOCustomButton.extend(
 /** @lends 	JOOToggleButton# */
 {
-	setupBase: function(config) {
+	setupBase : function(config) {
 		this.state = config.state;
 		this._super(config);
 	},
-	
-	setupDomObject: function(config) {
+
+	setupDomObject : function(config) {
 		this._super(config);
 		if (this.state)
 			this.access().addClass('joo-toggle-down');
@@ -670,11 +704,11 @@ JOOToggleButton = JOOCustomButton.extend(
 
 	/**
 	 * Change the state of the button.
-	 * @param {Boolean} state the state of the button 
+	 * @param {Boolean} state the state of the button
 	 */
-	setState: function(state) {
+	setState : function(state) {
 		this.state = state;
-		if(this.state) {
+		if (this.state) {
 			this.access().addClass('joo-toggle-down');
 			this.ontoggledown();
 		} else {
@@ -682,18 +716,18 @@ JOOToggleButton = JOOCustomButton.extend(
 			this.ontoggleup();
 		}
 	},
-	
+
 	/**
 	 * Get the state of the button.
 	 * @returns {Boolean} the state of the button
 	 */
-	getState: function() {
+	getState : function() {
 		return this.state;
 	},
-	
-	onclick: function(e) {
+
+	onclick : function(e) {
 		this.access().toggleClass("joo-toggle-down");
-		if(this.state) {
+		if (this.state) {
 			this.state = false;
 			this.ontoggleup();
 		} else {
@@ -702,12 +736,12 @@ JOOToggleButton = JOOCustomButton.extend(
 		}
 		this.dispatchEvent('toggle');
 	},
-	
-	ontoggledown: function() {
+
+	ontoggledown : function() {
 		this.dispatchEvent('toggleDown');
 	},
-	
-	ontoggleup: function() {
+
+	ontoggleup : function() {
 		this.dispatchEvent('toggleUp');
 	}
 });
@@ -719,13 +753,13 @@ JOOToggleButton = JOOCustomButton.extend(
 JOOCheckbox = JOOToggleButton.extend(
 /** @lends JOOCheckbox# */
 {
-	ontoggledown: function() {
+	ontoggledown : function() {
 		this.value = true;
 		this.access().addClass('checked');
 		this.dispatchEvent('change');
 	},
-	
-	ontoggleup: function() {
+
+	ontoggleup : function() {
 		this.value = false;
 		this.access().removeClass('checked');
 		this.dispatchEvent('change');
@@ -736,34 +770,34 @@ JOOCheckbox = JOOToggleButton.extend(
 	 * @returns {Boolean} the value. <code>true</code> if the checkbox is checked,
 	 * <code>false</code> otherwise.
 	 */
-	getValue: function() {
+	getValue : function() {
 		return this.value;
 	},
-	
+
 	/**
 	 * Change the value of the checkbox.
 	 * @param {Boolean} value the value of the checkbox
 	 */
-	setValue: function(value) {
+	setValue : function(value) {
 		if (value)
 			this.ontoggledown();
 		else
 			this.ontoggleup();
 	},
-	
-	toHtml: function() {
+
+	toHtml : function() {
 		return "<span></span> ";
 	}
 });
 
 JOOCloseButton = JOOCustomButton.extend({
-	
-	setupDomObject: function(config) {
+
+	setupDomObject : function(config) {
 		this._super(config);
 		this.access().addClass("joo-custom-button");
 	},
-	
-	toHtml: function() {
+
+	toHtml : function() {
 		return "<span></span>";
 	}
 });
@@ -787,7 +821,7 @@ JOOCloseButton = JOOCustomButton.extend({
 JOOSprite = UIComponent.extend(
 /** @lends JOOSprite# */
 {
-	setupDomObject: function(config) {
+	setupDomObject : function(config) {
 		this._super(config);
 		this.framerate = config.framerate || 30;
 		this.loop = config.loop || false;
@@ -798,19 +832,19 @@ JOOSprite = UIComponent.extend(
 		this.spriteHeight = config.spriteHeight;
 		this.speed = config.speed || 1;
 		this.stopped = false;
-		
+
 		if (config.src)
 			this.setSrc(config.src);
 		this.setWidth(this.spriteWidth);
 		this.setHeight(this.spriteHeight);
 	},
-	
-	setSrc: function(src) {
+
+	setSrc : function(src) {
 		this.src = src;
-		this.access().css('background-image', 'url('+this.src+')');
+		this.access().css('background-image', 'url(' + this.src + ')');
 	},
-	
-	getSrc: function() {
+
+	getSrc : function() {
 		return this.src;
 	},
 
@@ -819,27 +853,27 @@ JOOSprite = UIComponent.extend(
 	 * @param {Number} start the start frame
 	 * @param {Number} end the end frame
 	 */
-	play: function(start, end) {
+	play : function(start, end) {
 		this.stopped = false;
 		this.dispatchEvent("frameStart");
 		this.startFrame = start || 0;
 		this.endFrame = end;
-		if(end == undefined){
-			this.endFrame = this.verticalFramesNo * this.horizontalFramesNo - 1; 
-		} 
+		if (end == undefined) {
+			this.endFrame = this.verticalFramesNo * this.horizontalFramesNo - 1;
+		}
 		this.currentFrame = this.startFrame;
-		
+
 		this.playFrame();
 		this._playWithFramerate(this.framerate);
 	},
-	
-	_playWithFramerate: function(framerate) {
+
+	_playWithFramerate : function(framerate) {
 		framerate *= this.speed;
 		if (!this.stopped) {
 			var _self = this;
 			this.interval = setInterval(function() {
 				_self.playFrame();
-			}, parseFloat(1000/framerate));
+			}, parseFloat(1000 / framerate));
 		}
 	},
 
@@ -847,37 +881,37 @@ JOOSprite = UIComponent.extend(
 	 * Change the relative speed of the sprite.
 	 * @param speed the relative speed of the sprite
 	 */
-	setSpeed: function(speed) {
+	setSpeed : function(speed) {
 		var tempFramerate = this.framerate * speed;
 		clearInterval(this.interval);
 		this._playWithFramerate(tempFramerate);
 	},
-	
+
 	/**
 	 * Pause the sprite.
 	 */
-	pause: function() {
+	pause : function() {
 		this.dispatchEvent("framePause");
 		clearInterval(this.interval);
 	},
-	
+
 	/**
 	 * Resume the sprite.
 	 */
-	resume: function() {
+	resume : function() {
 		this.dispatchEvent("frameResume");
 		this._playWithFramerate(this.interval);
 	},
-	
+
 	/**
 	 * Stop the sprite.
 	 */
-	stop: function() {
+	stop : function() {
 		this.dispatchEvent("frameStop");
 		this.stopped = true;
 	},
-	
-	playFrame: function() {
+
+	playFrame : function() {
 		var ended = false;
 		if (this.currentFrame > this.endFrame) {
 			if (this.loop) {
@@ -897,28 +931,28 @@ JOOSprite = UIComponent.extend(
 		this.dispatchEvent("frameExit");
 		this.currentFrame++;
 	},
-	
+
 	/**
 	 * This method defines how animation works. Subclass can override it to
-	 * change the behaviour. This implementation just change the 
+	 * change the behaviour. This implementation just change the
 	 * <code>background-position</code> of the sprite.
 	 * @param frame
 	 */
-	onFrame: function(frame) {
-  		var x = frame % this.horizontalFramesNo;
-  		var y = 0;
-  		if (this.currentFrame != 0)
-   			y = Math.floor(frame / this.horizontalFramesNo);
-  		var xPos = -y*this.spriteWidth+"px";
-  		var yPos = -x*this.spriteHeight+"px";
-  		this.access().css('background-position', xPos+' '+yPos);
- 	},
-	
-	toHtml: function() {
+	onFrame : function(frame) {
+		var x = frame % this.horizontalFramesNo;
+		var y = 0;
+		if (this.currentFrame != 0)
+			y = Math.floor(frame / this.horizontalFramesNo);
+		var xPos = -y * this.spriteWidth + "px";
+		var yPos = -x * this.spriteHeight + "px";
+		this.access().css('background-position', xPos + ' ' + yPos);
+	},
+
+	toHtml : function() {
 		return "<div></div>";
 	},
-	
-	dispose: function(skipRemove) {
+
+	dispose : function(skipRemove) {
 		this.stop();
 		this._super(skipRemove);
 	}
@@ -929,14 +963,14 @@ JOOSprite = UIComponent.extend(
  * @augments JOOInput
  */
 JOOFileInput = JOOInput.extend({
-	
-	setupDomObject: function(config) {
+
+	setupDomObject : function(config) {
 		this._super(config);
 		if (config.multiple)
 			this.setAttribute('multiple', config.multiple);
 	},
-	
-	toHtml: function() {
+
+	toHtml : function() {
 		return "<input type='file' />";
 	}
 });
@@ -951,14 +985,19 @@ JOOFileInput = JOOInput.extend({
  * @augments UIComponent
  */
 JOOBasicUploader = UIComponent.extend({
-	
-	setupDomObject: function(config) {
+
+	setupDomObject : function(config) {
 		this.endpoint = config.endpoint || "";
 		this._super(config);
-		this.fileInput = new JOOFileInput({name: config.name, multiple: config.multiple});
-		
-		var iframeId = this.getId()+"-iframe";
-		var form = new CustomDisplayObject({html: "<form enctype='multipart/form-data' target='"+iframeId+"' action='"+this.endpoint+"' method='post'></form>"});
+		this.fileInput = new JOOFileInput({
+			name : config.name,
+			multiple : config.multiple
+		});
+
+		var iframeId = this.getId() + "-iframe";
+		var form = new CustomDisplayObject({
+			html : "<form enctype='multipart/form-data' target='" + iframeId + "' action='" + this.endpoint + "' method='post'></form>"
+		});
 		form.addChild(this.fileInput);
 		var _self = this;
 		this.fileInput.addEventListener('change', function(e) {
@@ -970,15 +1009,18 @@ JOOBasicUploader = UIComponent.extend({
 			var frame = _self.access().find('iframe');
 			$(frame).one('load', function() {
 				var response = frame.contents().find('body').html();
-				_self.dispatchEvent('submitSuccess', {endpoint: _self.endpoint, data: response});
+				_self.dispatchEvent('submitSuccess', {
+					endpoint : _self.endpoint,
+					data : response
+				});
 			});
 		});
 		this.addChild(form);
 	},
-	
-	toHtml: function() {
-		var iframeId = this.getId()+"-iframe";
-		return "<div><iframe class='joo-uploader-iframe' name='"+iframeId+"' id='"+iframeId+"'></iframe></div>";
+
+	toHtml : function() {
+		var iframeId = this.getId() + "-iframe";
+		return "<div><iframe class='joo-uploader-iframe' name='" + iframeId + "' id='" + iframeId + "'></iframe></div>";
 	}
 });
 
@@ -991,18 +1033,18 @@ JOOBasicUploader = UIComponent.extend({
  * @augments JOOBasicUploader
  */
 JOOAdvancedUploader = JOOBasicUploader.extend({
-	
-	setupDomObject: function(config) {
+
+	setupDomObject : function(config) {
 		this._super(config);
 		this.fileInput.access().addClass('joo-advanceduploader-input');
 		if (config.control) {
 			this.addChild(config.control);
 		}
 	},
-	
-	toHtml: function() {
-		var iframeId = this.getId()+"-iframe";
-		return "<div><iframe class='joo-uploader-iframe' name='"+iframeId+"' id='"+iframeId+"'></iframe></div>";
+
+	toHtml : function() {
+		var iframeId = this.getId() + "-iframe";
+		return "<div><iframe class='joo-uploader-iframe' name='" + iframeId + "' id='" + iframeId + "'></iframe></div>";
 	}
 });
 
@@ -1011,8 +1053,8 @@ JOOAdvancedUploader = JOOBasicUploader.extend({
  * @augments JOOToggleButton
  */
 JOOToggleBoldButton = JOOToggleButton.extend({
-	
-	toHtml: function(){
+
+	toHtml : function() {
 		return "<div></div>";
 	}
 });
@@ -1022,8 +1064,8 @@ JOOToggleBoldButton = JOOToggleButton.extend({
  * @augments JOOToggleButton
  */
 JOOToggleItalicButton = JOOToggleButton.extend({
-	
-	toHtml: function(){
+
+	toHtml : function() {
 		return "<div></div>";
 	}
 });
@@ -1033,8 +1075,8 @@ JOOToggleItalicButton = JOOToggleButton.extend({
  * @augments JOOToggleButton
  */
 JOOToggleUnderlineButton = JOOToggleButton.extend({
-	
-	toHtml: function(){
+
+	toHtml : function() {
 		return "<div></div>";
 	}
 });
@@ -1044,8 +1086,8 @@ JOOToggleUnderlineButton = JOOToggleButton.extend({
  * @augments JOOToggleButton
  */
 JOOToggleFlipHorizontalButton = JOOToggleButton.extend({
-	
-	toHtml: function(){
+
+	toHtml : function() {
 		return "<div></div>";
 	}
 });
@@ -1055,8 +1097,8 @@ JOOToggleFlipHorizontalButton = JOOToggleButton.extend({
  * @augments JOOToggleButton
  */
 JOOToggleFlipVerticalButton = JOOToggleButton.extend({
-	
-	toHtml: function() {
+
+	toHtml : function() {
 		return "<div></div>";
 	}
 });
@@ -1066,8 +1108,8 @@ JOOToggleFlipVerticalButton = JOOToggleButton.extend({
  * @augments JOOToggleButton
  */
 JOOToggleAlignLeftButton = JOOToggleButton.extend({
-	
-	toHtml: function(){
+
+	toHtml : function() {
 		return "<div></div>";
 	}
 });
@@ -1077,8 +1119,8 @@ JOOToggleAlignLeftButton = JOOToggleButton.extend({
  * @augments JOOToggleButton
  */
 JOOToggleAlignCenterButton = JOOToggleButton.extend({
-	
-	toHtml: function(){
+
+	toHtml : function() {
 		return "<div></div>";
 	}
 });
@@ -1088,8 +1130,8 @@ JOOToggleAlignCenterButton = JOOToggleButton.extend({
  * @augments JOOToggleButton
  */
 JOOToggleAlignRightButton = JOOToggleButton.extend({
-	
-	toHtml: function(){
+
+	toHtml : function() {
 		return "<div></div>";
 	}
 });
@@ -1101,15 +1143,19 @@ JOOToggleAlignRightButton = JOOToggleButton.extend({
 JOOTabbedPane = Panel.extend(
 /** @lends JOOTabbedPane# */
 {
-	
-	setupBase: function(config) {
+
+	setupBase : function(config) {
 		this.tabs = Array();
 		this._super(config);
 	},
-	
-	setupDomObject: function(config) {
-		this.header = new CustomDisplayObject({html: "<div class='joo-tab-header'></div>"});
-		this.content = new CustomDisplayObject({html: "<div class='joo-tab-content'></div>"});
+
+	setupDomObject : function(config) {
+		this.header = new CustomDisplayObject({
+			html : "<div class='joo-tab-header'></div>"
+		});
+		this.content = new CustomDisplayObject({
+			html : "<div class='joo-tab-content'></div>"
+		});
 		this._super(config);
 		this.addChild(this.header);
 		this.addChild(this.content);
@@ -1122,22 +1168,30 @@ JOOTabbedPane = Panel.extend(
 	 * @param {String} icon an icon associated with the tab
 	 * @param {String} tooltip a tooltip associated with the tab
 	 */
-	addTab: function(title, comp, icon, tooltip) {
+	addTab : function(title, comp, icon, tooltip) {
 		comp.access().addClass('joo-tab-item');
 		if (!tooltip)
 			tooltip = "";
-		var header = new CustomDisplayObject({html: "<span title='"+tooltip+"'></span>"});
+		var header = new CustomDisplayObject({
+			html : "<span title='" + tooltip + "'></span>"
+		});
 		if (icon != undefined)
-			header.addChild(new JOOImage({src: icon, passClickEvent: true}));
-		header.addChild(new JOOLabel({lbl: title, passClickEvent: true}));
+			header.addChild(new JOOImage({
+				src : icon,
+				passClickEvent : true
+			}));
+		header.addChild(new JOOLabel({
+			lbl : title,
+			passClickEvent : true
+		}));
 		header.access().addClass('joo-tab-control');
-		
+
 		var _self = this;
 		header.setAttribute('tabIndex', this.header.children.length);
 		header.addEventListener('click', function(e) {
 			_self.setTab(this.getAttribute('tabIndex'));
 		});
-		
+
 		this.header.addChild(header);
 		this.content.addChild(comp);
 		this.tabs.push(comp);
@@ -1145,23 +1199,23 @@ JOOTabbedPane = Panel.extend(
 			this.setTab(0);
 		}
 	},
-	
+
 	/**
 	 * Change the active tab.
 	 * @param {Number} index the index of the tab to be active
 	 */
-	setTab: function(index) {
-		for(var i=0; i<this.header.children.length; i++) {
+	setTab : function(index) {
+		for (var i = 0; i < this.header.children.length; i++) {
 			this.header.children[i].access().removeClass('active');
 		}
 		this.header.children[index].access().addClass('active');
-		for(var i=0; i<this.tabs.length; i++) {
+		for (var i = 0; i < this.tabs.length; i++) {
 			this.tabs[i].access().hide();
 		}
 		this.tabs[index].setStyle('display', 'block');
 	},
-	
-	toHtml: function() {
+
+	toHtml : function() {
 		return "<div></div>";
 	}
 });
@@ -1173,7 +1227,7 @@ JOOTabbedPane = Panel.extend(
 JOOAccordion = UIComponent.extend(
 /** @lends JOOAccordion# */
 {
-	setupDomObject: function(config) {
+	setupDomObject : function(config) {
 		this._super(config);
 		this.header = new Sketch();
 		this.header.access().addClass('joo-accordion-header');
@@ -1188,20 +1242,20 @@ JOOAccordion = UIComponent.extend(
 		this.addChild(this.header);
 		this.addChild(this.contentPane);
 	},
-	
+
 	/**
 	 * Get the content panel of the accordion.
 	 * @returns {Sketch} the content panel
 	 */
-	getContentPane: function() {
+	getContentPane : function() {
 		return this.contentPane;
 	},
-	
+
 	/**
 	 * Change the label of the accordion.
 	 * @param {String} label the label of the accordion
 	 */
-	setAccordionLabel: function(label) {
+	setAccordionLabel : function(label) {
 		this.header.access().html(label);
 	}
 });
@@ -1223,7 +1277,7 @@ JOOAccordion = UIComponent.extend(
 JOORuler = JOOInput.extend(
 /** @lends JOORuler# */
 {
-	setupDomObject: function(config) {
+	setupDomObject : function(config) {
 		this._super(config);
 		this.width = parseFloat(config.width);
 		this.height = parseFloat(config.height);
@@ -1236,31 +1290,38 @@ JOORuler = JOOInput.extend(
 		this.value = parseFloat(config.value || this.initmin);
 		this.autoExpand = this.autoExpand || true;
 		this.baseValue = 0;
-		
-		this.canvas = new Canvas({width: this.width, height: this.height});
+
+		this.canvas = new Canvas({
+			width : this.width,
+			height : this.height
+		});
 		this.addChild(this.canvas);
 		this.addEventListener('stageUpdated', function() {
 			this.initRuler();
 			this.initRoller();
 		});
 	},
-	
-	initRoller: function() {
-		this.backRoller = new JOOImage({absolute: true, height: 16, 
-			custom: {
-				position: 'absolute',
-				left: '-10px'
+
+	initRoller : function() {
+		this.backRoller = new JOOImage({
+			absolute : true,
+			height : 16,
+			custom : {
+				position : 'absolute',
+				left : '-10px'
 			},
-			src: 'static/images/backward.png'
+			src : 'static/images/backward.png'
 		});
-		this.forwardRoller = new JOOImage({absolute: true, height: 16, 
-			custom: {
-				position: 'absolute',
-				right: '-10px'
+		this.forwardRoller = new JOOImage({
+			absolute : true,
+			height : 16,
+			custom : {
+				position : 'absolute',
+				right : '-10px'
 			},
-			src: 'static/images/forward.png'
+			src : 'static/images/forward.png'
 		});
-		
+
 		var _self = this;
 		this.backRoller.addEventListener('mousedown', function() {
 			_self.startExpand();
@@ -1271,7 +1332,7 @@ JOORuler = JOOInput.extend(
 		this.backRoller.addEventListener('mouseout', function() {
 			_self.stopExpand();
 		});
-		
+
 		this.forwardRoller.addEventListener('mousedown', function() {
 			_self.startExpand(true);
 		});
@@ -1281,24 +1342,24 @@ JOORuler = JOOInput.extend(
 		this.forwardRoller.addEventListener('mouseout', function() {
 			_self.stopExpand();
 		});
-		
+
 		this.addChild(this.backRoller);
 		this.addChild(this.forwardRoller);
 	},
-	
-	initRuler: function() {
+
+	initRuler : function() {
 		var context = this.canvas.getContext();
 		context.beginPath();
 		context.clearRect(0, 0, parseInt(this.canvas.getWidth()), parseInt(this.canvas.getHeight()));
 		var len = this.initMax - this.initMin;
-		
-		if (this.groupMode == "quarter") 
+
+		if (this.groupMode == "quarter")
 			this.group = this.interval * 4;
 		else if (this.groupMode == "half")
 			this.group = this.interval * 2;
 		else
 			this.group = this.interval * 1;
-		
+
 		var font = new JOOFont();
 		context.setFont(font);
 		this.deltaY = 9;
@@ -1308,15 +1369,15 @@ JOORuler = JOOInput.extend(
 
 		var valueX = this.convertValueToX(this.deltaX);
 		this.drawPointer(valueX, 0, this.deltaX, this.deltaY);
-		
+
 		var base = this.baseValue % this.group;
 		var min = this.initMin - base;
 		var max = this.initMax - base;
-		for(var i=-base; i<=len; i += this.interval) {
+		for (var i = -base; i <= len; i += this.interval) {
 			var x = i * (this.getWidth() - 2 * this.deltaX) / len + this.deltaX;
-			context.moveTo(x, this.getHeight()/10 + this.deltaY);
+			context.moveTo(x, this.getHeight() / 10 + this.deltaY);
 			var h = this.height / 2;
-			
+
 			if (i == -base || i == max - min || (i + base) % this.group == 0) {
 				if (i == max - min)
 					context.setTextAlign('right');
@@ -1327,49 +1388,56 @@ JOORuler = JOOInput.extend(
 				context.fillText(i + base + min, x, this.height / 2 + 15 + this.deltaY);
 			}
 			if ((i + base) % this.group == 0) {
-				
+
 			} else if (((i + base) / this.interval) % (this.group / this.interval) == 2) {
 				h = h * 0.75;
 			} else {
 				h = h * 0.5;
 			}
-			context.lineTo(x, h  + this.deltaY);
+			context.lineTo(x, h + this.deltaY);
 		}
 		context.stroke();
 	},
-	
+
 	/**
 	 * Mark the ruler at a specific value.
 	 * @param {Number} value the value to be marked
 	 */
-	mark: function(value) {
+	mark : function(value) {
 		var _self = this;
 		var x = this.convertValueToX(this.deltaX, value);
-		var sk = new Sketch({width: 10, height: 10, 'background-color': 'red', custom: {
-			display: 'inline-block',
-			position: 'absolute',
-			cursor: 'pointer'
-		}});
-		sk.setLocation(x-5, 5);
+		var sk = new Sketch({
+			width : 10,
+			height : 10,
+			'background-color' : 'red',
+			custom : {
+				display : 'inline-block',
+				position : 'absolute',
+				cursor : 'pointer'
+			}
+		});
+		sk.setLocation(x - 5, 5);
 		this.addChild(sk);
 		sk.addEventListener('click', function() {
 			_self.setValue(value);
 		});
 	},
-	
-	convertValueToX: function(deltaX, value) {
+
+	convertValueToX : function(deltaX, value) {
 		value = value || this.value;
 		return (value - this.initMin) / (this.initMax - this.initMin) * (this.getWidth() - 2 * deltaX);
 	},
-	
-	convertXToValue: function(x, deltaX) {
+
+	convertXToValue : function(x, deltaX) {
 		var percent = x / (this.getWidth() - 2 * deltaX);
-    	if (percent < 0) percent = 0;
-    	else if (percent > 1) percent = 1;
-    	return Math.round(this.initMin + percent * (this.initMax - this.initMin));
+		if (percent < 0)
+			percent = 0;
+		else if (percent > 1)
+			percent = 1;
+		return Math.round(this.initMin + percent * (this.initMax - this.initMin));
 	},
-	
-	expandLeft: function() {
+
+	expandLeft : function() {
 		if (this.initMin > this.min) {
 			this.baseValue--;
 			this.initMin--;
@@ -1378,8 +1446,8 @@ JOORuler = JOOInput.extend(
 			this.dispatchEvent('expanded');
 		}
 	},
-	
-	expandRight: function() {
+
+	expandRight : function() {
 		if (this.initMax < this.max) {
 			this.baseValue++;
 			this.initMin++;
@@ -1388,86 +1456,95 @@ JOORuler = JOOInput.extend(
 			this.dispatchEvent('expanded');
 		}
 	},
-	
-	expand: function(inc, isRight) {
+
+	expand : function(inc, isRight) {
 		if (isRight) {
 			this.expandRight();
 		} else {
 			this.expandLeft();
 		}
 	},
-	
-	startExpand: function(isRight) {
+
+	startExpand : function(isRight) {
 		var _self = this;
 		this.expandInterval = setInterval(function() {
 			_self.expand(undefined, isRight);
 			_self.setValue(_self.getValue());
 		}, 25);
 	},
-	
-	stopExpand: function(isRight) {
+
+	stopExpand : function(isRight) {
 		clearInterval(this.expandInterval);
 	},
-	
-	startTracking: function() {
+
+	startTracking : function() {
 		var _self = this;
 		this.trackingInterval = setInterval(function() {
 			var inc = _self.pointer.getX() - (_self.getWidth() - 2 * _self.deltaX);
 			var v = _self.convertXToValue(_self.pointer.getX(), _self.deltaX);
-	    	if (v >= _self.initMax-1) {
-	    		if (_self.autoExpand) {
-	    			_self.expand(Math.round(inc / 2), true);
-	    		}
-	    	} else if (v <= _self.initMin) {
-	    		if (_self.autoExpand) {
-	    			_self.expand(Math.round(inc / 2));
-	    		}
-	    	}
+			if (v >= _self.initMax - 1) {
+				if (_self.autoExpand) {
+					_self.expand(Math.round(inc / 2), true);
+				}
+			} else if (v <= _self.initMin) {
+				if (_self.autoExpand) {
+					_self.expand(Math.round(inc / 2));
+				}
+			}
 		}, 25);
 	},
-	
-	stopTracking: function() {
+
+	stopTracking : function() {
 		clearInterval(this.trackingInterval);
 		this.trackingInterval = undefined;
 	},
-	
-	drawPointer: function(x, y, deltaX, deltaY) {
-		if (this.pointer) return;
-        var _self = this;
 
-        var img = new UIComponent({width: deltaX*2, height: deltaY*2});
-        img.access().addClass('joo-ruler-pointer');
-        img.setLocation(x, y);
-        img.addEventListener('dragstart', function() {
-        	_self.startTracking();
-        });
-        img.addEventListener('drag', function(e) {
-        	_self.dispatchEvent('pointerdrag',{"position":this.getX()});
-        });
-        img.addEventListener('dragstop', function(e) {
-        	hidetip();
-        	_self.stopTracking();
-        	_self.setValue(_self.convertXToValue(this.getX(), deltaX));
-        });
-        
-        Wrapper.wrap(img, DraggableInterface);
-        img.draggable({axis: 'x', containment: 'parent'});
-        img.startDrag();
- 
-        this.pointer = img;
-        
-        this.addChild(img);
+	drawPointer : function(x, y, deltaX, deltaY) {
+		if (this.pointer)
+			return;
+		var _self = this;
+
+		var img = new UIComponent({
+			width : deltaX * 2,
+			height : deltaY * 2
+		});
+		img.access().addClass('joo-ruler-pointer');
+		img.setLocation(x, y);
+		img.addEventListener('dragstart', function() {
+			_self.startTracking();
+		});
+		img.addEventListener('drag', function(e) {
+			_self.dispatchEvent('pointerdrag', {
+				"position" : this.getX()
+			});
+		});
+		img.addEventListener('dragstop', function(e) {
+			hidetip();
+			_self.stopTracking();
+			_self.setValue(_self.convertXToValue(this.getX(), deltaX));
+		});
+
+		Wrapper.wrap(img, DraggableInterface);
+		img.draggable({
+			axis : 'x',
+			containment : 'parent'
+		});
+		img.startDrag();
+
+		this.pointer = img;
+
+		this.addChild(img);
 	},
-	
-	getValue: function() {
+
+	getValue : function() {
 		return this.value;
 	},
-	
+
 	/**
 	 * Change the value of the ruler. It also updates the ruler pointer's position.
 	 * @param {Number} value the new value of the ruler
 	 */
-	setValue: function(value) {
+	setValue : function(value) {
 		var oldValue = this.value;
 		if (value < this.min)
 			value = this.min;
@@ -1489,16 +1566,16 @@ JOORuler = JOOInput.extend(
 });
 
 JOOToggleBar = Sketch.extend({
-	
-	setupBase: function(config) {
+
+	setupBase : function(config) {
 		this.items = {};
 		this.multi = config.multi;
 		this.value = undefined;
 		this.defaultValue = config.defaultValue;
 		this._super(config);
 	},
-	
-	setupDomObject: function(config) {
+
+	setupDomObject : function(config) {
 		this._super(config);
 		if (config.items) {
 			for (var i in config.items) {
@@ -1506,8 +1583,8 @@ JOOToggleBar = Sketch.extend({
 			}
 		}
 	},
-	
-	addItem: function(item, value) {
+
+	addItem : function(item, value) {
 		this.addChild(item);
 		this.items[value] = item;
 		item.itemId = value;
@@ -1519,25 +1596,25 @@ JOOToggleBar = Sketch.extend({
 				_self.onStateUp(item);
 		});
 	},
-	
-	getValue: function() {
+
+	getValue : function() {
 		return this.value;
 	},
-	
-	setValue: function(value) {
+
+	setValue : function(value) {
 		this.value = value;
 		this.dispatchEvent('change');
 	},
-	
-	onStateDown: function(item) {
+
+	onStateDown : function(item) {
 		if (this.getValue() != item.itemId) {
 			if (this.getValue() && this.items[this.getValue()])
 				this.items[this.getValue()].setState(false);
 			this.setValue(item.itemId);
 		}
 	},
-	
-	onStateUp: function(item) {
+
+	onStateUp : function(item) {
 		this.setValue(this.defaultValue);
 	}
 });
@@ -1548,27 +1625,31 @@ JOOToggleBar = Sketch.extend({
  * <ul>
  * 	<li><code>readonly</code> Whether each item in the list is readonly</li>
  * </ul>
- * @augments UIComponent 
+ * @augments UIComponent
  */
 JOOList = UIComponent.extend(
 /** @lends	JOOList# */
 {
-	setupBase: function(config) {
+	setupBase : function(config) {
 		this.items = Array();
 		this.readonly = config.readonly;
 		this.selectedItem = undefined;
 		this._super(config);
 	},
-	
+
 	/**
 	 * Add an item to the list.
-	 * @param {Object} obj the item to be added, must be an object with 
+	 * @param {Object} obj the item to be added, must be an object with
 	 * <code>label</code> and <code>value</code> properties
 	 * @returns {JOOText} the newly added item
 	 */
-	addItem: function(obj) {
+	addItem : function(obj) {
 		var item = new Sketch();
-		var text = new JOOText({lbl: obj.label, readonly: this.readonly, blurEvent: 'itemDeselected'});
+		var text = new JOOText({
+			lbl : obj.label,
+			readonly : this.readonly,
+			blurEvent : 'itemDeselected'
+		});
 		item.text = text;
 		item.addChild(text);
 		this.items.push(item);
@@ -1582,41 +1663,42 @@ JOOList = UIComponent.extend(
 		item.value = obj.value;
 		return item;
 	},
-	
+
 	/**
 	 * Get the current selected item.
 	 * @returns {JOOText} the current selected item
 	 */
-	getSelectedItem: function() {
+	getSelectedItem : function() {
 		return this.selectedItem;
 	},
-	
+
 	/**
 	 * Get the index of current selected item.
 	 * @returns {Number} the index
 	 */
-	getSelectedIndex: function() {
+	getSelectedIndex : function() {
 		return this.indexOf(this.selectedItem);
 	},
-	
+
 	/**
 	 * Programmatically select an item.
 	 * @param {JOOText} item the item to be selected
 	 */
-	selectItem: function(item) {
-		if (item == this.selectedItem) return;
+	selectItem : function(item) {
+		if (item == this.selectedItem)
+			return;
 		if (this.selectedItem) {
 			this.selectedItem.access().removeClass('selected');
 			this.selectedItem.text.dispatchEvent('itemDeselected');
 		}
 		this.selectedItem = item;
-		if(item){
+		if (item) {
 			this.selectedItem.access().addClass('selected');
 		}
 		this.dispatchEvent('change');
 	},
-	
-	setupDomObject: function(config) {
+
+	setupDomObject : function(config) {
 		this._super(config);
 		this.setLayout('vertical');
 	},
@@ -1634,7 +1716,7 @@ JOOList = UIComponent.extend(
 JOODialog = UIComponent.extend(
 /** @lends JOODialog# */
 {
-	setupDomObject: function(config) {
+	setupDomObject : function(config) {
 		this._super(config);
 
 		this.titleBar = new Sketch();
@@ -1644,162 +1726,180 @@ JOODialog = UIComponent.extend(
 
 		this.addChild(this.titleBar);
 		this.addChild(this.contentPane);
-		
+
 		var _self = this;
-		this.closeBtn = new JOOCloseButton({absolute: true});
+		this.closeBtn = new JOOCloseButton({
+			absolute : true
+		});
 		this.closeBtn.onclick = function() {
 			_self.dispatchEvent('closing');
-			if (config.closemethod == 'do_nothing') return;
-			if (!config.closemethod) config.closemethod = "close";
+			if (config.closemethod == 'do_nothing')
+				return;
+			if (!config.closemethod)
+				config.closemethod = "close";
 			_self[config.closemethod].apply(_self);
 		};
 		var label = new JOOLabel();
 		this.titleBar.addChild(label);
 		this.titleBar.addChild(this.closeBtn);
-		
+
 		if (config.title != undefined)
 			this.setTitle(config.title);
-		
+
 		if (!config.stick) {
-			this.draggable({handle: this.titleBar.access()});
+			this.draggable({
+				handle : this.titleBar.access()
+			});
 			this.startDrag();
 		}
 		this.addEventListener('stageUpdated', function() {
 			this.afterAdded();
 		});
 	},
-	
+
 	/**
 	 * Make the dialog centered by the screen.
 	 */
-	center: function() {
-		var w = ($(window).width() - this.access().outerWidth())/2;
-		var h = ($(window).height()-this.access().outerHeight())/2;
+	center : function() {
+		var w = ($(window).width() - this.access().outerWidth()) / 2;
+		var h = ($(window).height() - this.access().outerHeight()) / 2;
 		this.setLocation(w < 0 ? 0 : w, h < 0 ? 0 : h);
 	},
-	
-	afterAdded: function() {
+
+	afterAdded : function() {
 		var modal = this.config.modal || false;
 		if (modal) {
 			this.modalSketch = new Sketch();
 			this.modalSketch.access().addClass('joo-modal-dialog');
 			this.stage.addChild(this.modalSketch, this.access());
-			this.modalSketch.setStyle('z-index', parseInt(this.getStyle('z-index')-1));
+			this.modalSketch.setStyle('z-index', parseInt(this.getStyle('z-index') - 1));
 			this.modalSketch.access().show();
 		}
 	},
-	
+
 	/**
 	 * Change the title of the dialog.
 	 * @param title the new title
 	 */
-	setTitle: function(title) {
+	setTitle : function(title) {
 		this.config.title = title;
 		this.titleBar.getChildren()[0].setText(title);
 	},
-	
+
 	/**
 	 * Get the current title of the dialog.
 	 * @returns {String} the current title
 	 */
-	getTitle: function() {
+	getTitle : function() {
 		return this.titleBar.getChildren()[0].getText();
 	},
-	
+
 	/**
 	 * Get the content pane of the dialog.
 	 * @returns {Sketch} the content pane
 	 */
-	getContentPane: function() {
+	getContentPane : function() {
 		return this.contentPane;
 	},
-	
+
 	/**
 	 * Close the dialog.
 	 */
-	close: function() {
+	close : function() {
 		if (this.modalSketch != undefined)
 			this.modalSketch.selfRemove();
 		this.selfRemove();
 	},
-	
+
 	/**
 	 * Show the dialog.
 	 */
-	show: function() {
+	show : function() {
 		this.access().show();
 	},
-	
+
 	/**
 	 * Hide the dialog.
 	 */
-	hide: function() {
+	hide : function() {
 		this.access().hide();
 	},
-	
-	toHtml: function() {
+
+	toHtml : function() {
 		return "<div></div>";
 	}
 }).implement(DraggableInterface);
 
 AboutApplicationDialog = JOODialog.extend({
-	
-	setupBase: function(config) {
+
+	setupBase : function(config) {
 		this.config.modal = config.modal = false;
 		this._super(config);
 	},
-	
-	setupDomObject: function(config) {
+
+	setupDomObject : function(config) {
 		this._super(config);
-		
+
 		var appinfo = SingletonFactory.getInstance(ApplicationInfo);
 		this.setTitle("About " + appinfo.name);
 		this.setWidth(500);
-		
+
 		var sketch1 = new Sketch();
-		var img = new JOOImage({src: appinfo.logo, width: 100, height: 100});
+		var img = new JOOImage({
+			src : appinfo.logo,
+			width : 100,
+			height : 100
+		});
 		var panel1 = new Panel();
 		panel1.addChild(img);
-		
+
 		var panel2 = new Panel();
-		var header = new JOOLabel({lbl: appinfo.name});
-		var version = new JOOLabel({lbl: "Version " + appinfo.version});
-		var description = new JOOLabel({lbl: appinfo.description});
+		var header = new JOOLabel({
+			lbl : appinfo.name
+		});
+		var version = new JOOLabel({
+			lbl : "Version " + appinfo.version
+		});
+		var description = new JOOLabel({
+			lbl : appinfo.description
+		});
 		var font = new JOOFont();
-		
+
 		font.setFontSize('15px');
 		font.setBold(true);
 		header.applyFont(font);
-		
+
 		font.setFontSize('13px');
 		font.setBold(false);
 		font.setItalic(true);
 		version.applyFont(font);
 		font.setItalic(false);
 		description.applyFont(font);
-		
+
 		panel2.addChild(header);
 		panel2.addChild(version);
 		panel2.addChild(description);
 		panel2.setLayout('vertical');
 		panel2.setWidth(370);
 		panel2.setX(20);
-		
-		var copyright = new JOOLabel({lbl: "Copyright © "+appinfo.copyright+" <a href='"+appinfo.authorsUrl+"' target='_blank'>"+appinfo.authors+"</a>. All Rights Reserved"});
+
+		var copyright = new JOOLabel({
+			lbl : "Copyright © " + appinfo.copyright + " <a href='" + appinfo.authorsUrl + "' target='_blank'>" + appinfo.authors + "</a>. All Rights Reserved"
+		});
 		var panel3 = new Panel();
 		panel3.setWidth(600);
 		panel3.setHeight(50);
 		panel3.setY(20);
 		panel3.addChild(copyright);
-		
+
 		sketch1.addChild(panel1);
 		sketch1.addChild(panel2);
 		sketch1.addChild(panel3);
-		
+
 		this.getContentPane().addChild(sketch1);
 	},
-	
-	close: function() {
+
+	close : function() {
 		if (this.modalSketch != undefined)
 			this.modalSketch.access().hide();
 		this.access().hide();
@@ -1812,47 +1912,56 @@ AboutApplicationDialog = JOODialog.extend({
  * @implements DraggableInterface
  */
 SliderIcon = Sketch.extend({
-	
-	setupBase: function(config) {
+
+	setupBase : function(config) {
 		this._super(config);
 	},
-	
-	setupDomObject: function(config) {
+
+	setupDomObject : function(config) {
 		this._super(config);
 		this.setWidth(18);
 		this.setHeight(18);
-		
-		this.draggable({containment:'parent'});
-		
+
+		this.draggable({
+			containment : 'parent'
+		});
+
 		this.addEventListener("mousedown", function(e) {
 			this.enable = true;
-			$(window).bind("mousemove", {_self: this}, this.mouseMoveHandler);
+			$(window).bind("mousemove", {
+				_self : this
+			}, this.mouseMoveHandler);
 			this.addEventListener("mousemove", this.mouseMoveHandler);
 		});
 		this.addEventListener("mouseup", function(e) {
 			this.mouseUpHandler(e);
 		});
-		
-		$(window).bind("mouseup", {_self: this}, this.mouseUpHandler);
+
+		$(window).bind("mouseup", {
+			_self : this
+		}, this.mouseUpHandler);
 	},
-	
-	dispose: function(skipRemove) {
+
+	dispose : function(skipRemove) {
 		$(window).unbind("mouseup", this.mouseUpHandler);
 		$(window).unbind("mousedown", this.mouseDownHandler);
 		this._super(skipRemove);
 	},
-	
-	mouseUpHandler: function(e) {
+
+	mouseUpHandler : function(e) {
 		var _self = e.data ? e.data._self || this : this;
 		_self.enable = false;
 		$(window).unbind("mousemove", _self.mouseMoveHandler);
 		_self.removeEventListener("mousemove", _self.mouseMoveHandler);
 	},
-	
-	mouseMoveHandler: function(e) {
+
+	mouseMoveHandler : function(e) {
 		var _self = e.data ? e.data._self || this : this;
 		if (_self.enable) {
-			_self.dispatchEvent('slideChanged', {value: _self.getX(), ispos: "pos"});
+			_self.dispatchEvent('slideChanged', {
+				value : _self.getX(),
+				ispos : "pos"
+			});
 		}
 	}
 }).implement(DraggableInterface);
@@ -1864,11 +1973,11 @@ SliderIcon = Sketch.extend({
 JOOSlider = JOOInput.extend(
 /** @lends JOOSlider# */
 {
-	setupBase: function(config)	{
+	setupBase : function(config) {
 		this._super(config);
 	},
-	
-	setupDomObject: function(config) {
+
+	setupDomObject : function(config) {
 		config.width = config.width || 200;
 		config.height = 5;
 		this._super(config);
@@ -1879,51 +1988,51 @@ JOOSlider = JOOInput.extend(
 		this.max = config.max || 100;
 
 		this.addChild(this.sliderIcon);
-		
+
 		this.addEventListener('stageUpdated', function() {
 			this.slideTo(this.value);
 		});
-		
+
 		var _self = this;
 		this.sliderIcon.addEventListener("slideChanged", function(e) {
 			_self.slideTo(e.value, e.ispos);
 		});
-		
+
 		this.sliderIcon.addEventListener("mouseover", function(e) {
 			showtip(new Number(_self.getValue()).toFixed(2));
 		});
-		
+
 		this.sliderIcon.addEventListener("drag", function(e) {
 			showtip(new Number(_self.getValue()).toFixed(2));
 		});
-		
+
 		this.sliderIcon.addEventListener("dragstop", function(e) {
 			hidetip();
 		});
-		
+
 		this.sliderIcon.addEventListener("mouseout", function(e) {
 			hidetip();
 		});
 	},
-	
+
 	/**
 	 * SLide the icon to a specific value.
 	 * @param {String|Number} value the value of the slider.
 	 * @param {Boolean} ispos whether the <code>value</code> is position or absolute value.
 	 */
-	slideTo: function(value, ispos) {
+	slideTo : function(value, ispos) {
 		var posX = undefined;
-		if(ispos){
+		if (ispos) {
 			// position, not value anymore
 			posX = value;
 			value = ((parseFloat(posX)) / (this.getWidth() - 18)) * (this.max - this.min) + this.min;
-			if(value < this.min){
+			if (value < this.min) {
 				value = this.min;
 				posX = 9;
 			}
 		} else {
 			var oldPos = this.sliderIcon.getX();
-			
+
 			if (value < this.min) {
 				value = this.min;
 			}
@@ -1931,20 +2040,20 @@ JOOSlider = JOOInput.extend(
 				value = this.max;
 			}
 			posX = (value - this.min) / (this.max - this.min) * (this.getWidth() - 18);
-			
-			if (oldPos == posX) 
+
+			if (oldPos == posX)
 				return;
 		}
-		
+
 		this.sliderIcon.setX(posX);
-		
+
 		var rate = (value - this.min) / (this.max - this.min);
 		var lWidth = rate * (this.getWidth() - 18);
 		var rWidth = (1 - rate) * (this.getWidth() - 18);
 		this.access().find('.active').css("width", lWidth + "px");
 		this.access().find('.inactive').css("width", rWidth + "px");
 		this.access().find("input").val(value);
-		
+
 		this.dispatchEvent('change');
 	},
 
@@ -1952,19 +2061,19 @@ JOOSlider = JOOInput.extend(
 	 * Change the value of the slider.
 	 * @param {Number} value the new value
 	 */
-	setValue: function(value) {
+	setValue : function(value) {
 		this.slideTo(value);
 	},
-	
+
 	/**
 	 * Get the value of the slider.
 	 * @returns {Number} the value of the slider
 	 */
-	getValue: function()	{
+	getValue : function() {
 		return this.access().find("input").val();
 	},
-	
-	toHtml: function()	{
+
+	toHtml : function() {
 		return "<div><input type='hidden'><div class='joo-slider-bg active'></div><div class='joo-slider-bg inactive'></div></div>";
 	}
 });
@@ -1976,53 +2085,53 @@ JOOSlider = JOOInput.extend(
 JOOColorPicker = JOOInput.extend(
 /** @lends JOOColorPicker# */
 {
-	setupBase: function(config) {
+	setupBase : function(config) {
 		this._super(config);
 	},
-	
-	setupDomObject: function(config) {
+
+	setupDomObject : function(config) {
 		config.width = 18;
 		config.height = 18;
-		
+
 		this._super(config);
-		
-		if(!config.background ) {
+
+		if (!config.background) {
 			config.background = "#FFF";
 		}
-		
+
 		this.shown = false;
 		var _cpicker = this;
-		var c = config.background.substring(1,config.background.length);
+		var c = config.background.substring(1, config.background.length);
 		this.access().ColorPicker({
-			flat: true,
-			onChange: function(){
+			flat : true,
+			onChange : function() {
 				var hex = arguments[1];
 				_cpicker.colorPickerIcon.setStyle("background-color", hex);
 				_cpicker.dispatchEvent('change');
 			},
-			color:c
+			color : c
 		});
 		this.colorPickerIcon = new Sketch(config);
 		var colorPanel = this.access().find(".colorpicker");
 		this.colorPanelId = colorPanel.attr("id");
 		colorPanel.css("left", "22px");
 		colorPanel.css("top", "-2px");
-		
+
 		var _self = this;
 		this.colorPickerIcon.addEventListener("mouseover", function() {
 			showtip(_self.getValue());
 		});
-		
+
 		this.colorPickerIcon.addEventListener("mouseout", function() {
 			hidetip();
 		});
-		
+
 		this.colorPickerIcon.addEventListener("click", function(e) {
-			if(_cpicker.shown) {
-				$("#"+_cpicker.colorPanelId).hide();
+			if (_cpicker.shown) {
+				$("#" + _cpicker.colorPanelId).hide();
 				_cpicker.shown = false;
 			} else {
-				$("#"+_cpicker.colorPanelId).show();
+				$("#" + _cpicker.colorPanelId).show();
 				_cpicker.shown = true;
 			}
 		});
@@ -2030,43 +2139,45 @@ JOOColorPicker = JOOInput.extend(
 		this.colorPickerIcon.access().addClass('joo-colorpicker-icon');
 		this.colorPickerIcon.setStyle("background", config.background);
 	},
-	
+
 	/**
 	 * Change the value of the picker.
 	 * @param {String} value the new value
 	 */
-	setValue: function(value){
+	setValue : function(value) {
 		this.colorPickerIcon.setStyle("background-color", value);
 	},
-	
+
 	/**
 	 * Get the value of the picker.
 	 * @returns {String} the picker's value
 	 */
-	getValue: function(){
+	getValue : function() {
 		return this.colorPickerIcon.getStyle("background-color");
 	},
-	
-	toHtml: function(){
+
+	toHtml : function() {
 		return "<div></div>";
 	}
 });
 ListItem = UIComponent.extend({
-	
-	setupDomObject: function(config) {
+
+	setupDomObject : function(config) {
 		this._super(config);
-		this.label = new JOOLabel({lbl: config.lbl});
+		this.label = new JOOLabel({
+			lbl : config.lbl
+		});
 		if (config.showLabel) {
 			this.addChild(this.label);
 		}
 	},
-	
-	toHtml: function() {
+
+	toHtml : function() {
 		return "<li></li>";
 	}
 });
 UnorderedList = UIComponent.extend({
-	
+
 	setupBase : function(config) {
 		this._super(config);
 		this.data = [];
@@ -2260,4 +2371,4 @@ JOORadioButton = JOOInput.extend({
 	getChecked : function() {
 		return this.access().prop('checked');
 	}
-});
+}); 
