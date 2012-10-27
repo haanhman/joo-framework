@@ -18,8 +18,6 @@ function is_array(input){
    * @returns {Class} new class
    */
   Class.extend = function(prop) {
-	if (typeof updateTracker != 'undefined')
-		updateTracker(1);
     var _super = this.prototype;
    
     // Instantiate a base class (but only create the instance,
@@ -77,8 +75,6 @@ function is_array(input){
       // All construction is actually done in the init method
       if ( !initializing && this.init ) {
         this.init.apply(this, arguments);
-        if (typeof updateTracker != 'undefined')
-    		updateTracker(this.tracker || 5, true);
       }
     }
    
