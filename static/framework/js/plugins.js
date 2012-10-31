@@ -16,7 +16,7 @@ PluginManager = Class.extend(
 		}
 		var subject = SingletonFactory.getInstance(Subject);
 		subject.attachObserver(this);
-		this.plugins = Array();
+		this.plugins = {};
 	},
 	
 	/**
@@ -24,21 +24,30 @@ PluginManager = Class.extend(
 	 * @param {PluginInterface} plugin the plugin to be added
 	 * @param {Boolean} delay whether the plugin should not be loaded after added
 	 */
-	addPlugin: function(plugin, delay)	{
-		if (delay != true)
+	addPlugin: function(plugin, delay, extensionPoints)	{
+		if (delay != true) {
 			plugin.onLoad();
-		this.plugins.push(plugin);
+		}
+		// this.plugins.push(plugin);
+		for(var i=0; i<extensionPoints.length; i++) {
+			if (!this.plugins[extensionPoints[i]]) {
+				this.plugins[extensionPoints[i]] = {};
+			}
+			this.plugins[extensionPoints[i]][plugin.getName()] = plugin;
+		}
 	},
 	
 	/**
 	 * Remove plugin at the specified index
-	 * @param {Number} index the index of the plugin to be removed
+	 * @param {PluginInterface} plugin the plugin to be removed
 	 */
-	removePlugin: function(index)	{
-		var plugin = this.plugins[index];
-		if (plugin != undefined)	{
-			plugin.onUnload();
-			this.plugins.splice(index, 1);
+	removePlugin: function(plugin)	{
+		for(var i in this.plugins) {
+			var plg = this.plugins[i][plugin.getName()];
+			if (plg) {
+				plg.onUnload();
+				this.plugins[i][plugin.getName()] = undefined;
+			}
 		}
 	},
 	
@@ -54,13 +63,13 @@ PluginManager = Class.extend(
 	 * Remove every plugins managed by this manager
 	 */
 	removeAllPlugins: function()	{
-		for(var i=0;i<this.plugins.length;i++)	{
-			var plugin = this.plugins[i];
-			if (plugin.isLoaded())	{
+		for(var i in this.plugins)	{
+			for(var j in this.plugins) {
+				var plugin = this.plugins[i][j];
 				plugin.onUnload();
 			}
 		}
-		this.plugins = Array();
+		this.plugins = {};
 	},
 	
 	/**
@@ -69,8 +78,9 @@ PluginManager = Class.extend(
 	 * @param {Object} eventData the event data
 	 */
 	notify: function(eventName, eventData)	{
-		for(var i=0;i<this.plugins.length;i++)	{
-			var plugin = this.plugins[i];
+		var plugins = this.plugins[eventName];
+		for(var i in plugins)	{
+			var plugin = plugins[i];
 			if (plugin.isLoaded())	{
 				var methodName = "on"+eventName;
 				if (typeof plugin[methodName] != 'undefined')	{
@@ -97,8 +107,8 @@ PluginManager = Class.extend(
 PluginInterface = InterfaceImplementor.extend({
 	implement: function(obj)	{
 
-		obj.prototype.toString = obj.prototype.toString || function() {
-			return this.name;
+		obj.prototype.toString = function() {
+			return this.className;
 		};
 		
 		/**
@@ -156,8 +166,10 @@ PluginInterface = InterfaceImplementor.extend({
 		 * @name onLoad
 		 */
 		obj.prototype.onLoad = obj.prototype.onLoad || function()	{
-			this.loaded = true;
-			this.onBegin();
+			if (!this.loaded) {
+				this.loaded = true;
+				this.onBegin();
+			}
 		};
 		
 		/**
@@ -185,12 +197,11 @@ PluginInterface = InterfaceImplementor.extend({
 		 * @name onUnload
 		 */
 		obj.prototype.onUnload = obj.prototype.onUnload || function()	{
-			this.loaded = false;
-			this.onEnd();
+			if (this.loaded) {
+				this.loaded = false;
+				this.onEnd();
+			}
 		};
-		
-		//super interfaces
-		new ObserverInterface().implement(obj);
 	}
 });
 

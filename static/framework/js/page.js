@@ -237,7 +237,7 @@ Page = Class.extend(
 					var plugin = new window[newPlg.plugin];
 					plugin.setInitParameters(newPlg.params);
 					plugin.keep = true;
-					this.pluginManager.addPlugin(plugin, eval(newPlg.delay));
+					this.pluginManager.addPlugin(plugin, eval(newPlg.delay), newPlg.extensionPoints);
 				}
 			}
 		}
@@ -255,8 +255,9 @@ Page = Class.extend(
 		//removed unused plugins
 		for(var i=0;i<pluginsToRemoved.length;i++)	{
 			var plg = pluginsToRemoved[i];
-			var indexOf = this.pluginManager.getPlugins().indexOf(plg);
-			this.pluginManager.removePlugin(indexOf);
+			// var indexOf = this.pluginManager.getPlugins().indexOf(plg);
+			// this.pluginManager.removePlugin(indexOf);
+			this.pluginManager.removePlugin(plg);
 		}
 		
 		JOOUtils.generateEvent('ReloadPlugin');
