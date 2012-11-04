@@ -21,17 +21,22 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 		
 		obj.prototype.bindModelView = obj.prototype.bindModelView || function(ui, model, path, boundProperty) {
 			var method = ExpressionUtils.getMutatorMethod(ui, boundProperty);
+			if (!method) {
+				throw new Error("No setter defined for property "+boundProperty+" of class "+ui.className);
+			}
 			method.call(ui, ExpressionUtils.express(model, path), {path: path, bindingPath: path});
 			
-			//constraint model to view
-			model.addEventListener('change', function(e) {
-				if (this._currentTarget == ui)
+			var mfn = function(e) {
+				if (this._currentTarget == ui && ui.dead)
 					return;
 				if (path.indexOf(e.path) != -1 || e.path.indexOf(path) != -1) {
 					var _currentTarget = ui._currentTarget;
 					ui._currentTarget = this;
 					if (e.type == 'setter') {
 						var method = ExpressionUtils.getMutatorMethod(ui, boundProperty);
+						if (!method) {
+							throw new Error("No setter defined for property "+boundProperty+" of class "+ui.className);
+						}
 						method.call(ui, ExpressionUtils.express(model, path), {path: e.path, bindingPath: path});
 					} else {
 						var fn = 'partialModelChange' + boundProperty[0].toUpperCase()+boundProperty.substr(1);
@@ -44,7 +49,13 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 					}
 					ui._currentTarget = _currentTarget;
 				}
+			};
+			ui.addEventListener('dispose', function() {
+				model.removeEventListener('change', mfn);
 			});
+			
+			//constraint model to view
+			model.addEventListener('change', mfn);
 			
 			//constraint view to model
 			ui.addEventListener('change', function(e) {
@@ -53,6 +64,9 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 				var _currentTarget = model._currentTarget;
 				model._currentTarget = this;
 				var method = ExpressionUtils.getAccessorMethod(ui, boundProperty);
+				if (!method) {
+					throw new Error("No getter defined for property "+boundProperty+" of class "+ui.className);
+				}
 				var val = method.call(ui);
 				ExpressionUtils.expressSetter(model, path, val);
 				model._currentTarget = _currentTarget;
