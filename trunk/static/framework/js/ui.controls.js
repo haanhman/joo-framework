@@ -203,12 +203,20 @@ JOOLink = UIComponent.extend({
 	setupDomObject : function(config) {
 		this._super(config);
 		if (config.href)
-			this.setAttribute('href', config.href);
+			this.setHref(config.href);
 		if (config.lbl)
-			this.access().html(config.lbl);
+			this.setLbl(config.lbl);
 	},
-
-	toHtml : function() {
+	
+	setLbl: function(lbl) {
+		this.access().html(lbl);
+	},
+	
+	setHref: function(href) {
+		this.setAttribute('href', href);
+	},
+	
+	toHtml: function() {
 		return "<a></a>";
 	}
 });
