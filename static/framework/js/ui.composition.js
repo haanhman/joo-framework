@@ -21,9 +21,8 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 		
 		obj.prototype.bindModelView = obj.prototype.bindModelView || function(ui, model, path, boundProperty) {
 			var method = ExpressionUtils.getMutatorMethod(ui, boundProperty);
-			if (!method) {
-				throw new Error("No setter defined for property "+boundProperty+" of class "+ui.className);
-			}
+			if (!method)
+				throw new Error("No setter for property "+boundProperty+" of "+ui.className);
 			method.call(ui, ExpressionUtils.express(model, path), {path: path, bindingPath: path});
 			
 			var mfn = function(e) {
