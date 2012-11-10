@@ -108,7 +108,7 @@ function printStackTrace(e) {
 //	    	}
 	    }
 	    //Remove call to printStackTrace()
-	    callstack.shift();
+	    // callstack.shift();
 	    isCallstackPopulated = true;
 	} else if (window.opera && e.message) { //Opera
 		var lines = e.message.split('\n');

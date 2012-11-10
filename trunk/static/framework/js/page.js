@@ -251,7 +251,6 @@ Page = Class.extend(
 				pluginsToRemoved.push(oldPlg);
 			}
 		}
-		
 		//removed unused plugins
 		for(var i=0;i<pluginsToRemoved.length;i++)	{
 			var plg = pluginsToRemoved[i];
