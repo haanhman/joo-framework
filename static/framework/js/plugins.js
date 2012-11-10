@@ -29,6 +29,9 @@ PluginManager = Class.extend(
 			plugin.onLoad();
 		}
 		// this.plugins.push(plugin);
+		if (!extensionPoints || !extensionPoints.length) {
+			extensionPoints = ['__inactive_plugins__'];
+		}
 		for(var i=0; i<extensionPoints.length; i++) {
 			if (!this.plugins[extensionPoints[i]]) {
 				this.plugins[extensionPoints[i]] = {};
@@ -56,7 +59,15 @@ PluginManager = Class.extend(
 	 * @returns {Array} the current maintained plugins
 	 */
 	getPlugins: function()	{
-		return this.plugins;
+		var plugins = [];
+		for(var i in this.plugins) {
+			for(var j in this.plugins) {
+				var plg = this.plugins[i][j];
+				if (plugins.indexOf(plg) == -1)
+					plugins.push(plg);
+			}
+		}
+		return plugins;
 	},
 	
 	/**
@@ -64,7 +75,7 @@ PluginManager = Class.extend(
 	 */
 	removeAllPlugins: function()	{
 		for(var i in this.plugins)	{
-			for(var j in this.plugins) {
+			for(var j in this.plugins[i]) {
 				var plugin = this.plugins[i][j];
 				plugin.onUnload();
 			}
