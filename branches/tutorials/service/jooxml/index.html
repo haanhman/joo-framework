@@ -1,0 +1,62 @@
+<html>
+	<head>
+		<title>Services bindings with JOOXML support</title>
+		
+		<link rel="stylesheet" type="text/css" href="framework/joo-2.0.3.min.css" />
+	</head>
+	
+	<body>
+		<div id="Application-Main"></div>
+		
+		<script type="text/html" id="MyStageView">
+			<joo:composition>
+				<joo:Sketch service-endpoint="http://joolist.com/demo/cat/service/search/google-img"
+					 handler:servicefailure="this.serviceFailure(arguments[0])"
+					 handler:servicesuccess="this.serviceSuccess(arguments[0])">
+			    		<joo:JOOTextInput name="query" varName="input" value="meo" />
+			    		<joo:JOOButton service-submit="1" lbl="Submit" />
+		    	</joo:Sketch>
+		    	<joo:Sketch varName="images">
+		    	</joo:Sketch>
+		    </joo:composition>
+		</script>
+		
+		<script type="text/javascript" src="framework/joo-2.0.3r43.js"></script>
+		<script type="text/javascript" src="ServiceCapabilityPlugin.js"></script>
+		
+		<script>
+			SingletonFactory.getInstance(PluginManager).addPlugin(new ServiceCapabilityPlugin());
+			//create subclass of Stage
+			var MyStage = Stage.extend({
+				serviceSuccess: function(ret) {
+					this.images.removeAllChildren();
+					for(var i=0; i<ret.length; i++) {
+						this.images.addChild(new JOOImage({
+							src: ret[i]
+						}));
+					}
+				},
+				
+				serviceFailure: function(msg) {
+					alert(msg);
+				},
+				
+			    setupDomObject: function(config) {
+			        this._super(config);
+			        
+			        //render the JOOXML
+			        this.renderUIComposition();
+			    }
+			}).implement(CompositionRenderInterface);
+		</script>
+		
+		<script type="text/javascript" src="framework/class-name-injection.js"></script>
+			
+		<script type="text/javascript">
+			//instantiate the stage
+			var stage = new MyStage({
+			    id: 'Application-Main'
+			});
+		</script>
+	</body>
+</html>
