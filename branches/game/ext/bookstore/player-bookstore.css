@@ -1,0 +1,152 @@
+.joo-playerbookstore {
+    background-image: url(../bookstore/bg.jpg);
+    background-repeat: no-repeat;
+    width: 1028px;
+    
+    height: 768px;
+    position: absolute;
+    top: 0;	
+}
+.fairy-Store{
+    background-image: url(../bookstore/fairy.png);
+    background-repeat: no-repeat;
+    position: absolute;
+    width: 142px;
+    height: 168px;
+    top: 6px;
+    left: 718px;
+}
+.close-store {
+    position: absolute;
+    float: right;
+    right: 9px;
+    top: 4px;
+}
+.process-label {
+   font-size: 18px;
+    font-weight: bold;
+    position: absolute;
+    top: 372px;
+    left: 499px;
+}
+.process-image {
+    height: 74px;
+    -webkit-animation: process-image-eff;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-duration: 1.42s; /* Safari and Chrome */
+}
+
+@-webkit-keyframes process-image-eff {
+    from { -webkit-transform: rotate(0deg);}
+    to { -webkit-transform: rotate(360deg); }
+}
+.process-sketch {
+    position: absolute;
+    width: 1024px;
+    height: 768px;
+    top:0px; left: 0px;
+    background-color: rgba(15, 14, 14, 0.24);
+}
+.content-store {
+    width: 100%;
+}
+.notify-drag{
+    top: 182px;
+    left: 320px;
+}
+.shelf-top {
+    margin-top: 15px;
+    background-image: url(../bookstore/floor1.png);
+}
+.shelf-all {
+    width: 100%;
+    background-image: url(../bookstore/floor2.png);
+    background-size: 100%;
+}
+.shelf-all, .shelf-top {
+
+    height: 258px;
+    background-repeat: no-repeat;
+    background-position: bottom;
+
+
+}
+.book-top {
+
+}
+.book-normal {
+
+}
+.book-top, .book-normal {
+    position: absolute;
+    width: 174px;
+    height: 156px;
+    top: 16px;
+    z-index: -1;
+    left: 25px;
+}
+.book-cover-top, .book-cover-normal {
+    position: absolute;
+    width: 248px;
+    height: 192px;
+    z-index: 1;
+    background-repeat: no-repeat;
+    background-position-x: -16px;
+    background-position-y: 4px;
+}
+.book-cover-top, .book-top {
+    margin-left: 408px;
+    margin-top: 32px;
+}
+.book-cover-normal, .book-normal {
+    margin-top: 30px;
+}
+
+.book-getit {
+    background-image: url(../bookstore/published.png);   
+}
+.book-reading {
+    background-image: url(../bookstore/reading.png);
+}
+.book-comingsoon {
+    background-image: url(../bookstore/comingsoon.png);
+}
+
+.show-book-animation{
+    -webkit-animation: show-book-animation 1s 1 linear;
+}
+@-webkit-keyframes show-book-animation {
+    from { -webkit-transform: translate3d(-1024px, 0, 0)}
+    to { -webkit-transform: translate3d(0, 0, 0) }
+}
+.hide-book-animation{
+   -webkit-transition: 1500ms linear;
+   -webkit-transform: scale(0.23) translate(2px); opacity:0;
+}
+.hide-first-book-animation{
+    -webkit-transition: 1700ms linear;
+   -webkit-transform: translate3d(-1024px,0px,0px);
+}
+.book-effect{
+    -webkit-animation: bookeffect 1.246s 1 linear;
+    -webkit-transform-origin: 50% 98%;
+}
+@-webkit-keyframes bookeffect {
+    0% { -webkit-transform:  scale(1, 1); }
+    50% { -webkit-transform:  scale(0.8, 0.8);}
+    100% { -webkit-transform:  scale(1, 1);}
+}
+.fairy-effect{
+    -webkit-animation: fairy-effect;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-duration: 2.42s; /* Safari and Chrome */
+}
+@-webkit-keyframes fairy-effect {
+    0% { -webkit-transform:  translate3d(0px,0px,0px);}
+    50% { -webkit-transform:  translate3d(0px,27px,0px);}
+    100% { -webkit-transform:  translate3d(0px,0px,0px);}
+}
+
+ 
