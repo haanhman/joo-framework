@@ -1991,9 +1991,9 @@ JOOSlider = JOOInput.extend(
 		this._super(config);
 
 		this.sliderIcon = new SliderIcon();
-		this.value = config.value || 0;
-		this.min = config.min || 0;
-		this.max = config.max || 100;
+		this.value = (config.value || 0)/1;
+		this.min = (config.min || 0)/1;
+		this.max = (config.max || 100)/1;
 
 		this.addChild(this.sliderIcon);
 

@@ -300,26 +300,30 @@ DisplayObject = EventDispatcher.extend(
 		this._super(event, namespace, handler);
 	},
 	
-	dispatchEvent: function(event, eventData) {
+	dispatchEvent: function(event, eventData, target) {
 	    if (!InteractionControlHelper.getInteractionAbility(event))
 	        return;
-		if (!eventData) eventData = {};
-		if (typeof eventData['stopPropagation'] == 'undefined') {
-			eventData.stopPropagation = function() {
+	    if (!target)
+	    	target = this;
+	    var e = {
+	    	stopPropagation: function() {
 				this.isBubbleStop = true;
-			};
-			eventData.isPropagationStopped = function() {
+			},
+			isPropagationStopped: function() {
 				return this.isBubbleStop;
-			};
-		}
+			},
+			target: target,
+			currentTarget: this,
+			data: eventData
+	    }
 		var eventType = event.split('.')[0];
 		
 		var skipped = ['stageUpdated'];	//stageUpdated is internal event and should not be propagated
-		var result = this._super.apply(this, arguments);
+		var result = this._super.apply(this, [event, e]);
 		if (result) {
-			if (this._parent && !eventData.isPropagationStopped() 
+			if (this._parent && !e.isPropagationStopped() 
 					&& skipped.indexOf(eventType) == -1) {
-				this._parent.dispatchEvent.apply(this._parent, arguments);
+				this._parent.dispatchEvent.apply(this._parent, arguments, target);
 			}
 		}
 	},
