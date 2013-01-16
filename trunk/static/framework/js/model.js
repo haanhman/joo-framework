@@ -20,6 +20,8 @@ JOOService = EventDispatcher.extend({
 				_self.dispatchEvent('failure', msg);
 				JOOUtils.generateEvent('ServiceFailure', this.name, msg);
 			}
+		}, {
+			handler: this.handler
 		});
 	},
 	

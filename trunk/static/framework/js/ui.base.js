@@ -305,7 +305,10 @@ DisplayObject = EventDispatcher.extend(
 	        return;
 	    if (!target)
 	    	target = this;
+	    if (eventData && eventData.signature == '__joo_event__')
+	    	eventData = eventData.data;
 	    var e = {
+	    	signature: '__joo_event__',
 	    	stopPropagation: function() {
 				this.isBubbleStop = true;
 			},
@@ -953,6 +956,27 @@ DisplayObjectContainer = DisplayObject.extend(
 	addChildBeforePosition: function(obj, positionObj)	{
 		this._prepareAddChild(obj);
 		obj.access().insertBefore(positionObj);
+		obj.updateStage(this.stage);
+	},
+	
+	addChildAt: function(obj, index) {
+		if (index < 0) {
+			throw "Negative index is not supported";
+		}
+		if (!this.children.length) return;
+		if (index > this.children.length) {
+			throw "Invalid children position: "+index;
+		}
+		if (obj._parent != undefined)
+			obj._parent.detachChild(obj);
+		obj._parent = this;
+		this.children.splice(index, 0, obj);
+		if (index == 0) {
+			obj.access().insertBefore(this.children[index+1].access());
+		} else {
+			obj.access().insertAfter(this.children[index-1].access());
+		}
+		
 		obj.updateStage(this.stage);
 	},
 	
