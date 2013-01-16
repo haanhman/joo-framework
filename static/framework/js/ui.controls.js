@@ -291,6 +291,15 @@ JOOInput = UIComponent.extend(
 			this.setRequired(config.required);
 		if (config.type)
 			this.setType(config.type);
+		if (config.readonly)
+			this.setReadOnly(true);
+	},
+	
+	setReadOnly: function(readonly) {
+		if (readonly)
+			this.setAttribute('readonly', 'readonly');
+		else
+			this.removeAttribute('readonly');
 	},
 
 	setType : function(type) {

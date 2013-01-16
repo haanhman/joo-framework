@@ -20,6 +20,7 @@ AjaxInterface = InterfaceImplementor.extend({
 				var v = params[k];
 				memcacheKey += '.'+k+'.'+v;
 			}
+			var handler = options.handler || AjaxHandler;
 
 			//var root = SingletonFactory.getInstance(Application).getSystemProperties().get('host.root');
 			//var url = root+'/'+controller+'/'+action;
@@ -33,7 +34,7 @@ AjaxInterface = InterfaceImplementor.extend({
 					if ((now.getTime() - cacheTimestamp) < options.cacheTime)	{
 						var subject = SingletonFactory.getInstance(Subject);
 						subject.notifyEvent('AjaxQueryFetched', {result: value.ret, url: url});
-						AjaxHandler.handleResponse(value.ret, success, fail, url);
+						handler.handleResponse(value.ret, success, fail, url);
 						return;
 					} else {
 						memcache.clear(memcacheKey);
@@ -70,7 +71,7 @@ AjaxInterface = InterfaceImplementor.extend({
 							memcache.store(memcacheKey, {'ret': ret, 'timestamp': now.getTime()});
 						}
 						subject.notifyEvent('AjaxQueryFetched', {result: ret, url: url});
-						AjaxHandler.handleResponse(ret, success, fail, url);
+						handler.handleResponse(ret, success, fail, url);
 					}
 				},
 				error: function(ret, statusText, errorCode)	{

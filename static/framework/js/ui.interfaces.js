@@ -138,7 +138,7 @@ DraggableInterface = InterfaceImplementor.extend({
 		obj.prototype.stopDrag = obj.prototype.stopDrag || function(){
 			this.access().draggable("disable");
 		};
-	},
+	}
 });
 
 DraggableWrapper = {
