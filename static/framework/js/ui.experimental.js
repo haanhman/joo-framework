@@ -371,10 +371,6 @@ JOOSpriteAnimation = UIComponent.extend({
 	setupDomObject: function(config) {
 		this._super(config);
 		this.addChild(this.sprite);
-		var _self = this;
-		setTimeout(function(){
-			_self.sprite.play(config.startFrame, config.endFrame);
-		}, 300);
 	},
 	
 	toHtml: function() {
