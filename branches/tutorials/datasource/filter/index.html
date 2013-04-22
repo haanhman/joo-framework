@@ -1,0 +1,91 @@
+<html>
+	<head>
+		<title>Filtering with Datasource plugin</title>
+		
+		<link rel="stylesheet" type="text/css" href="framework/joo-2.0.3.min.css" />
+	</head>
+	
+	<body>
+		<div id="Application-Main"></div>
+		
+		<script type="text/html" id="MyStageView">
+			<joo:composition>
+				<b>List of programming languages</b>
+				<br />
+				<joo:JOOTextInput handler:keyup="this.inputChange()" varName="input"
+					width=300 placeholder="Filter languages based on name" />
+				<joo:Sketch varName="listUI" 
+					datasource-filter="value,label"
+					datasource-input="model"
+					datasource-object="MyDataSource"
+					datasource-item="MyItem">
+		    	</joo:Sketch>
+		    </joo:composition>
+		</script>
+		
+		<script type="text/html" id="MyItemView">
+			<joo:composition>
+				<joo:Sketch>
+					<%=label%>
+		    	</joo:Sketch>
+		    </joo:composition>
+		</script>
+		
+		<script type="text/javascript" src="framework/joo-2.0.3r43.js"></script>
+		<script type="text/javascript" src="DataSourceCapabilityPlugin.js"></script>
+		
+		<script type="text/javascript">
+			//load the plug-in manually (not required with full JOO application)
+			SingletonFactory.getInstance(PluginManager).addPlugin(new DataSourceCapabilityPlugin());
+			
+			//initialize the data-source object
+			MyDataSource = Class.extend({
+				getData: function() {
+					return [
+						{value: 'CSS', label: 'CSS'},
+						{value: 'CPP', label: 'C++'},
+						{value: 'HTML', label: 'Hypertext Transfer Markup Language'},
+						{value: 'JS', label: 'Javascript'},
+						{value: 'PHP', label: 'PHP'},
+						{value: 'Shell', label: 'Shell script'}
+					];
+				}
+			});
+			
+			//create a view class for each data-source row
+			MyItem = Sketch.extend({
+				
+				setupDomObject: function(config) {
+					this._super(config);
+					this.renderUIComposition();
+				}
+			}).implement(CompositionRenderInterface);
+			
+			//create subclass of Stage
+			var MyStage = Stage.extend({
+				
+				inputChange: function() {
+					this.listUI.dispatchEvent('filter', {
+						text: this.input.getValue()
+					});
+				},
+				
+			    setupDomObject: function(config) {
+			        this._super(config);
+			        
+			        //render the JOOXML
+			        this.renderUIComposition();
+			    }
+			}).implement(CompositionRenderInterface);
+		</script>
+		
+		<script type="text/javascript" src="framework/class-name-injection.js"></script>
+			
+		<script type="text/javascript">
+			//instantiate the stage
+			var stage = new MyStage({
+			    id: 'Application-Main'
+			});
+		</script>
+	</body>
+</html>
