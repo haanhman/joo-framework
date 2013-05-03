@@ -71,7 +71,7 @@ input.joo-ui, textarea.joo-ui, [contentEditable=true].joo-ui {
 	border-top: 1px solid silver;
 }
 
-.joo-jooinput:hover, .joo-jooinput:focus {
+.joo-jootextinput:hover, .joo-jootextinput:focus, .joo-jootextarea:hover, .joo-jootextarea:focus {
 	-webkit-box-shadow: inset inset 0 1px 2px rgba(0,0,0,0.3);
 	-moz-box-shadow: inset inset 0 1px 2px rgba(0,0,0,0.3);
 	box-shadow: inset inset 0 1px 2px rgba(0,0,0,0.3);
@@ -311,21 +311,17 @@ input.joo-ui, textarea.joo-ui, [contentEditable=true].joo-ui {
 }
 
 .joo-joomenubar {
-	width: 100%;
-	height: 30px;
 	background: url(../images/menu_bg.png);
 	cursor: default;
 }
 
 .joo-joomenu {
 	background: none;
-	color: black;
 }
 
 .joo-joomenu .joo-menu-label {
 	padding: 4px 16px;
 	display: inline-block;
-	color: black;
 }
 
 .joo-menu-label span {

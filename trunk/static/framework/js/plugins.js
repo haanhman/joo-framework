@@ -61,7 +61,7 @@ PluginManager = Class.extend(
 	getPlugins: function()	{
 		var plugins = [];
 		for(var i in this.plugins) {
-			for(var j in this.plugins) {
+			for(var j in this.plugins[i]) {
 				var plg = this.plugins[i][j];
 				if (plugins.indexOf(plg) == -1)
 					plugins.push(plg);

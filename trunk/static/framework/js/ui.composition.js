@@ -79,6 +79,8 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 		var children = Array();
 		var config = {};
 		var tagName = undefined;
+		if (composition.nodeType == 8)
+			return undefined;
 		if (composition.nodeType == 3) {	//text node
 			currentObject = new DisplayObject({domObject: $composition});
 			tagName = "text";
@@ -95,6 +97,8 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 		var isAddTab = false;
 		var isAddItem = false;
 		var tabTitle = undefined;
+		var lateValue = false;
+		var lateValueEvent = undefined;
 		
 		var ns = 'joo.ui.composition';
 		if (config['config-id']) {
@@ -133,6 +137,12 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 				config[i] = function() {
 					fn.apply(root, arguments);
 				};
+			} else if (i == "value-binding-event") {
+				lateValue = config.value;
+				if (config[i] != "late") {
+					lateValue = config.value;
+					lateValueEvent = config[i];
+				}
 			}
 		}
 		
@@ -217,8 +227,15 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 			root[varName] = currentObject;
 		}
 		
+		if (lateValueEvent) {
+			currentObject.addEventListener(lateValueEvent, function(ret) {
+				currentObject.setValue(lateValue);
+			});
+		}
+		
 		for(var i=0; i<children.length; i++) {
 			var child = this.processElement(root, currentObject, children[i], model);
+			if (!child) continue;
 			if (isAddTab) {
 				currentObject.addTab(tabTitle, child);
 			} else if (isAddItem) {
@@ -228,6 +245,10 @@ CompositionRenderInterface = InterfaceImplementor.extend({
 				if (currentObject != child)
 					currentObject.addChild(child);
 			}
+		}
+		
+		if (!lateValueEvent && lateValue) {
+			currentObject.setValue(lateValue);
 		}
 		return currentObject;
 	}

@@ -102,7 +102,7 @@ AjaxInterface = InterfaceImplementor.extend({
 			for(var i in options) {
 				_options[i] = options[i];
 			}
-			$.ajax(_options);
+			this.currentXhrRequest = $.ajax(_options);
 		};
 	}
 });

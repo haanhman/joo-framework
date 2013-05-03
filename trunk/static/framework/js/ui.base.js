@@ -305,19 +305,21 @@ DisplayObject = EventDispatcher.extend(
 	        return;
 	    if (!target)
 	    	target = this;
-	    if (eventData && eventData.signature == '__joo_event__')
-	    	eventData = eventData.data;
-	    var e = {
-	    	signature: '__joo_event__',
-	    	stopPropagation: function() {
-				this.isBubbleStop = true;
-			},
-			isPropagationStopped: function() {
-				return this.isBubbleStop;
-			},
-			target: target,
-			currentTarget: this,
-			data: eventData
+	    var e = eventData || {};
+	    
+	    if (!e.stopPropagation) {
+	    	e = {
+		    	signature: '__joo_event__',
+		    	stopPropagation: function() {
+					this.isBubbleStop = true;
+				},
+				isPropagationStopped: function() {
+					return this.isBubbleStop;
+				},
+				target: target,
+				currentTarget: this,
+				data: eventData
+		    }
 	    }
 		var eventType = event.split('.')[0];
 		
