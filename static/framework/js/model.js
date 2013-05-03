@@ -13,12 +13,12 @@ JOOService = EventDispatcher.extend({
 			onSuccess: function(ret) {
 				ret = _self.parse(ret);
 				_self.dispatchEvent('success', ret);
-				JOOUtils.generateEvent('ServiceSuccess', this.name, ret);
+				JOOUtils.generateEvent('ServiceSuccess', {name: this.name, ret: ret});
 			},
 			onFailure: function(msg) {
 				msg = _self.parseError(msg);
 				_self.dispatchEvent('failure', msg);
-				JOOUtils.generateEvent('ServiceFailure', this.name, msg);
+				JOOUtils.generateEvent('ServiceFailure', {name: this.name, msg: msg});
 			}
 		}, {
 			handler: this.handler
@@ -35,6 +35,12 @@ JOOService = EventDispatcher.extend({
 	
 	getEndPoint: function() {
 		return this.endpoint;
+	},
+	
+	cancel: function() {
+		if (this.currentXhrRequest) {
+			this.currentXhrRequest.abort();
+		}
 	}
 }).implement(AjaxInterface);
 
