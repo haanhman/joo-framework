@@ -1,0 +1,1 @@
+JOO is a javascript framework, by which programmer can make a website like a traditional application. JOO is a platform for rich client application.
